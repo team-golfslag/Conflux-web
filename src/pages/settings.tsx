@@ -12,7 +12,7 @@ This is the main entrypoint into the settings page.
 It is currently empty.
 */
 
-function settingsPagina() 
+function SettingsPagina() 
 {
     return (
     <>
@@ -22,4 +22,4 @@ function settingsPagina()
     )
 }
 
-export default settingsPagina
+export default SettingsPagina
