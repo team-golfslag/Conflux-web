@@ -7,8 +7,8 @@
 
 import { Routes, Route } from "react-router";
 import App from "./pages/App.tsx";
-import ProjectPagina from "./pages/projectPagina.tsx";
-import SettingsPagina from "./pages/settings.tsx";
+import ProjectPage from "./pages/projectPage.tsx";
+import SettingsPage from "./pages/settingsPage.tsx";
 
 /*
  this contains all of the different routes to the different pages. 
@@ -18,8 +18,8 @@ import SettingsPagina from "./pages/settings.tsx";
 const allRoutes = 
 <Routes>
   <Route index element={<App/>} /> 
-  <Route path="/projectPagina" element={<ProjectPagina/>}/>
-  <Route path="/settings" element={<SettingsPagina/>}/>
+  <Route path="/projectsPage" element={<ProjectPage/>}/>
+  <Route path="/settingsPage" element={<SettingsPage/>}/>
 </Routes>
 
 export default allRoutes 

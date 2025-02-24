@@ -13,7 +13,7 @@ this is the main entry point into the projects page.
 It is currently empty.
 */
 
-function ProjectPagina() 
+function ProjectPage() 
 {
     return (
     <>
@@ -23,4 +23,4 @@ function ProjectPagina()
     )
 }
 
-export default ProjectPagina
+export default ProjectPage
