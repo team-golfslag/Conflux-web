@@ -1,10 +1,28 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+/*
+  This program has been developed by students from the bachelor Computer Science at Utrecht
+  University within the Software Project course.
 
-createRoot(document.getElementById('root')!).render(
+  © Copyright Utrecht University (Department of Information and Computing Sciences)
+*/
+
+
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter} from "react-router";
+import allRoutes from './routes';
+
+/*
+This is the main entry point into the program
+*/
+
+const root = document.getElementById("root");
+
+createRoot(root!).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
-)
+    <BrowserRouter>
+        {allRoutes}
+    </BrowserRouter>
+  </StrictMode>
+);
+
+
