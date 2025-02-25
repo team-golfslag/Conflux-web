@@ -26,7 +26,7 @@ function App() {
           count is {count}
         </button>
       </div>
-      <Link to="/projectPagina" >Go to projectPagina </Link>
+      <Link to="/projectPage" >Go to projectPage </Link>
       <hr/>
       <Link to="/settings" >Go to settings </Link>
     </>
