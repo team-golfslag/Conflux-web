@@ -8,7 +8,6 @@
 
 import { useState } from 'react'
 import { Link } from 'react-router'
-import './App.css'
 
 /*
 This is a (temporary) file which serves as that which is seen at home. It has links to the other pages.
@@ -29,6 +28,8 @@ function App() {
       <Link to="/projectPage" >Go to projectPage </Link>
       <hr/>
       <Link to="/settings" >Go to settings </Link>
+      <hr/>
+      <Link to="/user" >Go to userPage </Link>
     </>
   )
 }
