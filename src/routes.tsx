@@ -7,7 +7,7 @@
 
 import { Routes, Route } from "react-router";
 import App from "./pages/App.tsx";
-import ProjectPage from "./pages/projectPage.tsx";
+import ProjectsPage from "./pages/projectsPage.tsx";
 import SettingsPage from "./pages/settingsPage.tsx";
 
 /*
@@ -18,7 +18,7 @@ import SettingsPage from "./pages/settingsPage.tsx";
 const allRoutes = 
 <Routes>
   <Route index element={<App/>} /> 
-  <Route path="/projectsPage" element={<ProjectPage/>}/>
+  <Route path="/projectsPage" element={<ProjectsPage/>}/>
   <Route path="/settings" element={<SettingsPage/>}/>
 </Routes>
 
