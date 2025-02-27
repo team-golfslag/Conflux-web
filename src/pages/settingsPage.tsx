@@ -8,7 +8,7 @@
 import { Link } from "react-router"
 
 /*
-This is the main entrypoint into the settings page.
+This is the main entry point into the settings page.
 It is currently empty.
 */
 

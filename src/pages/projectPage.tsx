@@ -19,8 +19,41 @@ function ProjectPage()
     <>
         <h1>Please create the project page here!</h1>
         <Link to = "/"> go to home </Link>
+        <Members members={members}/>
+        <Sponsors sponsors={sponsors}/>
     </>
     )
 }
+
+function Members(props:any){
+  return(<>
+    <div>
+      {props.members.map((name:string)=> <Member name={name}/>)}
+    </div>
+  </>)
+}
+const members = ["hans flippy", "","ha\nha\nha" , "piet", "memebr METEENHEELERGLANGENAAMWAT IRRITANTISVOORFORMATTING", "geertje", "robje jetten"]
+
+function Member(props:any){
+  return(<>
+    {props.name}
+  </>)
+}
+
+function Sponsors(props:any){
+  return(<>
+    <div>
+      {props.sponsors.map((name:string)=> <Sponsor name={name}/>)}
+    </div>
+  </>)
+}
+const sponsors = ["", "robje jetten"]
+
+function Sponsor(props:any){
+  return(<>
+    {props.name}
+  </>)
+}
+
 
 export default ProjectPage
