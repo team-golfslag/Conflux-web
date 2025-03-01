@@ -16,8 +16,9 @@ function SettingsPage()
 {
     return (
     <>
-        <h1>Please create the settings page here!</h1>
-        <Link to = "/"> go to home </Link>
+        
+        <h1 className="text-red-500 dark:text-blue-500">Please create the settings page here!</h1>
+        <Link to = "/" className="dark:text-red-800"> go to home </Link>
     </>
     )
 }
