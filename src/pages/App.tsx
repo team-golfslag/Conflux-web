@@ -9,6 +9,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import './App.css'
+//import {useQuery} from "@tanstack/react-query"
 
 /*
 This is a (temporary) file which serves as that which is seen at home. It has links to the other pages.
