@@ -1,30 +1,45 @@
+import Logo from "./Logo"
 
-const pages = ["menu", "about", "projects"]
+const pages = [{link:"", iconPath:"", displayText:"Home"}, 
+    {link:"", iconPath:"", displayText:"About"},
+    {link:"", iconPath:"", displayText:"Projects"}
+    ]
 
 
 function Header() {
     return (
         <>
             <div>
+                {<Logo size="5em"/>}
+                <h1>Conflux</h1>
+            </div>
+            <div>
                 Wow een navbar
                 <Navbar pages={pages}/>
             </div>
+                
         </>
     )
 }
 
 
-function Navbar(props:any){
+type navbarItem = {
+    link:string,
+    iconPath:string,
+    displayText:string
+}
+
+function Navbar( {pages} : {pages : [navbarItem]}){
     return (
-        <div className="h-auto w-screen bg-blue-800 ">
-            {props.pages.map((name:any)=> <NavbarItem name={name}/>)}
+        <div className="h-auto w-screen bg-blue-800 content-center p-2">
+            {pages.map((item:navbarItem)=> <NavbarItem item={item}/>)}
         </div>
     )
 }
 
-function NavbarItem(props:any){
+function NavbarItem({item}:{item:navbarItem}){
     return (
-        <label className="rounded h-12 m-2 text-xl bg-blue-500 hover:bg-blue-400">{props.name} </label>
+        <label className="rounded m-5 p-1 text-xl bg-blue-500 hover:bg-blue-400">{item.displayText} </label>
     )
 }
 
