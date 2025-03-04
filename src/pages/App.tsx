@@ -6,8 +6,8 @@
 */
 
 
-import { useState } from 'react'
-import { Link } from 'react-router'
+import {useState} from 'react'
+import {Link} from 'react-router'
 import Header from '../pageComponents/Header'
 
 /*
@@ -16,22 +16,24 @@ This is a (temporary) file which serves as that which is seen at home. It has li
 */
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <Header/>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
-      <Link to="/projectsPage" >Go to projectsPage </Link>
-      <hr/>
-      <Link to="/settings" >Go to settings </Link>
-    </>
-  )
+    return (
+        <>
+            <div className="h-screen flex flex-col items-center">
+                <Header/>
+                <h1>Vite + React</h1>
+                <div className="card">
+                    <button onClick={() => setCount((count) => count + 1)}>
+                        count is {count}
+                    </button>
+                </div>
+                <Link to="/projectsPage">Go to projectsPage </Link>
+                <hr/>
+                <Link to="/settings">Go to settings </Link>
+            </div>
+        </>
+    )
 }
 
 export default App
