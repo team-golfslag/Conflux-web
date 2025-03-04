@@ -20,11 +20,11 @@ function App() {
 
     return (
         <>
-            <div className="h-screen flex flex-col items-center">
+            <div className="h-screen flex flex-col items-center bg-primary text-primary-text">
                 <Header currentPage={"/"}/>
-                <h1>Vite + React</h1>
-                <div className="card">
-                    <button onClick={() => setCount((count) => count + 1)}>
+                <h1 className="text-5xl">Vite + React</h1>
+                <div className="card m-5">
+                    <button className="border-1 p-3 hover:bg-blue-900" onClick={() => setCount((count) => count + 1)}>
                         count is {count}
                     </button>
                 </div>

@@ -24,7 +24,7 @@ function Header(props: headerProps) {
             <div className="bg-blue-950 flex flex-col items-center justify-self-start">
                 <div className="flex items-center justify-center">
                     {<Logo size="5em"/>}
-                    <h1>Conflux</h1>
+                    <h1 className="text-5xl ">Conflux</h1>
                 </div>
                 <div className="">
                     <Navbar pages={pages} currentPage={props.currentPage}/>
