@@ -21,7 +21,7 @@ function App() {
     return (
         <>
             <div className="h-screen flex flex-col items-center">
-                <Header/>
+                <Header currentPage={"/"}/>
                 <h1>Vite + React</h1>
                 <div className="card">
                     <button onClick={() => setCount((count) => count + 1)}>
