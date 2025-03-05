@@ -7,8 +7,6 @@
 
 
 import {useState} from 'react'
-import {Link} from 'react-router'
-import Header from '../pageComponents/Header'
 
 /*
 This is a (temporary) file which serves as that which is seen at home. It has links to the other pages.
@@ -21,16 +19,12 @@ function App() {
     return (
         <>
             <div className="h-screen flex flex-col items-center bg-primary text-primary-text">
-                <Header currentPage={"/"}/>
                 <h1 className="text-5xl">Vite + React</h1>
                 <div className="card m-5">
                     <button className="border-1 p-3 hover:bg-blue-900" onClick={() => setCount((count) => count + 1)}>
                         count is {count}
                     </button>
                 </div>
-                <Link to="/projectsPage">Go to projectsPage </Link>
-                <hr/>
-                <Link to="/settings">Go to settings </Link>
             </div>
         </>
     )
