@@ -1,14 +1,23 @@
+/*
+  This program has been developed by students from the bachelor Computer Science at Utrecht
+  University within the Software Project course.
 
+  © Copyright Utrecht University (Department of Information and Computing Sciences)
+*/
+
+
+
+type projectTextBlockProps = {headerText : string, descriptiveText : string}
 
 /**
  * This is a template for a projectTextBlock. It has a header and a descriptive text. 
  * It has a zinc background, with a zoom in on hover. On click/focus actions have yet to be added
  *
- * @param {String} headerText 
- * @param {String} descriptiveText 
+ * @param {string} headerText 
+ * @param {string} descriptiveText 
  * @returns {*} 
  */
-const projectTextBlock = (headerText : String, descriptiveText : String) => 
+const ProjectTextBlock = ({headerText, descriptiveText} : projectTextBlockProps) => 
                     <a className="block max-w-sm p-6 bg-zinc-100 
                                     border border-zinc-200 rounded-lg shadow-sm 
                                     hover:bg-zinc-200 hover:scale-110 hover:duration-500
@@ -19,4 +28,4 @@ const projectTextBlock = (headerText : String, descriptiveText : String) =>
                        {descriptiveText}</p>
                     </a>
 
-export {projectTextBlock}
+export {ProjectTextBlock}
