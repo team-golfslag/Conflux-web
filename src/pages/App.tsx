@@ -9,6 +9,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import './App.css'
+import { Button } from '@/components/ui/button'
 
 /*
 This is a (temporary) file which serves as that which is seen at home. It has links to the other pages.
@@ -22,9 +23,9 @@ function App() {
     <>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <Button onClick={() => setCount((count) => count + 1)}>
           count is {count}
-        </button>
+        </Button>
       </div>
       <Link to="/projectsPage" >Go to projectsPage </Link>
       <hr/>
