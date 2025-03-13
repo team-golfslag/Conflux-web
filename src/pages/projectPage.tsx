@@ -17,7 +17,21 @@ function ProjectPage()
 {
     return (
     <>
-        <h1>Please create the project page here!</h1>
+        <section class = "fixed top-10 left-10 right-10 bg-sky-500">
+            <h1>Title</h1>
+        </section>
+        <article class = "fixed left-10 top-34 bg-amber-600">
+            <section>
+            <h1>Project Description</h1>
+            <p>blablalba</p>
+            </section>
+        </article>
+        <aside class = "fixed right-10 top-34 bg-amber-600">
+            time
+        </aside>
+        <aside class = "fixed right-10 top-44 bg-amber-600">
+            Contributors
+        </aside>
         <Link to = "/"> go to home </Link>
     </>
     )
