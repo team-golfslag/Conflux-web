@@ -6,34 +6,36 @@
 */
 
 
-import { Link } from "react-router"
+import { Link } from "react-router";
+import {useState} from "react";
+import {Card, CardContent, CardDescription, CardTitle} from "../components/ui/card"
 
 /*
 this is the main entry point into the projects page. 
-It is currently empty.
+
+This should do the following:
+ - either via function or URL, receive info on which project to load
+ - api call to receive the information on the project. This should also have error handling.
+ - present the information in a way conforming to the styleguide and figma
+ - apparantly, yesterday ben added shadeUi which can manage the components. 
+ - So, use that. see this website: https://ui.shadcn.com/docs/components/card#usage
 */
 
-function ProjectPage() 
-{
+
+function ProjectPage(){
+
+    let [dataIsLoading, setDataIsLoading] = useState(true)
+    let [projectData, setProjectData]     = useState(null)
+
     return (
-    <>
-        <section class = "fixed top-10 left-10 right-10 bg-sky-500">
-            <h1>Title</h1>
-        </section>
-        <article class = "fixed left-10 top-34 bg-amber-600">
-            <section>
-            <h1>Project Description</h1>
-            <p>blablalba</p>
-            </section>
-        </article>
-        <aside class = "fixed right-10 top-34 bg-amber-600">
-            time
-        </aside>
-        <aside class = "fixed right-10 top-44 bg-amber-600">
-            Contributors
-        </aside>
-        <Link to = "/"> go to home </Link>
-    </>
+    <div className="">
+        <div className="flex flex-col w-full px-3 py-4 gap-20 bg-red-500 place-content-center">
+            <Card className="w-50 flex-1 justify-center">
+                <CardTitle className="text-center font-bold">Project Name Here</CardTitle>
+            </Card>
+            <Link className="flex-1" to = "/"> go to home </Link>
+        </div>
+    </div>
     )
 }
 
