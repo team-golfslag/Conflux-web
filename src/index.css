@@ -51,7 +51,7 @@
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
 }
-
+/*
 a {
   font-weight: 500;
   color: #646cff;
@@ -105,7 +105,7 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
-
+*/
 .dark {
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
