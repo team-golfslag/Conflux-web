@@ -42,11 +42,12 @@ const ProjectSearchBar = () => {
     }
 
     return <>
-        <div></div>
-            <Input type="text" placeholder="Search for any project.." />
+        <div className="flex mb-15">
+            <Input className = "w-9/10"type="text" placeholder="Search for any project.." />
             <Button type="submit">Search</Button>
+        </div>
         <div>
-            <h2>Results</h2>
+            <h1 className= "mb-15">Results</h1>
             <ProjectCard project={pro}/>
         </div>
 
