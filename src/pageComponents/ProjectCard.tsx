@@ -8,17 +8,17 @@ const truncater = (str: string, length: number) => {
     return str.substring(0, Math.min(str.length, length)) + "...";
 }
 const ProjectCard = ({project}: ProjectCardProps) => {
-    return <div className="bg-white max-w-5xl rounded border-2 border-gray-400 px-4 py-2 flex">
-                <div className="w-1/6">
+    return <div className="bg-white max-w-5xl rounded-lg border-2 border-border px-4 py-2 flex duration-300 hover:shadow-lg hover:shadow-gray-300 hover:border-purple-700">
+                <div className="w-1/6 mx-2">
                     <img className="rounded-full" src="/src/assets/Golfslag.png" alt="team photo"/>
                 </div>
-        <div className="mx-4 w-3/5">
-            <h1>{project.title}</h1>
-                    <p className="text-base">{truncater(project.description as string, 350)}</p>
+        <div className="mx-2 w-3/5">
+            <h2 className="text-4xl mb-3">{project.title}</h2>
+                    <p className="text-base text-left">{truncater(project.description as string, 350)}</p>
                 </div>
-                <div className="mx-4">
-                    <p className="text-sm">start date: {project.startDate?.toDateString()}</p>
-                    <p className="text-sm">end date: {project.endDate?.toDateString()}</p>
+                <div className="mx-2">
+                    <p className="text-sm text-left">Start date: {project.startDate?.toDateString()}</p>
+                    <p className="text-sm text-left">End date: {project.endDate?.toDateString()}</p>
                 </div>
             </div>
 }

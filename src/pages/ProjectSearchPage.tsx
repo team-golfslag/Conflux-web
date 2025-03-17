@@ -47,7 +47,7 @@ const ProjectSearchBar = () => {
             <Button type="submit">Search</Button>
         </div>
         <div>
-            <h1 className= "mb-15">Results</h1>
+            <h2 className= "mb-15 text-left text-2xl font-bold">Results:</h2>
             <ProjectCard project={pro}/>
         </div>
 
