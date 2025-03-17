@@ -9,7 +9,6 @@ import Header from "@/components/header";
 import { Edit } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProjectOverview from "@/components/projectOverview";
-import { Card, CardContent } from "@/components/ui/card";
 import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
 import Timeline, { TimelineItem } from "@/components/timeline";
