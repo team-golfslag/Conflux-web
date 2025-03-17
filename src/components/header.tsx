@@ -42,7 +42,7 @@ export default function Header() {
       {/* Desktop Navigation */}
       <nav className="hidden md:flex gap-6 items-center">
         <Link to="/getting-started">
-          <Button variant="ghost" className="text-primary-foreground">Getting Started</Button>
+          <Button variant="ghost" className="text-primary-foreground bg-primary">Getting Started</Button>
         </Link>
         <Link to="/recent-projects">
           <Button variant="ghost" className="text-primary-foreground">Recent Projects</Button>
