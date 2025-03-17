@@ -51,7 +51,7 @@
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
 }
-/*
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -105,7 +105,7 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
-*/
+
 .dark {
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
@@ -187,4 +187,18 @@ button:focus-visible {
   body {
     @apply bg-background text-foreground;
   }
+}
+@font-face {  
+    font-family: Merriweather;  
+    src: url("src/fonts/Merriweather/Merriweather-Regular.ttf") format("ttf");
+}
+
+@font-face{
+    font-family: OpenSans;
+    src: url("src/fonts/Open_Sans/static/OpenSans-Regular.ttf") format("ttf");
+}
+
+@theme {
+    --font-Merriweather: "Merriweather";
+    --font-OpenSans: "OpenSans";
 }
