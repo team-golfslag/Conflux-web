@@ -2,6 +2,7 @@ import Project from "../typing/Project.ts";
 import ProjectCard from "../pageComponents/ProjectCard.tsx";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import Header from "@/components/header.tsx";
 
 const ProjectSearchBar = () => {
 
@@ -42,12 +43,13 @@ const ProjectSearchBar = () => {
     }
 
     return <>
-        <div className="flex mb-15">
-            <Input className = "w-9/10"type="text" placeholder="Search for any project.." />
+        <Header />
+        <div className="flex mb-15 w-full">
+            <Input className = "w-full"type="text" placeholder="Search for any project.." />
             <Button type="submit">Search</Button>
         </div>
-        <div>
-            <h2 className= "mb-15 text-left text-2xl font-bold">Results:</h2>
+        <div className="flex-col justify-items-center">
+            <h2 className= "mb-10 text-left text-2xl font-bold">Results:</h2>
             <ProjectCard project={pro}/>
         </div>
 
