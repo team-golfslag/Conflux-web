@@ -5,38 +5,42 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
+import { Card, CardContent } from "@/components/ui/card";
+import Header from "@/components/header";
+import { Edit } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@radix-ui/react-tabs";
+import ProjectOverview from "@/components/projectOverview";
 
-import { Link } from "react-router";
-import {useState} from "react";
-import {Card, CardContent, CardDescription, CardTitle} from "../components/ui/card"
-
-/*
-this is the main entry point into the projects page. 
-
-This should do the following:
- - either via function or URL, receive info on which project to load
- - api call to receive the information on the project. This should also have error handling.
- - present the information in a way conforming to the styleguide and figma
- - apparantly, yesterday ben added shadeUi which can manage the components. 
- - So, use that. see this website: https://ui.shadcn.com/docs/components/card#usage
-*/
-
-
-function ProjectPage(){
-
-    let [dataIsLoading, setDataIsLoading] = useState(true)
-    let [projectData, setProjectData]     = useState(null)
-
-    return (
-    <div className="">
-        <div className="flex flex-col w-full px-3 py-4 gap-20 bg-red-500 place-content-center">
-            <Card className="w-50 flex-1 justify-center">
-                <CardTitle className="text-center font-bold">Project Name Here</CardTitle>
-            </Card>
-            <Link className="flex-1" to = "/"> go to home </Link>
+export default function ProjectPage() {
+  return (
+    <>
+      <Header />
+      <div className="min-h-screen bg-secondary p-8">
+        {/* Title */}
+        <div className="flex items-center justify-between bg-white p-6 text-2xl font-semibold rounded-lg">
+          <span>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam
+            porttitor.
+          </span>
+          <button className="bg-primary m-2 text-primary-foreground p-2 rounded-lg transition-colors duration-300 flex items-center justify-center">
+            <Edit size={32} />
+          </button>
         </div>
-    </div>
-    )
-}
 
-export default ProjectPage
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            <TabsTrigger value="works">Works</TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview">
+           <ProjectOverview />
+          </TabsContent>
+          <TabsContent value="timeline">Hier komt de timeline</TabsContent>
+          <TabsContent value="works">Hier komen de works</TabsContent>
+        </Tabs>
+      </div>
+    </>
+  );
+}
