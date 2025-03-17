@@ -5,11 +5,9 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import { Card, CardContent } from "@/components/ui/card";
 import Header from "@/components/header";
 import { Edit } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TabsContent } from "@radix-ui/react-tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProjectOverview from "@/components/projectOverview";
 
 export default function ProjectPage() {
