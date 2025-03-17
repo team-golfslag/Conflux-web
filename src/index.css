@@ -188,3 +188,17 @@ button:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+@font-face {  
+    font-family: Merriweather;  
+    src: url("src/fonts/Merriweather/Merriweather-Regular.ttf") format("ttf");
+}
+
+@font-face{
+    font-family: OpenSans;
+    src: url("src/fonts/Open_Sans/static/OpenSans-Regular.ttf") format("ttf");
+}
+
+@theme {
+    --font-Merriweather: "Merriweather";
+    --font-OpenSans: "OpenSans";
+}
