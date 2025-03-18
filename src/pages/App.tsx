@@ -20,15 +20,15 @@ function App() {
 
   return (
     <>
-      <h1>Conflux Start Page!</h1>
-      <div className="card">
+      <h1 className="w-full text-6xl">Conflux Start Page!</h1>
+      <div className="w-screen h-screen flex flex-col justify-items-center justify-center card">
         <Button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </Button>
+          <Link to="/projectsPage" >Go to projectsPage </Link>
+          <hr/>
+          <Link to="/settings" >Go to settings </Link>
       </div>
-      <Link to="/projectsPage" >Go to projectsPage </Link>
-      <hr/>
-      <Link to="/settings" >Go to settings </Link>
     </>
   )
 }
