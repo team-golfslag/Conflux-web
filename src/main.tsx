@@ -6,12 +6,11 @@
 */
 
 
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter} from "react-router";
+import {StrictMode} from 'react';
+import {createRoot} from 'react-dom/client';
+import {BrowserRouter} from "react-router";
 import allRoutes from './routes';
 import "./index.css";
-
 /*
 This is the main entry point into the program
 */
@@ -19,11 +18,11 @@ This is the main entry point into the program
 const root = document.getElementById("root");
 
 createRoot(root!).render(
-  <StrictMode>
-    <BrowserRouter>
-        {allRoutes}
-    </BrowserRouter>
-  </StrictMode>
+    <StrictMode>
+        <BrowserRouter>
+            {allRoutes}
+        </BrowserRouter>
+    </StrictMode>
 );
 
 
