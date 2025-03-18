@@ -1,6 +1,6 @@
 /*
   This program has been developed by students from the bachelor Computer Science at Utrecht
-  University within the Software Project course.
+  University within the Software Models course.
 
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
@@ -19,7 +19,7 @@ const getSearchResults = async () => {
     const response = await fetch(`${config.apiBaseURL}/projects/query/ProjectsQuery/all`)
 
     if (!response.ok) {
-        throw new Error("Project not found")
+        throw new Error("Models not found")
     }
 
     return response.json()

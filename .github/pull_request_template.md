@@ -11,7 +11,6 @@
 
 [Describe any side effects of your changes. This might include changes to the behavior of existing features, or changes to the performance of the application.]
 
-
 ## Additional Information
 
 [Any additional information that reviewers should be aware of.]
@@ -26,12 +25,12 @@ If something is not possible, please leave a comment explaining why.
 
 - [ ] Code satisfies requirement as currently specified in YouTrack
 - [ ] The not-so-happy flow and errors are handled gracefully
-- [ ] Project builds without errors and warnings
+- [ ] Models builds without errors and warnings
 - [ ] Any decisions or changes to the requirements have been added to the task description in YouTrack
 - [ ] Code is well-commented
 - [ ] (Manually) Tested UI on desktop, tablet and mobile screen sizes
-  - UI is compatible for screens with a minimum of 340px of width
+    - UI is compatible for screens with a minimum of 340px of width
 - [ ] (Manually) Tested if changes might have unintended results for various browsers
-  - [ ] Chrome (or Chromium-based browsers)
-  - [ ] (Safari)
-  - [ ] Firefox
+    - [ ] Chrome (or Chromium-based browsers)
+    - [ ] (Safari)
+    - [ ] Firefox
