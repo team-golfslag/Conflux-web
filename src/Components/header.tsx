@@ -17,7 +17,7 @@ export default function Header() {
 
     useEffect(() => {
         const handleScroll = () => {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
             if (scrollTop > lastScrollTop) {
                 setIsScrollingUp(false);
             } else {
