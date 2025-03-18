@@ -45,7 +45,7 @@ const ProjectSearchBar = () => {
     return <>
         <Header />
         <div className="w-full flex-column mb-15 mt-15 justify-items-center">
-            <Input className = "w-1/3 rounded-2xl"type="text" placeholder="Search for any project.." />
+            <Input className = "w-1/3 rounded-2xl" type="text" placeholder="Search for any project.." />
             <Button type="submit">Search</Button>
         </div>
         <div className="flex-col justify-items-center">
