@@ -33,7 +33,7 @@ export default function Header() {
   }, [lastScrollTop]);
 
   return (
-    <header className={`w-full bg-primary text-primary-foreground p-4 md:p-6 flex items-center justify-between transition-transform duration-500 ease-in-out ${isScrollingUp ? 'sticky top-0' : '-top-16'}`}>
+    <header style={{zIndex:1}} className={`w-full bg-primary text-primary-foreground p-4 md:p-6 flex items-center justify-between transition-transform duration-500 ease-in-out ${isScrollingUp ? 'sticky top-0' : '-top-16'}`}>
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 bg-secondary rounded-full" />
         <span className="text-xl font-bold">CONFLUX</span>
