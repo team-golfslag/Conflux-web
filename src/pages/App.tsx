@@ -8,29 +8,33 @@
 
 import { useState } from 'react'
 import { Link } from 'react-router'
-import './App.css'
-//import {useQuery} from "@tanstack/react-query"
+import { Button } from '@/components/ui/button'
 
 /*
 This is a (temporary) file which serves as that which is seen at home. It has links to the other pages.
 ./App.css may give an error, but it should just work. Ask Max to intimidate the computer for you
 */
 
+
+
 function App() {
-  const [count, setCount] = useState(0)
+
+  const [count, setCount] = useState(0) 
 
   return (
-    <>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+       
+    <div className='flex justify-center w-full'>
+      <div className='flex items-center gap-10 flex-col'>
+        <h1 >Conflux Start Page!</h1>
+        <Button onClick={() => setCount((count) => count + 1)}>
           count is {count}
-        </button>
+        </Button>
+        <Link to="/projectsPage" >Go to projectsPage </Link>
+        <hr/>
+        <Link to="/settings" >Go to settings </Link>
       </div>
-      <Link to="/projectsPage" >Go to projectsPage </Link>
-      <hr/>
-      <Link to="/settings" >Go to settings </Link>
-    </>
+    </div>
+    
   )
 }
 
