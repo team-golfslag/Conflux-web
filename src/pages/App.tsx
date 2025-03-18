@@ -8,7 +8,7 @@
 
 import {useState} from 'react'
 import {Link} from 'react-router'
-import {Button} from '@/components/ui/button'
+import {Button} from '@/Components/ui/button'
 
 /*
 This is a (temporary) file which serves as that which is seen at home. It has links to the other pages.
