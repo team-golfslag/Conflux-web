@@ -28,14 +28,12 @@ const timelineData: TimelineItem[] = [
  * Uses the 'id' param from the react routing to get the correct page from the backend
  */
 export default function ProjectPage() {
-  const { id } = useParams();
+    const { id } = useParams();
   const projectId = id ?? "";
   const { data, error, isLoading } = useQuery<Project>(projectQuery(projectId));
-  if (isLoading)
-    return (
-      <>
-        <Header />
-        <div className="bg-secondary min-h-full p-8">
+  if (isLoading)return (
+        <>
+            <div className="bg-secondary min-h-full p-8">
           <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
             <span>Loading...</span>
           </div>
@@ -46,8 +44,9 @@ export default function ProjectPage() {
     return (
       <>
         <Header />
-        <div className="bg-secondary min-h-full p-8">
-          <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
+        <div className="bg-secondary min-h-fullp-8">
+
+                <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
             <span>{error.name}</span>
           </div>
           <div className="p-10" />
@@ -66,33 +65,28 @@ export default function ProjectPage() {
         {/* Title */}
         <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
           <span>{project.title}</span>
-          <Link
+                    <Link
             to="edit"
-            className="bg-primary text-primary-foreground m-2 flex items-center justify-center rounded-lg p-2 transition-colors duration-300"
-          >
-            <Edit size={24} />
-          </Link>
-        </div>
+                        className="bg-primary text-primary-foreground m-2 flex items-center justify-center rounded-lg p-2 transition-colors duration-300">
+                        <Edit size={24}/>
+                    </Link>
+                </div>
 
-        <main className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+                <main className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
           <div className="md:col-span-2">
-            <Tabs defaultValue="overview" className="h-full w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="contributors">Contributors</TabsTrigger>
-                <TabsTrigger value="works">Works</TabsTrigger>
-              </TabsList>
-              <TabsContent value="overview">
-                <ProjectOverview description={project.description} />
-              </TabsContent>
-              <TabsContent value="contributors">
-                <ProjectContributors people={project.people} />
-              </TabsContent>
-              <TabsContent value="works">
-                <ProjectWorks products={project.products} />
-              </TabsContent>
-            </Tabs>
-          </div>
+            <Tabs defaultValue="overview" className="h-fullw-full">
+                    <TabsList className="grid w-full grid-cols-3">
+                        <TabsTrigger value="overview">Overview</TabsTrigger>
+                        <TabsTrigger value="contributors">Contributors</TabsTrigger>
+                        <TabsTrigger value="works">Works</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="overview">
+                        <ProjectOverviewdescription={project.description}/>
+                    </TabsContent>
+                    <TabsContent value="contributors">
+                <ProjectContributors people={project.people} /></TabsContent>
+                    <TabsContent value="works"><ProjectWorks products={project.products} /></TabsContent>
+                </Tabs></div>
           {/* Side Panel */}
           <aside className="space-y-6">
             <div className="rounded-lg bg-white p-4 shadow">
@@ -111,7 +105,7 @@ export default function ProjectPage() {
             </div>
           </aside>
         </main>
-      </div>
-    </>
-  );
+            </div>
+        </>
+    );
 }
