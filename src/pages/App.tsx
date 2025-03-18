@@ -15,21 +15,26 @@ This is a (temporary) file which serves as that which is seen at home. It has li
 ./App.css may give an error, but it should just work. Ask Max to intimidate the computer for you
 */
 
+
+
 function App() {
-  const [count, setCount] = useState(0)
+
+  const [count, setCount] = useState(0) 
 
   return (
-    <>
-      <h1 className="w-full text-6xl">Conflux Start Page!</h1>
-      <div className="w-screen h-screen flex flex-col justify-items-center justify-center card">
+       
+    <div className='flex justify-center w-full'>
+      <div className='flex items-center gap-10 flex-col'>
+        <h1 >Conflux Start Page!</h1>
         <Button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </Button>
-          <Link to="/projectsPage" >Go to projectsPage </Link>
-          <hr/>
-          <Link to="/settings" >Go to settings </Link>
+        <Link to="/projectsPage" >Go to projectsPage </Link>
+        <hr/>
+        <Link to="/settings" >Go to settings </Link>
       </div>
-    </>
+    </div>
+    
   )
 }
 
