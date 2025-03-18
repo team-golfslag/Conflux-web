@@ -5,7 +5,7 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import { Routes, Route } from "react-router";
+import {Routes, Route} from "react-router";
 import App from "./pages/App.tsx";
 import ProjectPage from "./pages/projectPage.tsx";
 import SettingsPage from "./pages/settingsPage.tsx";
@@ -15,11 +15,11 @@ import SettingsPage from "./pages/settingsPage.tsx";
  We might need to use ? and : (and others) later in order to create optional and branching routes.
 */
 
-const allRoutes = 
-<Routes>
-  <Route index element={<App/>} /> 
-  <Route path="/projectsPage" element={<ProjectPage/>}/>
-  <Route path="/settings" element={<SettingsPage/>}/>
-</Routes>
+const allRoutes =
+    <Routes>
+        <Route index element={<App/>}/>
+        <Route path="/project/:id" element={<ProjectPage/>}/>
+        <Route path="/settings" element={<SettingsPage/>}/>
+    </Routes>
 
 export default allRoutes 

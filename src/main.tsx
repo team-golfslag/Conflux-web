@@ -6,9 +6,9 @@
 */
 
 
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { BrowserRouter} from "react-router";
+import {StrictMode} from 'react';
+import {createRoot} from 'react-dom/client';
+import {BrowserRouter} from "react-router";
 import allRoutes from './routes';
 import "./index.css";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
@@ -17,18 +17,18 @@ import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 This is the main entry point into the program
 */
 
-const queryCLient = new QueryClient();
+const queryClient = new QueryClient();
 
 const root = document.getElementById("root");
 
 createRoot(root!).render(
-  <StrictMode>
-      <QueryClientProvider client={queryCLient}>
-        <BrowserRouter>
-            {allRoutes}
-        </BrowserRouter>
-      </QueryClientProvider>
-  </StrictMode>
+    <StrictMode>
+        <QueryClientProvider client={queryClient}>
+            <BrowserRouter>
+                {allRoutes}
+            </BrowserRouter>
+        </QueryClientProvider>
+    </StrictMode>
 );
 
 

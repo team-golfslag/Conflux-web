@@ -6,9 +6,9 @@
 */
 
 
-import { useState } from 'react'
-import { Link } from 'react-router'
-import { Button } from '@/components/ui/button'
+import {useState} from 'react'
+import {Link} from 'react-router'
+import {Button} from '@/components/ui/button'
 
 /*
 This is a (temporary) file which serves as that which is seen at home. It has links to the other pages.
@@ -16,26 +16,25 @@ This is a (temporary) file which serves as that which is seen at home. It has li
 */
 
 
-
 function App() {
 
-  const [count, setCount] = useState(0) 
+    const [count, setCount] = useState(0)
 
-  return (
-       
-    <div className='flex justify-center w-full'>
-      <div className='flex items-center gap-10 flex-col'>
-        <h1 >Conflux Start Page!</h1>
-        <Button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </Button>
-        <Link to="/projectsPage" >Go to projectsPage </Link>
-        <hr/>
-        <Link to="/settings" >Go to settings </Link>
-      </div>
-    </div>
-    
-  )
+    return (
+
+        <div className='flex justify-center w-full'>
+            <div className='flex items-center gap-10 flex-col'>
+                <h1>Conflux Start Page!</h1>
+                <Button onClick={() => setCount((count) => count + 1)}>
+                    count is {count}
+                </Button>
+                <Link to="/projectsPage">Go to projectsPage </Link>
+                <hr/>
+                <Link to="/settings">Go to settings </Link>
+            </div>
+        </div>
+
+    )
 }
 
 export default App
