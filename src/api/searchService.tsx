@@ -8,18 +8,35 @@
 import {queryOptions} from "@tanstack/react-query"
 import config from "../../config.tsx"
 
-export function createSearchQuery() { //call this inside useQuery()
+export function searchAllQuery() { //call this inside useQuery()
     return queryOptions({
         queryKey: ["search"],
-        queryFn: getSearchResults
+        queryFn: getAllSearchResults
     })
 }
 
-const getSearchResults = async () => {
-    const response = await fetch(`${config.apiBaseURL}/projects/query/ProjectsQuery/all`)
+const getAllSearchResults = async () => {
+    const response = await fetch(`${config.apiBaseURL}/projects/all`)
 
     if (!response.ok) {
-        throw new Error("Models not found")
+        throw new Error("No projects found")
+    }
+
+    return response.json()
+}
+
+export function searchQuery(query: string) { //call this inside useQuery()
+    return queryOptions({
+        queryKey: ["projects", query],
+        queryFn: () => getSearchResults(query)
+    })
+}
+
+const getSearchResults = async (query: string) => {
+    const response = await fetch(`${config.apiBaseURL}/projects/?query=${query}`)
+
+    if (!response.ok) {
+        throw new Error("No projects found")
     }
 
     return response.json()
