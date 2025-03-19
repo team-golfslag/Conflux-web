@@ -1,3 +1,9 @@
+/*
+  This program has been developed by students from the bachelor Computer Science at Utrecht
+  University within the Software Project course.
+
+  © Copyright Utrecht University (Department of Information and Computing Sciences)
+*/
 import Project from "../typing/Project.ts";
 import ProjectCard from "../pageComponents/ProjectCard.tsx";
 import { Input } from "../components/ui/input";
@@ -47,7 +53,7 @@ const ProjectSearchBar = () => {
         <Header />
         <div className="w-screen h-screen">
             <div className="flex flex-row mb-15 mt-15 justify-center">
-                <Input  className="w-1/3 rounded-2xl" type="text" placeholder="Search for any project.." />
+                <Input  className="w-1/3 rounded-2xl" type="search" placeholder="Search for any project.." />
                 <Button type="submit">Search</Button>
             </div>
             <div className="flex flex-col items-center">
