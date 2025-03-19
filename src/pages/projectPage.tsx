@@ -26,36 +26,49 @@ const timelineData: TimelineItem[] = [
 export default function ProjectPage() {
 
     const {id} = useParams();
-    // const id = "0195a8cb-d13e-7094-ab80-866561ab0ce1"
-    console.log(id)
     const projectId = id ? id : "";
     const {data, error, isLoading} = useQuery(projectQuery(projectId));
-    console.log(data)
-    if (isLoading) return (<h2>Loading...</h2>)
-    if (error) return (<p>{error.message}</p>)
-    // return (
-    //     <p>{data}</p>
-    // )
-
+    if (isLoading) return (
+        <>
+            <Header/>
+            <div className="min-h-full bg-secondary p-8">
+                <div className="flex items-center justify-between bg-white p-3 text-2xl font-semibold rounded-lg">
+                    <span>
+                        Loading...
+                    </span>
+                </div>
+            </div>
+        </>
+    )
+    if (error) return (
+        <>
+            <Header/>
+            <div className="min-h-full bg-secondary p-8">
+                <div className="flex items-center justify-between bg-white p-3 text-2xl font-semibold rounded-lg">
+                    <span>
+                        {error.name}
+                    </span>
+                </div>
+                <div className="p-10"/>
+                <div className="flex items-center justify-between bg-white p-3 text-l rounded-lg">
+                    <span>
+                        {error.message}
+                    </span>
+                </div>
+            </div>
+        </>
+    )
     const project = data as Project;
 
-    // const project = {
-    //     title: "title",
-    //     description: "description",
-    //     people: [],
-    //     products: [],
-    //     startDate: new Date(2000, 0, 1),
-    //     endDate: new Date(2000, 1, 1)
-    // };
     return (
         <>
             <Header/>
             <div className="min-h-full bg-secondary p-8">
                 {/* Title */}
                 <div className="flex items-center justify-between bg-white p-3 text-2xl font-semibold rounded-lg">
-          <span>
-            {project.title}
-          </span>
+                    <span>
+                        {project.title}
+                    </span>
                     <button
                         className="bg-primary m-2 text-primary-foreground p-2 rounded-lg transition-colors duration-300 flex items-center justify-center">
                         <Edit size={24}/>
