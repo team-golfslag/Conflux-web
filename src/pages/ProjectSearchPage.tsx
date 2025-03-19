@@ -4,11 +4,11 @@
 
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
-import Project from "../typing/Project.ts";
-import ProjectCard from "../pageComponents/ProjectCard.tsx";
-import { Input } from "../components/ui/input";
-import Header from "@/components/header.tsx";
-import {Button} from "@/components/ui/button.tsx";
+import {Project} from "../types/models.ts";
+import ProjectCard from "../Components/ProjectCard.tsx";
+import {Input} from "../Components/ui/input.tsx";
+import Header from "@/Components/header.tsx";
+import {Button} from "@/Components/ui/button.tsx";
 
 const ProjectSearchBar = () => {
 
@@ -45,28 +45,31 @@ const ProjectSearchBar = () => {
             "Erat pulvinar penatibus litora; blandit ante ex. Aliquam finibus magna odio odio ullamcorper tincidunt. Vitae suspendisse facilisis ad ultricies porttitor. Vehicula suscipit taciti blandit integer sit eleifend. Risus a cras volutpat adipiscing mollis facilisi. Lorem sodales semper leo neque vehicula commodo. Fermentum neque condimentum tempor dapibus non urna pretium enim. Dis id pellentesque maecenas ac ut. Sodales curabitur vestibulum molestie neque rutrum lacinia mauris integer.",
         id: "09897836754",
         startDate: new Date(2025, 2, 1),
-        endDate: new Date(2225, 2, 1)
+        endDate: new Date(2225, 2, 1),
+        people: [],
+        products: [],
+        parties: []
     }
 
     return (
-    <>
-        <Header />
-        <div className="mb-5">
-            <div className="flex flex-row mb-15 mt-15 justify-center">
-                <Input  className="w-1/3 rounded-2xl" type="search" placeholder="Search for any project.." />
-                <Button type="submit">Search</Button>
+        <>
+            <Header/>
+            <div className="mb-5">
+                <div className="flex flex-row mb-15 mt-15 justify-center">
+                    <Input className="w-1/3 rounded-2xl" type="search" placeholder="Search for any project.."/>
+                    <Button type="submit">Search</Button>
+                </div>
+                <div className="flex flex-col items-center">
+                    <h2 className="mb-8 text-3xl font-bold">Results</h2>
+                    <ProjectCard project={pro}/>
+                    <ProjectCard project={pro}/>
+                    <ProjectCard project={pro}/>
+                    <ProjectCard project={pro}/>
+                    <ProjectCard project={pro}/>
+                </div>
             </div>
-            <div className="flex flex-col items-center">
-                <h2 className="mb-8 text-3xl font-bold">Results</h2>
-                <ProjectCard project={pro}/>
-                <ProjectCard project={pro}/>
-                <ProjectCard project={pro}/>
-                <ProjectCard project={pro}/>
-                <ProjectCard project={pro}/>
-            </div>
-        </div>
 
-    </>)
+        </>)
 }
 
 export default ProjectSearchBar

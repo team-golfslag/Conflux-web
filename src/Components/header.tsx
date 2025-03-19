@@ -1,6 +1,6 @@
 /*
   This program has been developed by students from the bachelor Computer Science at Utrecht
-  University within the Software Project course.
+  University within the Software Models course.
 
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
@@ -51,7 +51,7 @@ export default function Header() {
                 <Link to="/my-projects">
                     <Button variant="ghost" className="text-primary-foreground">My Projects</Button>
                 </Link>
-                <Link to="/search">
+                <Link to="/projects/search">
                     <Button variant="ghost" className="text-primary-foreground">
                         <div className="hover:text-secondary">
                             <Search className="w-6 h-6 text-primary-foreground"/>

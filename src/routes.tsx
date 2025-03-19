@@ -9,19 +9,19 @@ import { Routes, Route } from "react-router";
 import App from "./pages/App.tsx";
 import ProjectPage from "./pages/projectPage.tsx";
 import SettingsPage from "./pages/settingsPage.tsx";
-import ProjectSearchPage from "./pages/ProjectSearchPage.tsx";
+import ProjectSearchPage from "@/pages/ProjectSearchPage.tsx";
 
 /*
  this contains all of the different routes to the different pages. 
  We might need to use ? and : (and others) later in order to create optional and branching routes.
 */
 
-const allRoutes = 
-<Routes>
-  <Route index element={<App/>} /> 
-  <Route path="/projectsPage" element={<ProjectPage/>}/>
-  <Route path="/settings" element={<SettingsPage/>}/>
-  <Route path="/projects/search" element={<ProjectSearchPage/>}/>
-</Routes>
+const allRoutes =
+    <Routes>
+        <Route index element={<App/>}/>
+        <Route path="/project/:id" element={<ProjectPage/>}/>
+        <Route path="/settings" element={<SettingsPage/>}/>
+        <Route path="/projects/search" element={<ProjectSearchPage/>}/>
+    </Routes>
 
 export default allRoutes 
