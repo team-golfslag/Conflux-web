@@ -13,6 +13,7 @@ type ProjectWorksProps = { products: Product[] }
 export default function ProjectWorks(props: ProjectWorksProps) {
     return (
         <section className="space-y-4 bg-white p-6 shadow rounded-lg">
+            <h2 className="text-xl font-semibold mb-4">Contributors</h2>
             {props.products.map((product) => (
                 <Card key={product.id} className="bg-gray-200">
                     <CardContent className="flex items-center gap-4 p-3">
