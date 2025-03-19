@@ -15,7 +15,7 @@ import Timeline, {TimelineItem} from "@/Components/timeline";
 import {Project} from "@/types/models.ts";
 import {useParams} from "react-router";
 import {useQuery} from "@tanstack/react-query";
-import {createProjectQuery} from "@/api/projectService.tsx";
+import {projectQuery} from "@/api/projectService.tsx";
 
 const timelineData: TimelineItem[] = [
     {date: "01-01-2023", name: "Event One"},
@@ -25,16 +25,28 @@ const timelineData: TimelineItem[] = [
 ];
 export default function ProjectPage() {
 
-    // let {id} = useParams();
-    // if (!id) return Error();
-    // const {data, error, isLoading} = useQuery(createProjectQuery(id));
-    //
-    // if (isLoading) return (<h2>Loading...</h2>)
-    // if (error) return (<p>{error.message}</p>)
-    //
-    // const project = data as Project;
+    const {id} = useParams();
+    // const id = "0195a8cb-d13e-7094-ab80-866561ab0ce1"
+    console.log(id)
+    const projectId = id ? id : "";
+    const {data, error, isLoading} = useQuery(projectQuery(projectId));
+    console.log(data)
+    if (isLoading) return (<h2>Loading...</h2>)
+    if (error) return (<p>{error.message}</p>)
+    // return (
+    //     <p>{data}</p>
+    // )
 
-    const project = {startDate: Date.now(), endDate: Date.now()};
+    const project = data as Project;
+
+    // const project = {
+    //     title: "title",
+    //     description: "description",
+    //     people: [],
+    //     products: [],
+    //     startDate: new Date(2000, 0, 1),
+    //     endDate: new Date(2000, 1, 1)
+    // };
     return (
         <>
             <Header/>
@@ -73,9 +85,9 @@ export default function ProjectPage() {
                     <aside className="space-y-6">
                         <div className="bg-white p-4 shadow rounded-lg">
                             <h3 className="text-lg font-semibold">Start Date</h3>
-                            <p>{project.startDate.toDateString()}</p>
+                            <p>{project.startDate.toString()}</p>
                             <h3 className="text-lg font-semibold mt-4">End Date</h3>
-                            <p>{project.endDate.toDateString()}</p>
+                            <p>{project.endDate.toString()}</p>
                         </div>
 
                         {/* Contributors Section */}
