@@ -15,7 +15,7 @@ import {useState} from "react";
 
 const ProjectSearchBar = () => {
 
-    const [searchTerm, setSearchTerm] = useState("h");
+    const [searchTerm, setSearchTerm] = useState("a");
     const {data, error, isLoading, refetch} = useQuery(searchQuery(searchTerm))
 
     const handleSearch = () => {
