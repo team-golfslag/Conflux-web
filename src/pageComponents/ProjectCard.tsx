@@ -6,7 +6,7 @@ type ProjectCardProps = {
 
 
 const ProjectCard = ({project}: ProjectCardProps) => {
-    return<div className="bg-white w-2/3 max-h-49 rounded-lg border-2 border-border px-4 py-4 flex duration-300 hover:shadow-lg hover:shadow-gray-300 hover:border-purple-700 hover:cursor-pointer">
+    return<div className="bg-white w-2/3 max-h-49 rounded-lg border-2 border-border px-4 py-4 flex duration-300 hover:shadow-lg hover:shadow-gray-300 hover:border-purple-700 hover:cursor-pointer my-2">
                 <div className="w-1/6 mx-4 flex justify-center">
                     <img className="rounded-full p-5 max-w-100 max-h-100" src="/src/assets/Golfslag.png" alt="team photo"/>
                 </div>

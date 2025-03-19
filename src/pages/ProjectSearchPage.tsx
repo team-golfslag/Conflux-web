@@ -51,13 +51,17 @@ const ProjectSearchBar = () => {
     return (
     <>
         <Header />
-        <div className="w-screen h-screen">
+        <div className="bg-repeat-y">
             <div className="flex flex-row mb-15 mt-15 justify-center">
                 <Input  className="w-1/3 rounded-2xl" type="search" placeholder="Search for any project.." />
                 <Button type="submit">Search</Button>
             </div>
             <div className="flex flex-col items-center">
                 <h2 className="mb-8 text-3xl font-bold">Results</h2>
+                <ProjectCard project={pro}/>
+                <ProjectCard project={pro}/>
+                <ProjectCard project={pro}/>
+                <ProjectCard project={pro}/>
                 <ProjectCard project={pro}/>
             </div>
         </div>
