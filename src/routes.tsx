@@ -1,14 +1,15 @@
 /*
   This program has been developed by students from the bachelor Computer Science at Utrecht
-  University within the Software Models course.
+  University within the Software Project course.
 
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import {Routes, Route} from "react-router";
+import { Routes, Route } from "react-router";
 import App from "./pages/App.tsx";
 import ProjectPage from "./pages/projectPage.tsx";
 import SettingsPage from "./pages/settingsPage.tsx";
+import ProjectSearchPage from "@/pages/ProjectSearchPage.tsx";
 
 /*
  this contains all of the different routes to the different pages. 
@@ -20,6 +21,7 @@ const allRoutes =
         <Route index element={<App/>}/>
         <Route path="/project/:id" element={<ProjectPage/>}/>
         <Route path="/settings" element={<SettingsPage/>}/>
+        <Route path="/projects/search" element={<ProjectSearchPage/>}/>
     </Routes>
 
 export default allRoutes 

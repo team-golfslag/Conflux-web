@@ -51,7 +51,7 @@ export default function Header() {
                 <Link to="/my-projects">
                     <Button variant="ghost" className="text-primary-foreground">My Projects</Button>
                 </Link>
-                <Link to="/search">
+                <Link to="/projects/search">
                     <Button variant="ghost" className="text-primary-foreground">
                         <div className="hover:text-secondary">
                             <Search className="w-6 h-6 text-primary-foreground"/>
