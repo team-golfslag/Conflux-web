@@ -1,4 +1,4 @@
-name: Generate and Deploy JSDoc
+name: Generate and Deploy TypeDoc
 
 on:
   push:
