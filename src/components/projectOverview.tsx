@@ -7,6 +7,10 @@
 
 type ProjectOverviewProps = { description: string }
 
+/**
+ * Project Overview component
+ * @param props the description to be displayed
+ */
 export default function ProjectOverview(props: ProjectOverviewProps) {
     return (
         <section className="bg-white p-6 shadow rounded-lg h-full">

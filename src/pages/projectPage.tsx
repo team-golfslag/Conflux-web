@@ -5,24 +5,29 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import Header from "@/Components/header.tsx";
+import Header from "@/components/header.tsx";
 import {Edit} from "lucide-react";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/Components/ui/tabs";
-import ProjectOverview from "@/Components/projectOverview.tsx";
-import ProjectContributors from "@/Components/projectContributors";
-import ProjectWorks from "@/Components/projectWorks";
-import Timeline, {TimelineItem} from "@/Components/timeline";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import ProjectOverview from "@/components/projectOverview.tsx";
+import ProjectContributors from "@/components/projectContributors";
+import ProjectWorks from "@/components/projectWorks";
+import Timeline, {TimelineItem} from "@/components/timeline";
 import {Project} from "@/types/models.ts";
 import {useParams} from "react-router";
 import {useQuery} from "@tanstack/react-query";
 import {projectQuery} from "@/api/projectService.tsx";
 
+
+/** List of timeline data as dummy data */
 const timelineData: TimelineItem[] = [
     {date: "01-01-2023", name: "Event One"},
     {date: "15-03-2023", name: "Event Two"},
     {date: "10-06-2023", name: "Event Three"},
     {date: "22-09-2023", name: "Event Four"},
 ];
+
+/** Project page component <br>
+ * Uses the 'id' param from the react routing to get the correct page from the backend */
 export default function ProjectPage() {
 
     const {id} = useParams();

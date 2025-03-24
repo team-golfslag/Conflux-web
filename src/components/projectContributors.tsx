@@ -5,12 +5,16 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import {Card, CardContent} from "@/Components/ui/card";
+import {Card, CardContent} from "@/components/ui/card";
 import {Person} from "@/types/models.ts";
 
-type ProjectContributersProps = { people: Person[] }
+type ProjectContributorsProps = { people: Person[] }
 
-export default function ProjectContributors(props: ProjectContributersProps) {
+/**
+ * Project Contributors component
+ * @param props the people to be turned into a card
+ */
+export default function ProjectContributors(props: ProjectContributorsProps) {
     return (
         <section className="space-y-4 bg-white p-6 shadow rounded-lg h-full">
             <h2 className="text-xl font-semibold mb-4">Contributors</h2>

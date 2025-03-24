@@ -5,17 +5,20 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 import {Project} from "../types/models.ts";
-import ProjectCard from "../Components/ProjectCard.tsx";
-import {Input} from "../Components/ui/input.tsx";
-import Header from "@/Components/header.tsx";
-import {Button} from "@/Components/ui/button.tsx";
+import ProjectCard from "@/components/projectCard.tsx";
+import {Input} from "@/components/ui/input.tsx";
+import Header from "@/components/header.tsx";
+import {Button} from "@/components/ui/button.tsx";
 import {useQuery} from "@tanstack/react-query";
 import {searchQuery} from "@/api/searchService.tsx";
 import {useState} from "react";
 
-const ProjectSearchBar = () => {
+/** Project Search Page component <br>
+ * Fetches projects from the backend while typing using the refetch function.
+ * The first 10 projects matching the query are displayed. */
+const ProjectSearchPage = () => {
 
-    const [searchTerm, setSearchTerm] = useState("a");
+    const [searchTerm, setSearchTerm] = useState("");
     const {data, error, isLoading, refetch} = useQuery(searchQuery(searchTerm))
 
     const handleSearch = () => {
@@ -45,4 +48,4 @@ const ProjectSearchBar = () => {
         </>)
 }
 
-export default ProjectSearchBar
+export default ProjectSearchPage

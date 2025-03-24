@@ -8,13 +8,22 @@
 import {queryOptions} from "@tanstack/react-query"
 import config from "../../config.tsx"
 
-export function searchAllQuery() { //call this inside useQuery()
+/**
+ * Creates a search query to be executed in the search page.
+ * @param query the string used for querying the backend
+ */
+export function searchQuery(query: string) {
     return queryOptions({
-        queryKey: ["search"],
-        queryFn: getAllSearchResults
+        queryKey: ["projects", query],
+        queryFn: () => {
+            return query === "" ? getAllSearchResults() : getSearchResults(query)
+        }
     })
 }
 
+/**
+ * The data fetching for getting all projects
+ */
 const getAllSearchResults = async () => {
     const response = await fetch(`${config.apiBaseURL}/projects/all`)
 
@@ -25,13 +34,10 @@ const getAllSearchResults = async () => {
     return response.json()
 }
 
-export function searchQuery(query: string) { //call this inside useQuery()
-    return queryOptions({
-        queryKey: ["projects", query],
-        queryFn: () => getSearchResults(query)
-    })
-}
-
+/**
+ * The actual data fetching for getting a single project query
+ * @param query the string used for querying the backend
+ */
 const getSearchResults = async (query: string) => {
     const response = await fetch(`${config.apiBaseURL}/projects/?query=${query}`)
 

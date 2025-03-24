@@ -5,16 +5,16 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import { Routes, Route } from "react-router";
-import App from "./pages/App.tsx";
+import {Routes, Route} from "react-router";
+import App from "./pages/app.tsx";
 import ProjectPage from "./pages/projectPage.tsx";
 import SettingsPage from "./pages/settingsPage.tsx";
-import ProjectSearchPage from "@/pages/ProjectSearchPage.tsx";
+import ProjectSearchPage from "@/pages/projectSearchPage.tsx";
 
-/*
- this contains all of the different routes to the different pages. 
- We might need to use ? and : (and others) later in order to create optional and branching routes.
-*/
+/**
+ * This contains all different routes to the different pages. <br>
+ * We might need to use ? and : (and others) later in order to create optional and branching routes.
+ */
 
 const allRoutes =
     <Routes>

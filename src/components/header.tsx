@@ -6,15 +6,18 @@
 */
 import {useState, useEffect} from "react";
 import {Menu, Search, User} from "lucide-react";
-import {Button} from "@/Components/ui/button.tsx";
+import {Button} from "@/components/ui/button.tsx";
 import {Link} from 'react-router';
 
+/** Header component <br>
+ * Displays the main pages, search icon and the profile menu with fold-out functionality. <br>On mobile, the menu folds to a menu icon. */
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [isScrollingUp, setIsScrollingUp] = useState(false);
     const [lastScrollTop, setLastScrollTop] = useState(0);
 
+    // When scrolling up, the header becomes sticky. When scrolling down, the header stays behind.
     useEffect(() => {
         const handleScroll = () => {
             const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -52,17 +55,13 @@ export default function Header() {
                     <Button variant="ghost" className="text-primary-foreground">My Projects</Button>
                 </Link>
                 <Link to="/projects/search">
-                    <Button variant="ghost" className="text-primary-foreground">
-                        <div className="hover:text-secondary">
-                            <Search className="w-6 h-6 text-primary-foreground"/>
-                        </div>
+                    <Button variant="ghost">
+                        <Search className="w-6 h-6"/>
                     </Button>
                 </Link>
                 <div className="relative">
                     <Button variant="ghost" size="icon" onClick={() => setUserMenuOpen(!userMenuOpen)}>
-                        <div className="hover:text-secondary">
-                            <User className="w-6 h-6 text-primary-foreground"/>
-                        </div>
+                        <User className="w-6 h-6"/>
                     </Button>
                     {userMenuOpen && (
                         <div
