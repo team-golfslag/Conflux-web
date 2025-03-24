@@ -13,7 +13,6 @@ type ProjectWorksProps = { products: Product[] }
 /**
  * Project Works component
  * @param props the products to be turned into a card
- * @constructor
  */
 export default function ProjectWorks(props: ProjectWorksProps) {
     return (

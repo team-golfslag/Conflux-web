@@ -15,7 +15,8 @@ import {useState} from "react";
 
 /** Project Search Page component <br>
  * Fetches projects from the backend while typing using the refetch function.
- * The first 10 projects matching the query are displayed. */
+ * The first 10 projects matching the query are displayed.
+ */
 const ProjectSearchPage = () => {
 
     const [searchTerm, setSearchTerm] = useState("");

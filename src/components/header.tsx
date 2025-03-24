@@ -10,7 +10,8 @@ import {Button} from "@/components/ui/button.tsx";
 import {Link} from 'react-router';
 
 /** Header component <br>
- * Displays the main pages, search icon and the profile menu with fold-out functionality. <br>On mobile, the menu folds to a menu icon. */
+ * Displays the main pages, search icon and the profile menu with fold-out functionality. <br>On mobile, the menu folds to a menu icon.
+ */
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);

@@ -27,7 +27,8 @@ const timelineData: TimelineItem[] = [
 ];
 
 /** Project page component <br>
- * Uses the 'id' param from the react routing to get the correct page from the backend */
+ * Uses the 'id' param from the react routing to get the correct page from the backend
+ */
 export default function ProjectPage() {
 
     const {id} = useParams();

@@ -5,22 +5,17 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import React from "react";
+export type TimelineItem = { date: string, name: string }
+type TimelineProps = { items: TimelineItem[] }
 
-export class TimelineItem {
-    date: string = '';
-    name: string = '';
-}
-
-interface TimelineProps {
-    items: TimelineItem[];
-}
-
-
-const Timeline: React.FC<TimelineProps> = ({items}) => {
+/**
+ * Timeline component
+ * @param props the list of timeline items to be displayed
+ */
+const Timeline = (props: TimelineProps) => {
     return (
         <div className="relative border-l-2 border-gray-300 pl-4">
-            {items.map((item, index) => (
+            {props.items.map((item, index) => (
                 <div key={index} className="relative mb-6">
                     <div className="absolute -left-6.75 top-1 w-5 h-5 bg-gray-400 rounded-full"></div>
                     <p className="text-gray-400 pt-1 text-sm">{item.date}</p>
