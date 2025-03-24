@@ -24,8 +24,8 @@ jobs:
       - name: Compile TypeScript (type check)
         run: npx tsc --noEmit
 
-      - name: Generate JSDoc
-        run: npx jsdoc -c jsdoc.json
+      - name: Generate TypeDoc
+        run: npx typedoc --options typedoc.json
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
