@@ -5,11 +5,15 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import {Card, CardContent} from "@/Components/ui/card";
+import {Card, CardContent} from "@/components/ui/card";
 import {Product} from "@/types/models.ts";
 
 type ProjectWorksProps = { products: Product[] }
 
+/**
+ * Project Works component
+ * @param props the products to be turned into a card
+ */
 export default function ProjectWorks(props: ProjectWorksProps) {
     return (
         <section className="space-y-4 bg-white p-6 shadow rounded-lg">

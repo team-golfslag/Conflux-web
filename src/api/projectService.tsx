@@ -8,19 +8,26 @@
 import {queryOptions} from "@tanstack/react-query"
 import config from "../../config.tsx"
 
-export const projectQuery = (projectId: string) => { //call this inside useQuery()
+/**
+ * Creates a project query to be executed in the project page.
+ * @param projectId the string id of the project
+ */
+export const projectQuery = (projectId: string) => {
     return queryOptions({
         queryKey: ["project", projectId],
         queryFn: () => getProjectById(projectId)
     })
 };
 
-const getProjectById = async (id: string) => {
-    const response = await fetch(`${config.apiBaseURL}/project/${id}`)
+/**
+ * The actual data fetching for a singular project
+ * @param projectId the string id of the project
+ */
+const getProjectById = async (projectId: string) => {
+    const response = await fetch(`${config.apiBaseURL}/project/${projectId}`)
 
     if (!response.ok) {
         throw new Error("Requested project not found")
     }
-    // console.log(response.ok)
     return response.json()
 }
