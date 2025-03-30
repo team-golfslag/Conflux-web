@@ -6,7 +6,7 @@
 */
 
 import {Card, CardContent} from "@/components/ui/card";
-import {Person} from "@/types/models.ts";
+import {Person} from "@/types/person.ts";
 
 type ProjectContributorsProps = { people: Person[] }
 

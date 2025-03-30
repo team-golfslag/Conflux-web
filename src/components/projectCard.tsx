@@ -5,7 +5,7 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import {Project} from "../types/models.ts";
+import {Project} from "../types/project.ts";
 
 type ProjectCardProps = {
     project: Project

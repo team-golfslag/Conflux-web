@@ -6,7 +6,7 @@
 */
 
 import {Card, CardContent} from "@/components/ui/card";
-import {Product} from "@/types/models.ts";
+import {Product} from "@/types/product.ts";
 
 type ProjectWorksProps = { products: Product[] }
 
