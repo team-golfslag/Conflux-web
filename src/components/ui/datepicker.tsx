@@ -16,11 +16,12 @@ type DatePickerProps = {
     id?: string
     value?: Date
     onChange?: (d?: Date) => void
+    disabled?: boolean
 }
 
 
 
-function DatePicker({onChange, value, id}: DatePickerProps) {
+function DatePicker({onChange, value, id, disabled}: DatePickerProps) {
 
     return (
         <Popover>
@@ -32,6 +33,7 @@ function DatePicker({onChange, value, id}: DatePickerProps) {
                         "w-[240px] justify-start text-left font-normal",
                         !value && "text-muted-foreground"
                     )}
+                    disabled={disabled}
                 >
                     <CalendarIcon />
                     {value ? format(value, "PPP") : <span>Pick a date</span>}

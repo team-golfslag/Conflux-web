@@ -10,10 +10,11 @@ type ProjectFormProps = {
     initialValue?: Project
     onChange?: (newProject: Project) => void
     onSubmit: (newProject: Project) => void
+    disabled?: boolean
 }
 
 
-const ProjectForm = ({title, initialValue, onChange, onSubmit}: ProjectFormProps) => {
+const ProjectForm = ({initialValue, onChange, onSubmit, disabled}: ProjectFormProps) => {
 
     const [currentProject, setCurrentProject] = useState<Project>(initialValue ? initialValue : {
         id: "",
@@ -41,6 +42,7 @@ const ProjectForm = ({title, initialValue, onChange, onSubmit}: ProjectFormProps
                               onChange={(e) => {
                                   setCurrentProject(old => ({...old, title: e.target.value}))
                               }}
+                              disabled={disabled}
                 />
 
                 <LabeledTextarea
@@ -50,6 +52,7 @@ const ProjectForm = ({title, initialValue, onChange, onSubmit}: ProjectFormProps
                     onChange={(e) => {
                         setCurrentProject(old => ({...old, description: e.target.value}))
                     }}
+                    disabled={disabled}
                 />
 
                 <div className="flex flex-row w-full flex-wrap gap-y-4">
@@ -60,6 +63,7 @@ const ProjectForm = ({title, initialValue, onChange, onSubmit}: ProjectFormProps
                             onChange={(startDate) => {
                                 setCurrentProject((old) => ({...old, start_date: startDate}))
                             }}
+                            disabled={disabled}
                         />
                     </div>
                     <div className="min-w-1/2">
@@ -74,7 +78,7 @@ const ProjectForm = ({title, initialValue, onChange, onSubmit}: ProjectFormProps
                 </div>
 
 
-                <Button>Submit</Button>
+                <Button disabled={disabled}>Submit</Button>
             </form>
 
         </div>
