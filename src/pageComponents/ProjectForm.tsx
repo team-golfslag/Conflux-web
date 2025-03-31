@@ -56,18 +56,18 @@ const ProjectForm = ({title, initialValue, onChange, onSubmit}: ProjectFormProps
                     <div className="min-w-1/2">
                         <LabeledDatePicker
                             label="Start date:"
-                            value={currentProject.startDate}
+                            value={currentProject.start_date}
                             onChange={(startDate) => {
-                                setCurrentProject((old) => ({...old, startDate}))
+                                setCurrentProject((old) => ({...old, start_date: startDate}))
                             }}
                         />
                     </div>
                     <div className="min-w-1/2">
                         <LabeledDatePicker
                             label="End date:"
-                            value={currentProject.endDate}
+                            value={currentProject.end_date}
                             onChange={(endDate) => {
-                                setCurrentProject((old) => ({...old, endDate}))
+                                setCurrentProject((old) => ({...old, end_date: endDate}))
                             }}
                         />
                     </div>

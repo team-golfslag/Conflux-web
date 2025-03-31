@@ -13,7 +13,7 @@ import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
 import Timeline, {TimelineItem} from "@/components/timeline";
 import {Project} from "@/types/project.ts";
-import {useParams} from "react-router";
+import {Link, useParams} from "react-router";
 import {useQuery} from "@tanstack/react-query";
 import {projectQuery} from "@/api/projectService.tsx";
 
@@ -33,7 +33,7 @@ export default function ProjectPage() {
 
     const {id} = useParams();
     const projectId = id ? id : "";
-    const {data, error, isLoading} = useQuery(projectQuery(projectId));
+    const {data, error, isLoading} = useQuery<Project>(projectQuery(projectId));
     if (isLoading) return (
         <>
             <Header/>
@@ -75,10 +75,11 @@ export default function ProjectPage() {
                     <span>
                         {project.title}
                     </span>
-                    <button
+                    <Link
+                        to="edit"
                         className="bg-primary m-2 text-primary-foreground p-2 rounded-lg transition-colors duration-300 flex items-center justify-center">
                         <Edit size={24}/>
-                    </button>
+                    </Link>
                 </div>
 
                 <main className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
@@ -104,9 +105,9 @@ export default function ProjectPage() {
                     <aside className="space-y-6">
                         <div className="bg-white p-4 shadow rounded-lg">
                             <h3 className="text-lg font-semibold">Start Date</h3>
-                            <p>{project.start_date.toString()}</p>
+                            <p>{project.start_date?.toDateString()}</p>
                             <h3 className="text-lg font-semibold mt-4">End Date</h3>
-                            <p>{project.end_date.toString()}</p>
+                            <p>{project.end_date?.toDateString()}</p>
                         </div>
 
                         {/* Contributors Section */}

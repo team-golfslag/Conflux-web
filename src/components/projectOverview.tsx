@@ -5,7 +5,7 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-type ProjectOverviewProps = { description: string }
+type ProjectOverviewProps = { description?: string }
 
 /**
  * Project Overview component

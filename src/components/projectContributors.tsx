@@ -8,17 +8,17 @@
 import {Card, CardContent} from "@/components/ui/card";
 import {Person} from "@/types/person.ts";
 
-type ProjectContributorsProps = { people: Person[] }
+type ProjectContributorsProps = { people?: Person[] }
 
 /**
  * Project Contributors component
  * @param props the people to be turned into a card
  */
-export default function ProjectContributors(props: ProjectContributorsProps) {
+export default function ProjectContributors({people}: ProjectContributorsProps) {
     return (
         <section className="space-y-4 bg-white p-6 shadow rounded-lg h-full">
             <h2 className="text-xl font-semibold mb-4">Contributors</h2>
-            {props.people.map((person) => (
+            {people?.map((person) => (
                 <Card key={person.id} className="bg-gray-200">
                     <CardContent className="flex items-center gap-4 p-3">
                         <div className="w-12 h-12 bg-gray-500 rounded-full"/>
