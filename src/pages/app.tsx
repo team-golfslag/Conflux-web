@@ -10,6 +10,10 @@ import {Button} from "@/components/ui/button.tsx";
 function App() {
     return <>
         <div className="w-screen h-screen bg-background flex flex-col items-center justify-center">
+            <div className = "animate-bounce duration-1000">
+                <img className="rounded-full w-30 h-30 object-contain" src="/src/assets/golfslag.png"
+                     alt="team photo"/>
+            </div>
             <div className="m-5 transition-opacity duration-2000 opacity-100 flex flex-col items-center">
                 <h1 className="text-6xl">Welcome to Conflux</h1>
                 <p className="">We kindly ask you to login for a more personalized experience</p>
@@ -17,6 +21,7 @@ function App() {
             <div className = "transition-opacity duration-3000 opacity-100">
                 <Button onClick = {validation}>Log in</Button>
             </div>
+
         </div>
 
     </>
