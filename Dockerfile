@@ -3,7 +3,7 @@ FROM node:alpine AS react-build
 WORKDIR /app
 COPY . ./
 RUN npm i
-RUN npm run build
+RUN npm run build:prod
 
 
 FROM nginx:alpine
