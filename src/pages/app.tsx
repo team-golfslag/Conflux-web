@@ -10,7 +10,7 @@ import {Button} from "@/components/ui/button.tsx";
 function App() {
     return <>
         <div className="w-screen h-screen bg-background flex flex-col items-center justify-center">
-            <div className = "animate-bounce duration-1000">
+            <div className = "">
                 <img className="rounded-full w-30 h-30 object-contain" src="/src/assets/golfslag.png"
                      alt="team photo"/>
             </div>
