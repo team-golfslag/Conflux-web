@@ -1,4 +1,4 @@
-import Project from "@/types/Project.ts";
+import {Project} from "@/types/models.ts";
 import LabeledInput from "@/pageComponents/LabeledInput.tsx";
 import {useEffect, useState} from "react";
 import {Button} from "@/components/ui/button.tsx";
@@ -6,7 +6,6 @@ import LabeledTextarea from "@/pageComponents/LabeledTextarea.tsx";
 import LabeledDatePicker from "@/pageComponents/LabeledDatePicker.tsx";
 
 type ProjectFormProps = {
-    title: string
     initialValue?: Project
     onChange?: (newProject: Project) => void
     onSubmit: (newProject: Project) => void
@@ -16,10 +15,15 @@ type ProjectFormProps = {
 
 const ProjectForm = ({initialValue, onChange, onSubmit, disabled}: ProjectFormProps) => {
 
-    const [currentProject, setCurrentProject] = useState<Project>(initialValue ? initialValue : {
+    const [currentProject, setCurrentProject] = useState<Project>(initialValue || {
         id: "",
         title: ""
     })
+
+    useEffect(() => {
+        if (initialValue)
+            setCurrentProject(initialValue)
+    }, [initialValue]);
 
     useEffect(() => {
         if (onChange)
@@ -28,10 +32,6 @@ const ProjectForm = ({initialValue, onChange, onSubmit, disabled}: ProjectFormPr
     }, [currentProject, onChange])
 
     return <>
-        <div className="w-screen h-20 bg-primary">
-            <h2 className="w-[639px] h-20 justify-center text-accent text-4xl font-bold font-['Work_Sans'] text-center">{title}</h2>
-        </div>
-
         <div className="w-1/2 my-4 bg-Item-Background m-auto min-h-screen">
             <form
                 className="space-y-4"
@@ -73,6 +73,7 @@ const ProjectForm = ({initialValue, onChange, onSubmit, disabled}: ProjectFormPr
                             onChange={(endDate) => {
                                 setCurrentProject((old) => ({...old, end_date: endDate}))
                             }}
+                            disabled={disabled}
                         />
                     </div>
                 </div>
