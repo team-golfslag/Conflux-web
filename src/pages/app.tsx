@@ -12,7 +12,7 @@ function App() {
         <div className="w-screen h-screen bg-background flex flex-col items-center justify-center">
             <div className = "">
                 <img className="rounded-full w-30 h-30 object-contain" src="/src/assets/golfslag.png"
-                     alt="team photo"/>
+                     alt="Golfslag logo"/>
             </div>
             <div className="m-5 transition-opacity duration-2000 opacity-100 flex flex-col items-center">
                 <h1 className="text-6xl">Welcome to Conflux</h1>
