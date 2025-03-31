@@ -18,7 +18,7 @@ function App() {
                 <h1 className="text-6xl">Welcome to Conflux</h1>
                 <p>We kindly ask you to login for a more personalized experience</p>
             </div>
-            <div className>
+            <div>
                 <Button onClick = {validation}>Log in</Button>
             </div>
 
