@@ -44,6 +44,7 @@ function DatePicker({onChange, value, id, disabled}: DatePickerProps) {
                     mode="single"
                     selected={value}
                     onSelect={onChange}
+                    defaultMonth={value}
                     initialFocus
                 />
             </PopoverContent>
