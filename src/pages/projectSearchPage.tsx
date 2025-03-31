@@ -41,7 +41,7 @@ const ProjectSearchPage = () => {
                     {isLoading && <h3>Loading...</h3>}
                     {error && <h3>Error: {(error as Error).message}</h3>}
                     {projects.slice(0, 10).map((project) => (
-                        <ProjectCard project={project}/>
+                        <ProjectCard project={project} key={project.id}/>
                     ))}
                 </div>
             </div>
