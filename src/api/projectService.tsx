@@ -1,6 +1,6 @@
 /*
   This program has been developed by students from the bachelor Computer Science at Utrecht
-  University within the Software Models course.
+  University within the Software Project course.
 
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
@@ -24,7 +24,7 @@ export const projectQuery = (projectId: string) => {
  * @param projectId the string id of the project
  */
 const getProjectById = async (projectId: string) => {
-    const response = await fetch(`${config.apiBaseURL}/project/${projectId}`)
+    const response = await fetch(`${config.apiBaseURL}/projects/${projectId}`)
 
     if (!response.ok) {
         throw new Error("Requested project not found")

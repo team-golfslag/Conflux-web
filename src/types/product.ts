@@ -5,12 +5,8 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import {Navigate} from "react-router";
-
-function App() {
-    return (
-        <Navigate to="/projects/search"/>
-    )
+export type Product = {
+    id: string,
+    title: string,
+    url: string
 }
-
-export default App

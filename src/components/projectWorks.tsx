@@ -1,12 +1,12 @@
 /*
   This program has been developed by students from the bachelor Computer Science at Utrecht
-  University within the Software Models course.
+  University within the Software Project course.
 
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
 import {Card, CardContent} from "@/components/ui/card";
-import {Product} from "@/types/models.ts";
+import {Product} from "@/types/product.ts";
 
 type ProjectWorksProps = { products: Product[] }
 

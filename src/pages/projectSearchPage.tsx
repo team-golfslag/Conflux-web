@@ -4,7 +4,7 @@
 
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
-import {Project} from "../types/models.ts";
+import {Project} from "../types/project.ts";
 import ProjectCard from "@/components/projectCard.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import Header from "@/components/header.tsx";

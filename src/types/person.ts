@@ -5,12 +5,7 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import {Navigate} from "react-router";
-
-function App() {
-    return (
-        <Navigate to="/projects/search"/>
-    )
+export type Person = {
+    id: string,
+    name: string
 }
-
-export default App

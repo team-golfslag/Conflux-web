@@ -1,6 +1,6 @@
 /*
   This program has been developed by students from the bachelor Computer Science at Utrecht
-  University within the Software Models course.
+  University within the Software Project course.
 
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
@@ -12,7 +12,7 @@ import ProjectOverview from "@/components/projectOverview.tsx";
 import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
 import Timeline, {TimelineItem} from "@/components/timeline";
-import {Project} from "@/types/models.ts";
+import {Project} from "@/types/project.ts";
 import {useParams} from "react-router";
 import {useQuery} from "@tanstack/react-query";
 import {projectQuery} from "@/api/projectService.tsx";
@@ -104,9 +104,9 @@ export default function ProjectPage() {
                     <aside className="space-y-6">
                         <div className="bg-white p-4 shadow rounded-lg">
                             <h3 className="text-lg font-semibold">Start Date</h3>
-                            <p>{project.startDate.toString()}</p>
+                            <p>{project.start_date.toString()}</p>
                             <h3 className="text-lg font-semibold mt-4">End Date</h3>
-                            <p>{project.endDate.toString()}</p>
+                            <p>{project.end_date.toString()}</p>
                         </div>
 
                         {/* Contributors Section */}
