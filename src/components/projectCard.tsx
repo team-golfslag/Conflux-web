@@ -6,6 +6,7 @@
 */
 
 import {Project} from "../types/project.ts";
+import {Link} from "react-router";
 
 type ProjectCardProps = {
     project: Project
@@ -16,8 +17,8 @@ type ProjectCardProps = {
  * @param props the project to be turned into the card
  */
 const ProjectCard = (props: ProjectCardProps) => {
-    return <a
-        href={`/project/${props.project.id}`}
+    return <Link
+        to={`/projects/${props.project.id}`}
         className="bg-white w-2/3 max-h-49 rounded-lg border-2 border-border px-4 py-4 flex duration-300 hover:shadow-lg hover:shadow-gray-300 hover:border-purple-700 hover:cursor-pointer my-2">
         <div className="w-1/6 mx-4 flex justify-center">
             <img className="rounded-full  max-w-full max-h-full object-contain" src="/src/assets/golfslag.png"
@@ -27,7 +28,7 @@ const ProjectCard = (props: ProjectCardProps) => {
             <h2 className="text-4xl mb-3">{props.project.title}</h2>
             <p className="text-base text-left">{props.project.description}</p>
         </div>
-    </a>
+    </Link>
 }
 
 export default ProjectCard
