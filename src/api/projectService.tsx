@@ -64,7 +64,7 @@ const getProjectById = async (projectId: string): Promise<Project> => {
 
 
 type ProjectEditSchema = {
-    title?: string,
+    title: string,
     description?: string,
     start_date?: Date,
     end_date?: Date,
