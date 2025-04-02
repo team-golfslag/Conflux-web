@@ -17,7 +17,7 @@ type projectTextBlockProps = { headerText: string, descriptiveText: string }
  * @returns {*}
  */
 const ProjectTextBlock = ({headerText, descriptiveText}: projectTextBlockProps) =>
-    <a className="block max-w-sm p-6 bg-zinc-100
+    <div className="block max-w-sm p-6 bg-zinc-100
                                     border border-zinc-200 rounded-lg shadow-sm 
                                     hover:bg-zinc-200 hover:scale-110 hover:duration-500
                                     focus:ring-2 focus:ring-blue-700">
@@ -25,6 +25,6 @@ const ProjectTextBlock = ({headerText, descriptiveText}: projectTextBlockProps) 
             {headerText}</h5>
         <p className="font-OpenSans text-zinc-500">
             {descriptiveText}</p>
-    </a>
+    </div>
 
 export {ProjectTextBlock}

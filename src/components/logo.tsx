@@ -1,4 +1,4 @@
-function Logo({size}: { size: string }) {
+function Logo({size}: Readonly<{ size: string }>) {
     return (
         <svg
             height={size}

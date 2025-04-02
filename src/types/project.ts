@@ -12,10 +12,10 @@ import {Party} from "@/types/party.ts";
 export type Project = {
     id: string,
     title: string,
-    description: string,
-    start_date: Date,
-    end_date: Date,
-    people: Person[],
-    products: Product[],
-    parties: Party[]
+    description?: string,
+    start_date?: Date,
+    end_date?: Date,
+    people?: Person[],
+    products?: Product[],
+    parties?: Party[]
 }

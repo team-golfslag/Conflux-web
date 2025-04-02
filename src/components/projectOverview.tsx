@@ -5,13 +5,13 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-type ProjectOverviewProps = { description: string }
+type ProjectOverviewProps = { description?: string }
 
 /**
  * Project Overview component
  * @param props the description to be displayed
  */
-export default function ProjectOverview(props: ProjectOverviewProps) {
+export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
     return (
         <section className="bg-white p-6 shadow rounded-lg h-full">
             <h2 className="text-xl font-semibold mb-4">Project Description</h2>
