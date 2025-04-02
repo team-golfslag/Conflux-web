@@ -13,15 +13,15 @@ import {useMutation, useQuery} from "@tanstack/react-query";
 import {editProjectQuery, projectQuery} from "@/api/projectService.tsx";
 
 type ProjectEditParams = {
-    projectId: string
+    id: string
 }
 
 const ProjectEdit = () => {
 
-    const { projectId } = useParams<ProjectEditParams>();
+    const { id } = useParams<ProjectEditParams>();
 
     const [project, setProject] = useState<Project>();
-    const {data: initialData, error, isLoading} = useQuery<Project>(projectQuery(projectId as string));
+    const {data: initialData, error, isLoading} = useQuery<Project>(projectQuery(id as string));
 
     const navigate = useNavigate();
 
@@ -31,13 +31,13 @@ const ProjectEdit = () => {
         }
     }, [initialData, error, isLoading])
 
-    const {mutate, error: mutationError, isPending, isSuccess} = useMutation(editProjectQuery(projectId as string, project))
+    const {mutate, error: mutationError, isPending, isSuccess} = useMutation(editProjectQuery(id as string, project))
 
     useEffect(() => {
         if (isSuccess) {
-            navigate(`/projects/${projectId}`)
+            navigate(`/projects/${id}`)
         }
-    }, [isSuccess, navigate, projectId]);
+    }, [isSuccess, navigate, id]);
 
 
 
@@ -52,9 +52,9 @@ const ProjectEdit = () => {
 
     return <>
         <div className="w-screen h-20 bg-primary">
-            <h2 className="w-[639px] h-20 justify-center text-accent text-4xl font-bold font-['Work_Sans'] text-center">Edit project</h2>
+            <h2 className="w-[639px] h-20 justify-center text-accent text-4xl font-bold font-sans text-center">Edit project</h2>
         </div>
-        {mutationError && <h1>An error occured during the request: {mutationError.message}</h1>}
+        {mutationError && <h1>An error occurred during the request: {mutationError.message}</h1>}
         <ProjectForm initialValue={project}
                      onSubmit={(p) => mutate(p)}
                      disabled={isPending}

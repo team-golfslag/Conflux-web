@@ -25,7 +25,7 @@ const allRoutes =
   <Route path="/projects/search" element={<ProjectSearchPage/>}/>
   <Route path="/projects/new" element={<NewProject/>}/>
   <Route path="/projects/:id" element={<ProjectPage/>}/>
-  <Route path="/projects/:projectId/edit" element={<ProjectEdit/>}/>
+  <Route path="/projects/:id/edit" element={<ProjectEdit/>}/>
 </Routes>
 
 export default allRoutes 
