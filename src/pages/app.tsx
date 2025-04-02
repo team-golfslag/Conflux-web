@@ -4,8 +4,8 @@
 
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
-import {Button} from "@/components/ui/button.tsx";
 
+import {Button} from "@/components/ui/button.tsx";
 
 function App() {
     return (
@@ -19,14 +19,14 @@ function App() {
                 <p>We kindly ask you to login for a more personalized experience</p>
             </div>
             <div>
-                <Button onClick = {validation}>Log in</Button>
+                <Button onClick={validation}>Log in</Button>
             </div>
 
         </div>
     )
 }
 
-const validation = () => window.location.href= '/projects/search'
+const validation = () => window.location.href = '/projects/search'
 
 
 export default App

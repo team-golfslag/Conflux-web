@@ -30,7 +30,7 @@ export function editProjectQuery(projectId: string, original?: Project): UseMuta
 
             const updateRequest: ProjectEditSchema = {
                 title: update.title,
-                description: update.description ?? undefined ,
+                description: update.description ?? undefined,
                 end_date: update.end_date ?? undefined,
                 start_date: update.start_date ?? undefined,
             }
@@ -52,15 +52,13 @@ const getProjectById = async (projectId: string): Promise<Project> => {
     }
 
     const pseudoProject = await response.json()
-    const project: Project = {
+    return {
         ...pseudoProject,
         start_date: new Date(pseudoProject.start_date),
         end_date: new Date(pseudoProject.end_date),
 
     }
-    return project;
 }
-
 
 
 type ProjectEditSchema = {
@@ -69,7 +67,6 @@ type ProjectEditSchema = {
     start_date?: Date,
     end_date?: Date,
 }
-
 
 
 /**
@@ -93,11 +90,31 @@ const editProject = async (projectId: string, update: ProjectEditSchema): Promis
     }
 
     const pseudoProject = await response.json()
-    const project: Project = {
+    return {
         start_date: Date.parse(pseudoProject.start_date),
         end_date: Date.parse(pseudoProject.end_date),
         ...pseudoProject,
-
     }
-    return project
+}
+
+export const addPersonToProjectQuery = (projectId: string, personId: string) => {
+    return {
+        mutationFn: () => addPersonToProject(projectId, personId)
+    }
+}
+
+const addPersonToProject = async (projectId: string, personId: string): Promise<Project> => {
+    const response = await fetch(
+        `${config.apiBaseURL}/projects/${projectId}/addPerson/${personId}`,
+        {
+            method: "POST",
+            body: '',
+            headers: {"Content-Type": "application/json"}
+        })
+
+    if (!response.ok) {
+        throw new Error("Requested project not found")
+    }
+
+    return response.json()
 }
