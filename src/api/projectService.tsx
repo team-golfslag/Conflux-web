@@ -20,11 +20,11 @@ export function projectQuery(projectId: string): UseQueryOptions<Project> {
     }
 }
 
-export function editProjectQuery(projectId: string, origional?: Project): UseMutationOptions<Project, Error, Project> {
+export function editProjectQuery(projectId: string, original?: Project): UseMutationOptions<Project, Error, Project> {
     return {
         mutationFn: (update) => {
 
-            if (!origional) {
+            if (!original) {
                 throw new Error("No original found");
             }
 
