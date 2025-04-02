@@ -1,11 +1,10 @@
-/*
-  This program has been developed by students from the bachelor Computer Science at Utrecht
-  University within the Software Project course.
+/**
+ * This program has been developed by students from the bachelor Computer Science at Utrecht
+ * University within the Software Project course.
+ * © Copyright Utrecht University (Department of Information and Computing Sciences)
+ */
 
-  © Copyright Utrecht University (Department of Information and Computing Sciences)
-*/
-
-import {Routes, Route} from "react-router";
+import { Routes, Route } from "react-router";
 import App from "./pages/app.tsx";
 import ProjectPage from "./pages/projectPage.tsx";
 import SettingsPage from "./pages/settingsPage.tsx";
@@ -18,14 +17,15 @@ import NewProject from "@/pages/NewProject.tsx";
  * We might need to use ? and : (and others) later in order to create optional and branching routes.
  */
 
-const allRoutes = 
-<Routes>
-  <Route index element={<App/>} /> 
-  <Route path="/settings" element={<SettingsPage/>}/>
-  <Route path="/projects/search" element={<ProjectSearchPage/>}/>
-  <Route path="/projects/new" element={<NewProject/>}/>
-  <Route path="/projects/:id" element={<ProjectPage/>}/>
-  <Route path="/projects/:id/edit" element={<ProjectEdit/>}/>
-</Routes>
+const allRoutes = (
+  <Routes>
+    <Route index element={<App />} />
+    <Route path="/settings" element={<SettingsPage />} />
+    <Route path="/projects/search" element={<ProjectSearchPage />} />
+    <Route path="/projects/new" element={<NewProject />} />
+    <Route path="/projects/:id" element={<ProjectPage />} />
+    <Route path="/projects/:id/edit" element={<ProjectEdit />} />
+  </Routes>
+);
 
-export default allRoutes 
+export default allRoutes;
