@@ -6,10 +6,11 @@ import LabeledTextarea from "@/pageComponents/LabeledTextarea.tsx";
 import LabeledDatePicker from "@/pageComponents/LabeledDatePicker.tsx";
 
 type ProjectFormProps = {
-    initialValue?: Project
-    onChange?: (newProject: Project) => void
-    onSubmit: (newProject: Project) => void
-    disabled?: boolean
+    initialValue?: Project,
+    onChange?: (newProject: Project) => void,
+    onSubmit: (newProject: Project) => void,
+    disabled?: boolean,
+    title?: string
 }
 
 
