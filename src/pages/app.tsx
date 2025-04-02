@@ -8,7 +8,7 @@ import {Button} from "@/components/ui/button.tsx";
 
 
 function App() {
-    return <>
+    return (
         <div className="w-screen h-screen bg-background flex flex-col items-center justify-center">
             <div>
                 <img className="rounded-full w-30 h-30 object-contain" src="/src/assets/golfslag.png"
@@ -23,9 +23,7 @@ function App() {
             </div>
 
         </div>
-
-    </>
-
+    )
 }
 
 const validation = () => window.location.href= '/projects/search'

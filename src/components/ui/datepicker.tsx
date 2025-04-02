@@ -21,7 +21,7 @@ type DatePickerProps = {
 
 
 
-function DatePicker({onChange, value, id, disabled}: DatePickerProps) {
+function DatePicker({onChange, value, id, disabled}: Readonly<DatePickerProps>) {
 
     return (
         <Popover>
@@ -45,7 +45,6 @@ function DatePicker({onChange, value, id, disabled}: DatePickerProps) {
                     selected={value}
                     onSelect={onChange}
                     defaultMonth={value}
-                    initialFocus
                 />
             </PopoverContent>
         </Popover>

@@ -14,7 +14,7 @@ type ProjectContributorsProps = { people?: Person[] }
  * Project Contributors component
  * @param props the people to be turned into a card
  */
-export default function ProjectContributors({people}: ProjectContributorsProps) {
+export default function ProjectContributors({people}: Readonly<ProjectContributorsProps>) {
     return (
         <section className="space-y-4 bg-white p-6 shadow rounded-lg h-full">
             <h2 className="text-xl font-semibold mb-4">Contributors</h2>

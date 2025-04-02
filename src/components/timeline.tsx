@@ -15,8 +15,8 @@ type TimelineProps = { items: TimelineItem[] }
 const Timeline = (props: TimelineProps) => {
     return (
         <div className="relative border-l-2 border-gray-300 pl-4">
-            {props.items.map((item, index) => (
-                <div key={index} className="relative mb-6">
+            {props.items.map((item) => (
+                <div key={item.name} className="relative mb-6"> {/* TODO a unique key is required for each item */}
                     <div className="absolute -left-6.75 top-1 w-5 h-5 bg-gray-400 rounded-full"></div>
                     <p className="text-gray-400 pt-1 text-sm">{item.date}</p>
                     <p className="text-xl font-semibold text-black">{item.name}</p>

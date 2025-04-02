@@ -32,7 +32,7 @@ const timelineData: TimelineItem[] = [
 export default function ProjectPage() {
 
     const {id} = useParams();
-    const projectId = id ? id : "";
+    const projectId = id ?? "";
     const {data, error, isLoading} = useQuery<Project>(projectQuery(projectId));
     if (isLoading) return (
         <>

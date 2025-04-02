@@ -14,7 +14,7 @@ type ProjectWorksProps = { products?: Product[] }
  * Project Works component
  * @param props the products to be turned into a card
  */
-export default function ProjectWorks({products}: ProjectWorksProps) {
+export default function ProjectWorks({products}: Readonly<ProjectWorksProps>) {
     return (
         <section className="space-y-4 bg-white p-6 shadow rounded-lg">
             <h2 className="text-xl font-semibold mb-4">Works</h2>

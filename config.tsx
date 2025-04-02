@@ -5,9 +5,6 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-// import dotenv from 'dotenv';
-
-// dotenv.config();
 
 const config = {
     apiBaseURL: "http://localhost:8000"//process.env.API_BASE_URL

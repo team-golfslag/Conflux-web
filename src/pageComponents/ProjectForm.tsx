@@ -1,4 +1,4 @@
-import {Project} from "@/types/models.ts";
+import {Project} from "@/types/project.ts";
 import LabeledInput from "@/pageComponents/LabeledInput.tsx";
 import {useEffect, useState} from "react";
 import {Button} from "@/components/ui/button.tsx";
@@ -31,7 +31,7 @@ const ProjectForm = ({initialValue, onChange, onSubmit, disabled}: ProjectFormPr
 
     }, [currentProject, onChange])
 
-    return <>
+    return (
         <div className="w-1/2 my-4 bg-Item-Background m-auto min-h-screen">
             <form
                 className="space-y-4"
@@ -40,7 +40,7 @@ const ProjectForm = ({initialValue, onChange, onSubmit, disabled}: ProjectFormPr
                               placeholder="Project title..."
                               value={currentProject.title}
                               onChange={(e) => {
-                                  setCurrentProject(old => ({...old, title: e.target.value}))
+                                  setCurrentProject((old: Project) => ({...old, title: e.target.value}))
                               }}
                               disabled={disabled}
                 />
@@ -50,7 +50,7 @@ const ProjectForm = ({initialValue, onChange, onSubmit, disabled}: ProjectFormPr
                     placeholder="Project Description..."
                     value={currentProject.description}
                     onChange={(e) => {
-                        setCurrentProject(old => ({...old, description: e.target.value}))
+                        setCurrentProject((old: Project) => ({...old, description: e.target.value}))
                     }}
                     disabled={disabled}
                 />
@@ -61,7 +61,7 @@ const ProjectForm = ({initialValue, onChange, onSubmit, disabled}: ProjectFormPr
                             label="Start date:"
                             value={currentProject.start_date}
                             onChange={(startDate) => {
-                                setCurrentProject((old) => ({...old, start_date: startDate}))
+                                setCurrentProject((old: Project) => ({...old, start_date: startDate}))
                             }}
                             disabled={disabled}
                         />
@@ -71,7 +71,7 @@ const ProjectForm = ({initialValue, onChange, onSubmit, disabled}: ProjectFormPr
                             label="End date:"
                             value={currentProject.end_date}
                             onChange={(endDate) => {
-                                setCurrentProject((old) => ({...old, end_date: endDate}))
+                                setCurrentProject((old: Project) => ({...old, end_date: endDate}))
                             }}
                             disabled={disabled}
                         />
@@ -83,7 +83,7 @@ const ProjectForm = ({initialValue, onChange, onSubmit, disabled}: ProjectFormPr
             </form>
 
         </div>
-    </>
+    )
 }
 
 export default ProjectForm

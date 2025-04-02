@@ -5,7 +5,7 @@
   © Copyright Utrecht University (Department of Information and Computing Sciences)
 */
 
-import {Project} from "@/types/models.ts";
+import {Project} from "@/types/project.ts";
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router";
 import ProjectForm from "@/pageComponents/ProjectForm.tsx";
