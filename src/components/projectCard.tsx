@@ -1,34 +1,40 @@
-/*
-  This program has been developed by students from the bachelor Computer Science at Utrecht
-  University within the Software Project course.
+/**
+ * This program has been developed by students from the bachelor Computer Science at Utrecht
+ * University within the Software Project course.
+ * © Copyright Utrecht University (Department of Information and Computing Sciences)
+ */
 
-  © Copyright Utrecht University (Department of Information and Computing Sciences)
-*/
-
-import {Project} from "../types/project.ts";
-import {Link} from "react-router";
+import { Project } from "../types/project.ts";
+import { Link } from "react-router";
+import logo from "@/assets/golfslag.png";
 
 type ProjectCardProps = {
-    project: Project
-}
+  project: Project;
+};
 
 /**
  * Project Card component
  * @param props the project to be turned into the card
  */
 const ProjectCard = (props: ProjectCardProps) => {
-    return <Link
-        to={`/projects/${props.project.id}`}
-        className="bg-white w-2/3 max-h-49 rounded-lg border-2 border-border px-4 py-4 flex duration-300 hover:shadow-lg hover:shadow-gray-300 hover:border-purple-700 hover:cursor-pointer my-2">
-        <div className="w-1/6 mx-4 flex justify-center">
-            <img className="rounded-full  max-w-full max-h-full object-contain" src="/src/assets/golfslag.png"
-                 alt="team logo"/>
-        </div>
-        <div className="flex flex-col mx-2 w-full p-2 overflow-y-clip">
-            <h2 className="text-4xl mb-3">{props.project.title}</h2>
-            <p className="text-base text-left">{props.project.description}</p>
-        </div>
+  return (
+    <Link
+      to={`/projects/${props.project.id}`}
+      className="border-border my-2 flex max-h-49 w-2/3 rounded-lg border-2 bg-white px-4 py-4 duration-300 hover:cursor-pointer hover:border-purple-700 hover:shadow-lg hover:shadow-gray-300"
+    >
+      <div className="mx-4 flex w-1/6 justify-center">
+        <img
+          className="max-h-full max-w-full rounded-full object-contain"
+          src={logo}
+          alt="logo"
+        />
+      </div>
+      <div className="mx-2 flex w-full flex-col overflow-y-clip p-2">
+        <h2 className="mb-3 text-4xl">{props.project.title}</h2>
+        <p className="text-left text-base">{props.project.description}</p>
+      </div>
     </Link>
-}
+  );
+};
 
-export default ProjectCard
+export default ProjectCard;

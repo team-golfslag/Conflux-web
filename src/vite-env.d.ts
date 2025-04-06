@@ -3,6 +3,11 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-type Guid = string;
 
-export type { Guid };
+interface ImportMetaEnv {
+  readonly VITE_API_URL: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}

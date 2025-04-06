@@ -8,6 +8,9 @@ concurrency:
   group: end-to-end-${{ github.head_ref }}
   cancel-in-progress: true
 
+env:
+  NODE_VERSION: 20.18.3
+
 jobs:
   end-to-end:
     name: Build Frontend and Analyse with SonarCloud
@@ -15,14 +18,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - uses: oven-sh/setup-bun@v2
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: "**/package.json"
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: Install dependencies
-        run: bun install
+        run: npm install
       - name: Build the project
         run: |
-          bun run build
+          npm run build
