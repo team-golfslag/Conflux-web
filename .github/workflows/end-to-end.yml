@@ -28,6 +28,9 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # temporary workaround for issue https://github.com/npm/cli/issues/4828
+      - name: Remove package lock
+        run: rm package-lock.json
       - name: Install dependencies
         run: npm install
       - name: Build the project
