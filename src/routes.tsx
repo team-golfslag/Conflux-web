@@ -4,7 +4,7 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { Routes, Route } from "react-router";
+import {Routes, Route} from "react-router";
 import App from "./pages/app.tsx";
 import ProjectPage from "./pages/projectPage.tsx";
 import SettingsPage from "./pages/settingsPage.tsx";
@@ -19,15 +19,15 @@ import PersonSearch from "@/components/personSearch.tsx";
  */
 
 const allRoutes = (
-  <Routes>
-    <Route index element={<App />} />
-    <Route path="/settings" element={<SettingsPage />} />
-    <Route path="/projects/search" element={<ProjectSearchPage />} />
-    <Route path="/projects/new" element={<NewProject />} />
-    <Route path="/projects/:id" element={<ProjectPage />} />
-    <Route path="/projects/:id/edit" element={<ProjectEdit />} />
-    <Route path="/people/search" element={<PersonSearch />} />
-  </Routes>
+    <Routes>
+        <Route index element={<App/>}/>
+        <Route path="/settings" element={<SettingsPage/>}/>
+        <Route path="/projects/search" element={<ProjectSearchPage/>}/>
+        <Route path="/projects/new" element={<NewProject/>}/>
+        <Route path="/projects/:id" element={<ProjectPage/>}/>
+        <Route path="/projects/:id/edit" element={<ProjectEdit/>}/>
+        <Route path="/people/search" element={<PersonSearch/>}/>
+    </Routes>
 );
 
 export default allRoutes;

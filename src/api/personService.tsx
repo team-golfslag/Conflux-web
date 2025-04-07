@@ -4,41 +4,44 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { queryOptions, UseMutationOptions } from "@tanstack/react-query";
+import {queryOptions, UseMutationOptions} from "@tanstack/react-query"
 import config from "@/config.ts";
-import { Person } from "@/types/person.ts";
+import {Person} from "@/types/person.ts";
 
 export function createPersonQuery(name: string): UseMutationOptions<Person> {
-  return {
-    mutationFn: () => createPerson(name),
-  };
+    return {
+        mutationFn: () => createPerson(name)
+    }
 }
 
 const createPerson = async (personName: string): Promise<Person> => {
-  const response = await fetch(`${config.apiBaseURL}/people`, {
-    method: "POST",
-    body: JSON.stringify({ name: personName }),
-    headers: { "Content-Type": "application/json" },
-  });
+    const response = await fetch(
+        `${config.apiBaseURL}/people`,
+        {
+            method: "POST",
+            body: JSON.stringify({"name": personName}),
+            headers: {"Content-Type": "application/json"}
+        }
+    )
 
-  if (!response.ok) {
-    throw new Error(await response.text());
-  }
+    if (!response.ok) {
+        throw new Error(await response.text())
+    }
 
-  return await response.json();
-};
+    return await response.json();
+}
 
 /**
  * Creates a search query to be executed in the search page.
  * @param query the string used for querying the backend
  */
 export function searchPeopleQuery(query: string) {
-  return queryOptions({
-    queryKey: ["people", query],
-    queryFn: () => {
-      return getSearchResults(query);
-    },
-  });
+    return queryOptions({
+        queryKey: ["people", query],
+        queryFn: () => {
+            return getSearchResults(query);
+        },
+    });
 }
 
 /**
@@ -46,11 +49,11 @@ export function searchPeopleQuery(query: string) {
  * @param query the string used for querying the backend
  */
 const getSearchResults = async (query: string) => {
-  const response = await fetch(`${config.apiBaseURL}/people/?query=${query}`);
+    const response = await fetch(`${config.apiBaseURL}/people/?query=${query}`);
 
-  if (!response.ok) {
-    throw new Error("No people found");
-  }
+    if (!response.ok) {
+        throw new Error("No people found");
+    }
 
-  return response.json();
+    return response.json();
 };

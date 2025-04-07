@@ -4,7 +4,7 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { queryOptions } from "@tanstack/react-query";
+import {queryOptions} from "@tanstack/react-query";
 import config from "../config";
 
 /**
@@ -12,25 +12,25 @@ import config from "../config";
  * @param query the string used for querying the backend
  */
 export function searchProjectsQuery(query: string) {
-  return queryOptions({
-    queryKey: ["projects", query],
-    queryFn: () => {
-      return query === "" ? getAllSearchResults() : getSearchResults(query);
-    },
-  });
+    return queryOptions({
+        queryKey: ["projects", query],
+        queryFn: () => {
+            return query === "" ? getAllSearchResults() : getSearchResults(query);
+        },
+    });
 }
 
 /**
  * The data fetching for getting all projects
  */
 const getAllSearchResults = async () => {
-  const response = await fetch(`${config.apiBaseURL}/projects/all`);
+    const response = await fetch(`${config.apiBaseURL}/projects/all`);
 
-  if (!response.ok) {
-    throw new Error("No projects found");
-  }
+    if (!response.ok) {
+        throw new Error("No projects found");
+    }
 
-  return response.json();
+    return response.json();
 };
 
 /**
@@ -38,11 +38,11 @@ const getAllSearchResults = async () => {
  * @param query the string used for querying the backend
  */
 const getSearchResults = async (query: string) => {
-  const response = await fetch(`${config.apiBaseURL}/projects/?query=${query}`);
+    const response = await fetch(`${config.apiBaseURL}/projects/?query=${query}`);
 
-  if (!response.ok) {
-    throw new Error("No projects found");
-  }
+    if (!response.ok) {
+        throw new Error("No projects found");
+    }
 
-  return response.json();
+    return response.json();
 };

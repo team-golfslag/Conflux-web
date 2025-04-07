@@ -3,11 +3,11 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { PersonSelect } from "@/components/personSelect.tsx";
+import {PersonSelect} from "@/components/personSelect.tsx";
 
 export function PersonAddDialog() {
-  return (
-    // <Dialog open={true}/>
-    <PersonSelect />
-  );
+    return (
+        // <Dialog open={true}/>
+        <PersonSelect/>
+    )
 }
