@@ -3,6 +3,13 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-type Guid = string;
 
-export type { Guid };
+export type Config = {
+  apiBaseURL: string;
+};
+
+const config: Config = {
+  apiBaseURL: import.meta.env.VITE_API_URL,
+};
+
+export default config;
