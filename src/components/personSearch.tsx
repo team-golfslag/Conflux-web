@@ -3,29 +3,24 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { Project } from "../types/project.ts";
-import ProjectCard from "@/components/projectCard.tsx";
-import { Input } from "@/components/ui/input.tsx";
-import Header from "@/components/header.tsx";
-import { Button } from "@/components/ui/button.tsx";
 import { useQuery } from "@tanstack/react-query";
-import { searchProjectsQuery } from "@/api/searchService.tsx";
+import { Person } from "@/types/person.ts";
 import { useState } from "react";
+import Header from "@/components/header.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { searchPeopleQuery } from "@/api/personService.tsx";
 
-/** Project Search Page component <br>
- * Fetches projects from the backend while typing using the refetch function.
- * The first 10 projects matching the query are displayed.
- */
-const ProjectSearchPage = () => {
+const PersonSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { data, error, isLoading, refetch } = useQuery(
-    searchProjectsQuery(searchTerm),
+    searchPeopleQuery(searchTerm),
   );
 
   const handleSearch = () => {
     refetch();
   };
-  const projects = (data as Project[]) || [];
+  const people = (data as Person[]) || [];
 
   return (
     <>
@@ -46,8 +41,8 @@ const ProjectSearchPage = () => {
           <h2 className="mb-8 text-3xl font-bold">Results</h2>
           {isLoading && <h3>Loading...</h3>}
           {error && <h3>Error: {error.message}</h3>}
-          {projects.slice(0, 10).map((project) => (
-            <ProjectCard project={project} key={project.id} />
+          {people.slice(0, 10).map((person) => (
+            <p>{person.name}</p>
           ))}
         </div>
       </div>
@@ -55,4 +50,4 @@ const ProjectSearchPage = () => {
   );
 };
 
-export default ProjectSearchPage;
+export default PersonSearch;

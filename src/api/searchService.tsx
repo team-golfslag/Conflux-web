@@ -11,7 +11,7 @@ import config from "../config";
  * Creates a search query to be executed in the search page.
  * @param query the string used for querying the backend
  */
-export function searchQuery(query: string) {
+export function searchProjectsQuery(query: string) {
   return queryOptions({
     queryKey: ["projects", query],
     queryFn: () => {

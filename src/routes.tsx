@@ -11,6 +11,7 @@ import SettingsPage from "./pages/settingsPage.tsx";
 import ProjectSearchPage from "@/pages/projectSearchPage.tsx";
 import ProjectEdit from "@/pages/ProjectEdit.tsx";
 import NewProject from "@/pages/NewProject.tsx";
+import PersonSearch from "@/components/personSearch.tsx";
 
 /**
  * This contains all different routes to the different pages. <br>
@@ -25,6 +26,7 @@ const allRoutes = (
     <Route path="/projects/new" element={<NewProject />} />
     <Route path="/projects/:id" element={<ProjectPage />} />
     <Route path="/projects/:id/edit" element={<ProjectEdit />} />
+    <Route path="/people/search" element={<PersonSearch />} />
   </Routes>
 );
 
