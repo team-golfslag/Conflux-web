@@ -29,5 +29,6 @@ export type Party = {
 export type Product = {
     id: string,
     title: string,
-    url: string
+    url: string,
+    isvalid : boolean,
 }
