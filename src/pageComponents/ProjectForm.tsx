@@ -42,7 +42,7 @@ const ProjectForm = ({
     }, [currentProject, onChange]);
 
     return (
-        <div className="flex justify-between">
+        <div className="flex justify-center">
             <div className="bg-Item-Background my-4 min-h-screen w-1/2 flex-col flex">
                 <form className="space-y-4" action={() => onSubmit(currentProject)}>
                     <LabeledInput
@@ -104,9 +104,9 @@ const ProjectForm = ({
                 </form>
             </div>
             <div id="contributor-container"
-                 className="h-100 overflow-y-scroll m-2 w-1/5 flex flex-col rounded-lg border-2 bg-white p-4 border-borderpx-4 py-4">
-                {currentProject.people?.map((person) => (<PersonCard person={person}/>))}
+                 className=" m-2 w-1/5 flex flex-col rounded-lg border-2 bg-white p-4 border-borderpx-4 py-4">
                 <PersonSelect/>
+                {currentProject.people?.map((person) => (<PersonCard person={person}/>))}
             </div>
         </div>
     );

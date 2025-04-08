@@ -73,13 +73,14 @@ export function PersonSelect() {
                 duration-300 hover:cursor-pointer hover:border-purple-700 hover:shadow-lg hover:shadow-gray-300">
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
-                        <Button>
-                            <div className="mx-4 flex w-1/6 justify-center">
-                                <Plus className="h-full w-full rounded-full object-contain"/>
-                            </div>
-                            <div className="mx-2 flex w-full flex-col overflow-y-clip p-2">
-                                <h2 className="mb-3 text-2xl">Add new person</h2>
-                            </div>
+                        <Button className="flex flex-row overflow-hidden justify-left">
+
+                                <div className="mx-2 flex w-max">
+                                    <Plus className="h-full w-full rounded-full object-contain"/>
+                                </div>
+                                <div className="mx-2 my-5 w-full">
+                                    <h2 className="mb-3 text-2xl my-2 overflow-hidden max-w-full">Add new person</h2>
+                                </div>
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[200px] p-0" align="start">
