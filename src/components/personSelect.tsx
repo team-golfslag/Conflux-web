@@ -73,7 +73,7 @@ export function PersonSelect() {
                 duration-300 hover:cursor-pointer hover:border-purple-700 hover:shadow-lg hover:shadow-gray-300">
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
-                        <Button className="flex flex-row overflow-hidden justify-left">
+                        <Button className="max-w-full">
 
                                 <div className="mx-2 flex w-max">
                                     <Plus className="h-full w-full rounded-full object-contain"/>
