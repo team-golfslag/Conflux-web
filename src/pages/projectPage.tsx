@@ -81,7 +81,7 @@ export default function ProjectPage() {
                         <TabsTrigger value="works">Works</TabsTrigger>
                     </TabsList>
                     <TabsContent value="overview">
-                        <ProjectOverviewdescription={project.description}/>
+                        <ProjectOverview description={project.description}/>
                     </TabsContent>
                     <TabsContent value="contributors">
                 <ProjectContributors people={project.people} /></TabsContent>
