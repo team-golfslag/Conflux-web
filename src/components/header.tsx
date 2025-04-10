@@ -37,7 +37,7 @@ export default function Header() {
 
   return (
     <header
-      className={`bg-primary text-primary-foreground flex sticky w-full items-center justify-center py-2 transition-all duration-400 ease-in-out ${
+      className={`bg-primary text-primary-foreground sticky flex w-full items-center justify-center py-2 transition-all duration-400 ease-in-out ${
         isScrollingUp ? "top-0" : "-top-20"
       } z-1`}
     >
@@ -51,8 +51,8 @@ export default function Header() {
         <nav className="hidden items-center gap-6 md:flex">
           <Link to="/getting-started">
             <Button
-                variant="ghost"
-                className="text-primary-foreground bg-primary"
+              variant="ghost"
+              className="text-primary-foreground bg-primary"
             >
               Getting Started
             </Button>
@@ -74,33 +74,33 @@ export default function Header() {
           </Link>
           <div className="relative">
             <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
+              variant="ghost"
+              size="icon"
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
             >
               <User className="h-6 w-6" />
             </Button>
             {userMenuOpen && (
-                <div className="bg-primary text-primary-foreground absolute right-0 mt-2 w-48 rounded-md shadow-lg">
-                  <Link
-                      to="/profile"
-                      className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                      to="/settings"
-                      className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
-                  >
-                    Settings
-                  </Link>
-                  <Link
-                      to="/logout"
-                      className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
-                  >
-                    Log Out
-                  </Link>
-                </div>
+              <div className="bg-primary text-primary-foreground absolute right-0 mt-2 w-48 rounded-md shadow-lg">
+                <Link
+                  to="/profile"
+                  className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
+                >
+                  Profile
+                </Link>
+                <Link
+                  to="/settings"
+                  className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
+                >
+                  Settings
+                </Link>
+                <Link
+                  to="/logout"
+                  className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
+                >
+                  Log Out
+                </Link>
+              </div>
             )}
           </div>
         </nav>
