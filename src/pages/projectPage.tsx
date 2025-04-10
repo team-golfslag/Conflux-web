@@ -4,7 +4,6 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import Header from "@/components/header.tsx";
 import { Edit } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProjectOverview from "@/components/projectOverview.tsx";
@@ -33,19 +32,13 @@ export default function ProjectPage() {
   const { data, error, isLoading } = useQuery<Project>(projectQuery(projectId));
   if (isLoading)
     return (
-      <>
-        <div className="bg-secondary min-h-full p-8">
           <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
             <span>Loading...</span>
           </div>
-        </div>
-      </>
     );
   if (error)
     return (
       <>
-        <Header />
-        <div className="bg-secondary min-h-fullp-8">
           <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
             <span>{error.name}</span>
           </div>
@@ -53,15 +46,12 @@ export default function ProjectPage() {
           <div className="text-l flex items-center justify-between rounded-lg bg-white p-3">
             <span>{error.message}</span>
           </div>
-        </div>
       </>
     );
   const project = data as Project;
 
   return (
     <>
-      <Header />
-      <div className="bg-secondary min-h-full p-8">
         {/* Title */}
         <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
           <span>{project.title}</span>
@@ -110,7 +100,6 @@ export default function ProjectPage() {
             </div>
           </aside>
         </main>
-      </div>
     </>
   );
 }

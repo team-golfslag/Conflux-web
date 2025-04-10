@@ -10,13 +10,13 @@ import { ReactElement } from "react";
 import { Outlet } from "react-router-dom";
 
 /** Layout component <br>
- *
+ * This component is used to create the layout of the page.
  */
 export default function Layout(): ReactElement {
   return (
     <>
       <Header />
-      <div className="mb-5 min-h-screen">
+      <div className="min-h-screen">
         <Outlet />
       </div>
       <Footer />
