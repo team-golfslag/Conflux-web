@@ -14,8 +14,8 @@ export default function Footer() {
     <footer className="bg-primary flex h-30 w-full justify-center">
       <div className="flex w-full max-w-6xl items-center px-8 py-4">
         <img className="h-16 w-16" src={logo} alt="" />
-        <div className="flex w-full flex-col justify-center px-16 py-4">
-          <p className="text-white">© Utrecht University (ICS) 2025</p>
+        <div className="flex w-full flex-col justify-center gap-1 px-8 sm:px-16 py-4">
+          <p className="flex text-white">© Utrecht University (ICS) <span className="hidden sm:block pl-1">2025</span></p>
           <a
             className="flex items-center gap-2 text-zinc-300 hover:text-white"
             href="https://github.com/team-golfslag"
