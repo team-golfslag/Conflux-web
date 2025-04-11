@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { Menu, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { Link } from "react-router";
-
+import config from "@/config";
 /** Header component <br>
  * Displays the main pages, search icon and the profile menu with fold-out functionality. <br>On mobile, the menu folds to a menu icon.
  */
@@ -34,7 +34,6 @@ export default function Header() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, [lastScrollTop]);
-
   return (
     <header
       className={`bg-primary text-primary-foreground flex w-full items-center justify-between p-4 transition-transform duration-500 ease-in-out md:p-6 ${
@@ -94,7 +93,9 @@ export default function Header() {
                 Settings
               </Link>
               <Link
-                to="/logout"
+                to={`${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(
+                  config.webUIUrl,
+                )}`}
                 className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
               >
                 Log Out
@@ -137,7 +138,7 @@ export default function Header() {
               Recent Projects
             </Button>
           </Link>
-          <Link to="/my-projects">
+          <Link to="/projects/search">
             <Button variant="ghost" className="text-primary-foreground w-full">
               My Projects
             </Button>

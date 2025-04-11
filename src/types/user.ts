@@ -3,12 +3,13 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
+import { Collaboration } from "./collaboration";
 
-interface ImportMetaEnv {
-  readonly VITE_API_URL: string;
-  readonly VITE_WEBUI_URL: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
+export type User = {
+  id: string;
+  name: string;
+  given_name: string;
+  family_name: string;
+  email: string;
+  collaborations: Collaboration[];
+};

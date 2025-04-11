@@ -3,12 +3,10 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
+import { Group } from "./group";
 
-interface ImportMetaEnv {
-  readonly VITE_API_URL: string;
-  readonly VITE_WEBUI_URL: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
+export type Collaboration = {
+  organization: string;
+  collaboration_group: Group;
+  groups: Group[];
+};
