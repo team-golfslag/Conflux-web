@@ -41,10 +41,12 @@ export default function Header() {
         isScrollingUp ? "sticky top-0" : "-top-16"
       } z-1`}
     >
-      <div className="flex items-center gap-4">
-        <div className="bg-secondary h-12 w-12 rounded-full" />
-        <span className="text-xl font-bold">CONFLUX</span>
-      </div>
+      <Link to="/dashboard">
+        <div className="flex items-center gap-4">
+          <div className="bg-secondary h-12 w-12 rounded-full" />
+          <span className="text-xl font-bold">CONFLUX</span>
+        </div>
+      </Link>
 
       {/* Desktop Navigation */}
       <nav className="hidden items-center gap-6 md:flex">
