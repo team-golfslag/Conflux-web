@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { searchQuery } from "@/api/searchService.tsx";
 import { useState } from "react";
+import { Separator } from "@/components/ui/separator.tsx"
 
 /** Project Search Page component <br>
  * Fetches projects from the backend while typing using the refetch function.
@@ -41,9 +42,10 @@ const ProjectSearchPage = () => {
           </Button>
         </div>
         <div className="flex flex-col items-center">
-          <h2 className="mb-8 text-3xl font-bold">Results</h2>
+          <Separator className="w-2/3 my-8" />
           {isLoading && <h3>Loading...</h3>}
           {error && <h3>Error: {error.message}</h3>}
+          {projects.length === 0 && <h3>No results found</h3>}
           {projects.slice(0, 10).map((project) => (
             <ProjectCard project={project} key={project.id} />
           ))}
