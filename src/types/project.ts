@@ -6,6 +6,7 @@
 import { Person } from "@/types/person.ts";
 import { Product } from "@/types/product.ts";
 import { Party } from "@/types/party.ts";
+import { Role } from "@/types/role.ts";
 
 export type Project = {
   id: string;
@@ -16,4 +17,5 @@ export type Project = {
   people?: Person[];
   products?: Product[];
   parties?: Party[];
+  roles?: Role[];
 };

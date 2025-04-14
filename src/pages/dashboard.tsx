@@ -66,7 +66,14 @@ const Dashboard = () => {
                 <div className="flex-grow"></div>
                 <div className="flex justify-end">
                   <p className="text-sm leading-7 text-gray-500 [&:not(:first-child)]:mt-6">
-                    Role: not available
+                    {/* only show first 3 roles */}
+                    Roles:{" "}
+                    {project.roles!.length > 3
+                      ? project
+                          .roles!.slice(0, 3)
+                          .map((role) => role.name)
+                          .join(", ") + "..."
+                      : project.roles!.map((role) => role.name).join(", ")}
                   </p>
                   <div className="flex-grow"></div>
                   <Link to={`/projects/${project.id}`}>

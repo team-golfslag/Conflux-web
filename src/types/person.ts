@@ -4,7 +4,11 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
+import { Role } from "./role";
+
 export type Person = {
   id: string;
   name: string;
+  email: string;
+  roles: Role[];
 };

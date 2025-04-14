@@ -3,3 +3,11 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
+
+export type Role = {
+  id: string;
+  project_id: string;
+  name: string;
+  description?: string;
+  urn: string;
+};

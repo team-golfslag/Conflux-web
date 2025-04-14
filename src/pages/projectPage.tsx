@@ -88,7 +88,7 @@ export default function ProjectPage() {
             <h3 className="text-lg font-semibold">Start Date</h3>
             <p>{project.start_date?.toDateString()}</p>
             <h3 className="mt-4 text-lg font-semibold">End Date</h3>
-            <p>{project.end_date?.toDateString()}</p>
+            <p>TBD</p>
           </div>
 
           {/* Contributors Section */}

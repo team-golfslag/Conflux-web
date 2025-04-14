@@ -25,7 +25,10 @@ export default function ProjectContributors({
             <div className="h-12 w-12 rounded-full bg-gray-500" />
             <div>
               <p className="font-semibold">{person.name}</p>
-              <p className="text-sm text-gray-600">Role</p>
+              <p className="text-sm text-gray-600">{person.email}</p>
+              <p className="text-sm text-gray-600">
+                {person.roles.map((role) => role.name).join(", ")}
+              </p>
             </div>
           </CardContent>
         </Card>
