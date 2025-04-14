@@ -47,7 +47,7 @@ const Dashboard = () => {
           {projectData?.map((project, index) => (
             <Card
               key={index}
-              className="flex h-60 flex-col gap-0 py-0 pt-6 shadow-md"
+              className="flex h-60 flex-col gap-0 m-3 py-0 pt-6 shadow-md"
             >
               <CardHeader className="bg-gray-100 p-4">
                 <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
