@@ -6,10 +6,12 @@
 
 export type Config = {
   apiBaseURL: string;
+  webUIUrl: string;
 };
 
 const config: Config = {
   apiBaseURL: import.meta.env.VITE_API_URL,
+  webUIUrl: import.meta.env.VITE_WEBUI_URL,
 };
 
 export default config;

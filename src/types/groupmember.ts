@@ -3,12 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-
-interface ImportMetaEnv {
-  readonly VITE_API_URL: string;
-  readonly VITE_WEBUI_URL: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
+export type GroupMember = {
+  display_name: string;
+  sram_id: string;
+};
