@@ -12,7 +12,6 @@ import {Link} from "react-router";
  * Displays the main pages, search icon and the profile menu with fold-out functionality. <br>On mobile, the menu folds to a menu icon.
  */
 export default function Header() {
-    // const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [isScrollingUp, setIsScrollingUp] = useState(false);
     const [lastScrollTop, setLastScrollTop] = useState(0);
