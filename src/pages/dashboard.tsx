@@ -43,15 +43,18 @@ const Dashboard = () => {
         </div>
 
         {/* User's Projects Section */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {projectData?.map((project, index) => (
-            <Card key={index} className="flex flex-col shadow-md">
-              <CardHeader className="rounded-t-md bg-gray-100 p-4">
+            <Card
+              key={index}
+              className="flex h-60 flex-col gap-0 py-0 pt-6 shadow-md"
+            >
+              <CardHeader className="bg-gray-100 p-4">
                 <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
                   {project.title}
                 </h4>
               </CardHeader>
-              <CardContent className="flex flex-grow flex-col p-4">
+              <CardContent className="flex flex-grow flex-col p-4 wrap-break-word">
                 {/* Project Description (truncated if too long) */}
                 <p className="leading-7 [&:not(:first-child)]:mt-6">
                   {truncate(project.description, {
