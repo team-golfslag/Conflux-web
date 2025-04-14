@@ -4,7 +4,6 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import { userSessionQuery } from "@/api/userSessionService";
-import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { User } from "@/types/user";
@@ -16,7 +15,6 @@ const Dashboard = () => {
   if (isLoading)
     return (
       <>
-        <Header />
         <div className="bg-secondary min-h-full p-8">
           <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
             <span>Loading...</span>
@@ -26,7 +24,6 @@ const Dashboard = () => {
     );
   return (
     <>
-      <Header />
       <div className="h-full max-h-screen space-y-6 p-6">
         {/* Welcome Banner */}
         <div className="rounded-m bg-primary rounded-lg p-4 text-white shadow-md">
