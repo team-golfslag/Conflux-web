@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { Link } from "react-router";
+import config from "@/config";
 
 /** Header component <br>
  * Displays the main pages, search icon and the profile menu with fold-out functionality. <br>On mobile, the menu folds to a menu icon.
@@ -75,7 +76,9 @@ export default function Header() {
                 Settings
               </Link>
               <Link
-                to="/logout"
+                to={`${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(
+                  config.webUIUrl,
+                )}`}
                 className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
               >
                 Log Out
