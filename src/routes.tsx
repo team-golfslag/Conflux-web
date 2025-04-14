@@ -12,6 +12,7 @@ import ProjectEdit from "@/pages/ProjectEdit.tsx";
 import NewProject from "@/pages/NewProject.tsx";
 import Layout from "@/components/layout.tsx";
 import App from "@/pages/app.tsx";
+import Dashboard from "./pages/dashboard.tsx";
 
 /**
  * This contains all different routes to the different pages. <br>
@@ -22,6 +23,7 @@ const allRoutes = (
   <Routes>
     <Route index element={<App />} />
     <Route element={<Layout />}>
+      <Route path="dashboard" element={<Dashboard />} />
       <Route path="settings" element={<SettingsPage />} />
       <Route path="projects">
         <Route path="search" element={<ProjectSearchPage />} />
