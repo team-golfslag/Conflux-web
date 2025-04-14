@@ -4,7 +4,9 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-export type Person = {
+export type Role = {
   id: string;
   name: string;
+  description: string;
+  urn: string;
 };

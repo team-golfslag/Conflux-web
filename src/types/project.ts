@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { Person } from "@/types/person.ts";
+import { Collaborator } from "@/types/collaborator.ts";
 import { Product } from "@/types/product.ts";
 import { Party } from "@/types/party.ts";
 
@@ -13,7 +13,7 @@ export type Project = {
   description?: string;
   start_date?: Date;
   end_date?: Date;
-  people?: Person[];
+  people?: Collaborator[];
   products?: Product[];
   parties?: Party[];
 };

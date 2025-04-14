@@ -5,9 +5,9 @@
  */
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Person } from "@/types/person.ts";
+import { Collaborator } from "@/types/collaborator.ts";
 
-type ProjectContributorsProps = { people?: Person[] };
+type ProjectContributorsProps = { people?: Collaborator[] };
 
 /**
  * Project Contributors component
