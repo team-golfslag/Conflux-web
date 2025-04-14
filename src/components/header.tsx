@@ -99,8 +99,8 @@ export default function Header() {
                 </Link>
                 <Link
                   to={`${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(
-                  config.webUIUrl,
-                )}`}
+                    config.webUIUrl,
+                  )}`}
                   className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
                 >
                   Log Out
