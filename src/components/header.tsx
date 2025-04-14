@@ -3,6 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
+import logo from "@/assets/golfslag.png";
 import { useState, useEffect } from "react";
 import { Menu, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
@@ -43,7 +44,9 @@ export default function Header() {
     >
       <div className="flex w-full max-w-6xl items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="bg-secondary h-8 w-8 rounded-full" />
+          <div className="h-8 w-8 rounded-full">
+            <img src={logo} alt="Logo" className="h-full w-full rounded-full" />
+          </div>
           <span className="text-xl font-bold uppercase">Conflux</span>
         </div>
 
