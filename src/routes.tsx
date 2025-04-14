@@ -5,14 +5,17 @@
  */
 
 import { Routes, Route } from "react-router";
-import ProjectPage from "./pages/projectPage.tsx";
-import SettingsPage from "./pages/settingsPage.tsx";
-import ProjectSearchPage from "@/pages/projectSearchPage.tsx";
-import ProjectEdit from "@/pages/ProjectEdit.tsx";
-import NewProject from "@/pages/NewProject.tsx";
-import Layout from "@/components/layout.tsx";
-import App from "@/pages/app.tsx";
-import Dashboard from "./pages/dashboard.tsx";
+import { lazy, Suspense } from "react";
+
+// Lazy-loaded pages
+const App = lazy(() => import("@/pages/app.tsx"));
+const Layout = lazy(() => import("@/components/layout.tsx"));
+const Dashboard = lazy(() => import("./pages/dashboard.tsx"));
+const SettingsPage = lazy(() => import("./pages/settingsPage.tsx"));
+const ProjectSearchPage = lazy(() => import("@/pages/projectSearchPage.tsx"));
+const ProjectPage = lazy(() => import("./pages/projectPage.tsx"));
+const ProjectEdit = lazy(() => import("@/pages/ProjectEdit.tsx"));
+const NewProject = lazy(() => import("@/pages/NewProject.tsx"));
 
 /**
  * This contains all different routes to the different pages. <br>
@@ -20,19 +23,21 @@ import Dashboard from "./pages/dashboard.tsx";
  */
 
 const allRoutes = (
-  <Routes>
-    <Route index element={<App />} />
-    <Route element={<Layout />}>
-      <Route path="dashboard" element={<Dashboard />} />
-      <Route path="settings" element={<SettingsPage />} />
-      <Route path="projects">
-        <Route path="search" element={<ProjectSearchPage />} />
-        <Route path="new" element={<NewProject />} />
-        <Route path=":id" element={<ProjectPage />} />
-        <Route path=":id/edit" element={<ProjectEdit />} />
+  <Suspense fallback={<div>Loading...</div>}>
+    <Routes>
+      <Route index element={<App />} />
+      <Route element={<Layout />}>
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="settings" element={<SettingsPage />} />
+        <Route path="projects">
+          <Route path="search" element={<ProjectSearchPage />} />
+          <Route path="new" element={<NewProject />} />
+          <Route path=":id" element={<ProjectPage />} />
+          <Route path=":id/edit" element={<ProjectEdit />} />
+        </Route>
       </Route>
-    </Route>
-  </Routes>
+    </Routes>
+  </Suspense>
 );
 
 export default allRoutes;
