@@ -31,7 +31,7 @@ const Dashboard = () => {
     );
   return (
     <>
-      <div className="h-full max-h-screen space-y-6 p-6">
+      <div className="h-full space-y-6 p-6">
         {/* Welcome Banner */}
         <div className="rounded-m bg-primary rounded-lg p-4 text-white shadow-md">
           <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
