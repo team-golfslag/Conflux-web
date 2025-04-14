@@ -43,12 +43,18 @@ export default function Header() {
       } z-1`}
     >
       <div className="flex w-full max-w-6xl items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="h-8 w-8 rounded-full">
-            <img src={logo} alt="Logo" className="h-full w-full rounded-full" />
+        <Link to="/dashboard">
+          <div className="flex items-center gap-4">
+            <div className="h-8 w-8 rounded-full">
+              <img
+                src={logo}
+                alt="Logo"
+                className="h-full w-full rounded-full"
+              />
+            </div>
+            <span className="text-xl font-bold uppercase">Conflux</span>
           </div>
-          <span className="text-xl font-bold uppercase">Conflux</span>
-        </div>
+        </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 md:flex">

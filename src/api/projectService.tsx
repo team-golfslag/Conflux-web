@@ -46,7 +46,13 @@ export function editProjectQuery(
  * @param projectId the string id of the project
  */
 const getProjectById = async (projectId: string): Promise<Project> => {
-  const response = await fetch(`${config.apiBaseURL}/projects/${projectId}`);
+  const response = await fetch(`${config.apiBaseURL}/projects/${projectId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
 
   if (!response.ok) {
     throw new Error("Requested project not found");
@@ -83,6 +89,7 @@ const editProject = async (
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
   });
 
   if (!response.ok) {

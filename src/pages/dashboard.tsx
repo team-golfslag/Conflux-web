@@ -3,16 +3,23 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
+import { searchQuery } from "@/api/searchService";
 import { userSessionQuery } from "@/api/userSessionService";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Project } from "@/types/project";
 import { User } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { truncate } from "lodash";
+import { Link } from "react-router";
 
 const Dashboard = () => {
-  const { data, isLoading } = useQuery<User>(userSessionQuery());
-  if (isLoading)
+  const { data: userData, isLoading: userLoading } =
+    useQuery<User>(userSessionQuery());
+  const { data: projectData, isLoading: projectLoading } = useQuery<Project[]>(
+    searchQuery(""),
+  );
+  if (userLoading || projectLoading)
     return (
       <>
         <div className="bg-secondary min-h-full p-8">
@@ -28,7 +35,7 @@ const Dashboard = () => {
         {/* Welcome Banner */}
         <div className="rounded-m bg-primary rounded-lg p-4 text-white shadow-md">
           <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-            Welcome, {data?.name}!
+            Welcome, {userData?.name}!
           </h3>
           <p className="leading-7 [&:not(:first-child)]:mt-6">
             Here's an overview of your current projects:
@@ -37,17 +44,17 @@ const Dashboard = () => {
 
         {/* User's Projects Section */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {data?.collaborations.map((project, index) => (
+          {projectData?.map((project, index) => (
             <Card key={index} className="flex flex-col shadow-md">
               <CardHeader className="rounded-t-md bg-gray-100 p-4">
                 <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-                  {project.collaboration_group.display_name}
+                  {project.title}
                 </h4>
               </CardHeader>
               <CardContent className="flex flex-grow flex-col p-4">
                 {/* Project Description (truncated if too long) */}
                 <p className="leading-7 [&:not(:first-child)]:mt-6">
-                  {truncate(project.collaboration_group.description, {
+                  {truncate(project.description, {
                     length: 100,
                     separator: " ",
                     omission: "...",
@@ -59,9 +66,11 @@ const Dashboard = () => {
                     Role: not available
                   </p>
                   <div className="flex-grow"></div>
-                  <Button variant="outline" size="sm">
-                    View Details
-                  </Button>
+                  <Link to={`/projects/${project.id}`}>
+                    <Button variant="outline" size="sm">
+                      View Details
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
