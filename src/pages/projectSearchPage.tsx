@@ -44,7 +44,7 @@ const ProjectSearchPage = () => {
           <h2 className="mb-8 text-3xl font-bold">Results</h2>
           {isLoading && <h3>Loading...</h3>}
           {error && <h3>Error: {error.message}</h3>}
-          {projects.slice(0, 10).map((project) => (
+          {projects.slice(0, 15).map((project) => (
             <ProjectCard project={project} key={project.id} />
           ))}
         </div>
