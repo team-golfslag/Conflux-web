@@ -3,6 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
+import logo from "@/assets/golfslag.png";
 import { useState, useEffect } from "react";
 import { Menu, Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
@@ -34,76 +35,81 @@ export default function Header() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, [lastScrollTop]);
+
   return (
     <header
-      className={`bg-primary text-primary-foreground flex w-full items-center justify-between p-4 transition-transform duration-500 ease-in-out md:p-6 ${
-        isScrollingUp ? "sticky top-0" : "-top-16"
+      className={`bg-primary text-primary-foreground sticky flex w-full items-center justify-center py-2 transition-all duration-400 ease-in-out ${
+        isScrollingUp ? "top-0" : "-top-20"
       } z-1`}
     >
-      <div className="flex items-center gap-4">
-        <div className="bg-secondary h-12 w-12 rounded-full" />
-        <span className="text-xl font-bold">CONFLUX</span>
-      </div>
-
-      {/* Desktop Navigation */}
-      <nav className="hidden items-center gap-6 md:flex">
-        <Link to="/getting-started">
-          <Button
-            variant="ghost"
-            className="text-primary-foreground bg-primary"
-          >
-            Getting Started
-          </Button>
-        </Link>
-        <Link to="/recent-projects">
-          <Button variant="ghost" className="text-primary-foreground">
-            Recent Projects
-          </Button>
-        </Link>
-        <Link to="/my-projects">
-          <Button variant="ghost" className="text-primary-foreground">
-            My Projects
-          </Button>
-        </Link>
-        <Link to="/projects/search">
-          <Button variant="ghost">
-            <Search className="h-6 w-6" />
-          </Button>
-        </Link>
-        <div className="relative">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setUserMenuOpen(!userMenuOpen)}
-          >
-            <User className="h-6 w-6" />
-          </Button>
-          {userMenuOpen && (
-            <div className="bg-primary text-primary-foreground absolute right-0 mt-2 w-48 rounded-md shadow-lg">
-              <Link
-                to="/profile"
-                className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
-              >
-                Profile
-              </Link>
-              <Link
-                to="/settings"
-                className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
-              >
-                Settings
-              </Link>
-              <Link
-                to={`${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(
-                  config.webUIUrl,
-                )}`}
-                className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
-              >
-                Log Out
-              </Link>
-            </div>
-          )}
+      <div className="flex w-full max-w-6xl items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="h-8 w-8 rounded-full">
+            <img src={logo} alt="Logo" className="h-full w-full rounded-full" />
+          </div>
+          <span className="text-xl font-bold uppercase">Conflux</span>
         </div>
-      </nav>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden items-center gap-6 md:flex">
+          <Link to="/getting-started">
+            <Button
+              variant="ghost"
+              className="text-primary-foreground bg-primary"
+            >
+              Getting Started
+            </Button>
+          </Link>
+          <Link to="/recent-projects">
+            <Button variant="ghost" className="text-primary-foreground">
+              Recent Projects
+            </Button>
+          </Link>
+          <Link to="/my-projects">
+            <Button variant="ghost" className="text-primary-foreground">
+              My Projects
+            </Button>
+          </Link>
+          <Link to="/projects/search">
+            <Button variant="ghost">
+              <Search className="h-6 w-6" />
+            </Button>
+          </Link>
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+            >
+              <User className="h-6 w-6" />
+            </Button>
+            {userMenuOpen && (
+              <div className="bg-primary text-primary-foreground absolute right-0 mt-2 w-48 rounded-md shadow-lg">
+                <Link
+                  to="/profile"
+                  className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
+                >
+                  Profile
+                </Link>
+                <Link
+                  to="/settings"
+                  className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
+                >
+                  Settings
+                </Link>
+                <Link
+                  to={`${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(
+                    config.webUIUrl,
+                  )}`}
+                  className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
+                >
+                  Log Out
+                </Link>
+              </div>
+            )}
+          </div>
+        </nav>
+      </div>
 
       {/* Mobile Navigation */}
       <div className="flex gap-4 md:hidden">
