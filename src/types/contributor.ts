@@ -5,7 +5,7 @@
  */
 import { Role } from "@/types/role.ts";
 
-export type Collaborator = {
+export type Contributor = {
   id: string;
   or_ci_d?: string;
   name: string;
