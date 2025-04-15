@@ -6,6 +6,7 @@
 
 import { Routes, Route } from "react-router";
 import { lazy, Suspense } from "react";
+import ScrollToTop from "@/hooks/scrollToTop.ts";
 
 // Lazy-loaded pages
 const App = lazy(() => import("@/pages/app.tsx"));
@@ -24,6 +25,7 @@ const NewProject = lazy(() => import("@/pages/NewProject.tsx"));
 
 const allRoutes = (
   <Suspense fallback={<div>Loading...</div>}>
+    <ScrollToTop />
     <Routes>
       <Route index element={<App />} />
       <Route element={<Layout />}>
