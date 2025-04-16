@@ -5,7 +5,7 @@
  */
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Person } from "@/types/person.ts";
+import { Person } from "@team-golfslag/conflux-api-client/src/client";
 
 type ProjectContributorsProps = { people?: Person[] };
 
