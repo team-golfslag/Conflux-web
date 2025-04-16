@@ -15,7 +15,6 @@ type ProjectFormProps = {
   onChange?: (newProject: Project) => void;
   onSubmit: (newProject: Project) => void;
   disabled?: boolean;
-  title?: string;
 };
 
 const ProjectForm = ({
