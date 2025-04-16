@@ -86,7 +86,7 @@ export default function ProjectPage() {
                 <ProjectOverview description={project.description} />
               </TabsContent>
               <TabsContent value="contributors">
-                <ProjectContributors contributor={project.contributors} />
+                <ProjectContributors contributors={project.contributors} />
               </TabsContent>
               <TabsContent value="works">
                 <ProjectWorks products={project.products} />
