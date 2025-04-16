@@ -3,19 +3,18 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { Project } from "@/types/project.ts";
 import LabeledInput from "@/pageComponents/LabeledInput.tsx";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button.tsx";
 import LabeledTextarea from "@/pageComponents/LabeledTextarea.tsx";
 import LabeledDatePicker from "@/pageComponents/LabeledDatePicker.tsx";
+import { Project } from "@team-golfslag/conflux-api-client/src/client";
 
 type ProjectFormProps = {
   initialValue?: Project;
   onChange?: (newProject: Project) => void;
   onSubmit: (newProject: Project) => void;
   disabled?: boolean;
-  title?: string;
 };
 
 const ProjectForm = ({
@@ -25,10 +24,7 @@ const ProjectForm = ({
   disabled,
 }: ProjectFormProps) => {
   const [currentProject, setCurrentProject] = useState<Project>(
-    initialValue || {
-      id: "",
-      title: "",
-    },
+    initialValue || new Project(),
   );
 
   useEffect(() => {
@@ -47,10 +43,13 @@ const ProjectForm = ({
           placeholder="Project title..."
           value={currentProject.title}
           onChange={(e) => {
-            setCurrentProject((old: Project) => ({
-              ...old,
-              title: e.target.value,
-            }));
+            setCurrentProject(
+              (old: Project) =>
+                new Project({
+                  ...old,
+                  title: e.target.value,
+                }),
+            );
           }}
           disabled={disabled}
         />
@@ -60,10 +59,13 @@ const ProjectForm = ({
           placeholder="Project Description..."
           value={currentProject.description}
           onChange={(e) => {
-            setCurrentProject((old: Project) => ({
-              ...old,
-              description: e.target.value,
-            }));
+            setCurrentProject(
+              (old: Project) =>
+                new Project({
+                  ...old,
+                  description: e.target.value,
+                }),
+            );
           }}
           disabled={disabled}
         />
@@ -74,10 +76,13 @@ const ProjectForm = ({
               label="Start date:"
               value={currentProject.start_date}
               onChange={(startDate) => {
-                setCurrentProject((old: Project) => ({
-                  ...old,
-                  start_date: startDate,
-                }));
+                setCurrentProject(
+                  (old: Project) =>
+                    new Project({
+                      ...old,
+                      start_date: startDate,
+                    }),
+                );
               }}
               disabled={disabled}
             />
@@ -87,10 +92,13 @@ const ProjectForm = ({
               label="End date:"
               value={currentProject.end_date}
               onChange={(endDate) => {
-                setCurrentProject((old: Project) => ({
-                  ...old,
-                  end_date: endDate,
-                }));
+                setCurrentProject(
+                  (old: Project) =>
+                    new Project({
+                      ...old,
+                      end_date: endDate,
+                    }),
+                );
               }}
               disabled={disabled}
             />

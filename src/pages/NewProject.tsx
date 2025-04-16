@@ -4,15 +4,13 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import ProjectForm from "@/pageComponents/ProjectForm.tsx";
+import { Project } from "@team-golfslag/conflux-api-client/src/client";
 
 const NewProject = () => {
   return (
     <ProjectForm
       title="New project"
-      initialValue={{
-        id: "",
-        title: "",
-      }}
+      initialValue={new Project()}
       onChange={(x) => {
         console.log(x);
       }}
