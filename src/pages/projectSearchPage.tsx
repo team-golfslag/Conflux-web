@@ -6,11 +6,11 @@
 import { Project } from "../types/project.ts";
 import ProjectCard from "@/components/projectCard.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import { Button } from "@/components/ui/button.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { searchQuery } from "@/api/searchService.tsx";
 import { useState } from "react";
-import { Separator } from "@/components/ui/separator.tsx"
+import { Separator } from "@/components/ui/separator.tsx";
+import { Search } from "lucide-react";
 
 /** Project Search Page component <br>
  * Fetches projects from the backend while typing using the refetch function.
@@ -18,31 +18,28 @@ import { Separator } from "@/components/ui/separator.tsx"
  */
 const ProjectSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data, error, isLoading, refetch } = useQuery(searchQuery(searchTerm));
+  const { data, error, isLoading } = useQuery(searchQuery(searchTerm));
 
-  const handleSearch = () => {
-    refetch();
-  };
   const projects = (data as Project[]) || [];
 
   return (
     <>
-      <div className="flex flex-row justify-center py-16">
+      <div className="relative w-full max-w-3xl px-12 py-16">
         <Input
-          className="w-1/3 rounded-2xl"
+          className="mx-auto w-full max-w-2xl rounded-2xl"
           type="search"
           placeholder="Search for any project.."
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button onClick={handleSearch} type="submit">
-          Search
-        </Button>
+        <Search className="text-muted-foreground absolute top-1/2 right-16 -translate-y-1/2 transform" />
       </div>
-      <div className="flex flex-col items-center">
-        <Separator className="w-2/3 my-8" />
+      <div className="flex max-w-3xl flex-wrap justify-center gap-8">
+        <Separator className="my-8" />
         {isLoading && <h3>Loading...</h3>}
         {error && <h3>Error: {error.message}</h3>}
-          {projects.length === 0 && <h3>No results found</h3>}
+        {!isLoading && !error && projects.length === 0 && (
+          <h3>No results found</h3>
+        )}
         {projects.slice(0, 10).map((project) => (
           <ProjectCard project={project} key={project.id} />
         ))}
