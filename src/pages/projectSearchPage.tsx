@@ -24,16 +24,16 @@ const ProjectSearchPage = () => {
 
   return (
     <>
-      <div className="relative w-full max-w-3xl px-12 py-16">
+      <div className="relative w-full max-w-3xl px-4 py-8 sm:px-12 sm:py-16">
         <Input
-          className="mx-auto w-full max-w-2xl rounded-2xl"
+          className="mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
           type="search"
           placeholder="Search for any project.."
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Search className="text-muted-foreground absolute top-1/2 right-16 -translate-y-1/2 transform" />
+        <Search className="text-muted-foreground absolute top-1/2 right-10 -translate-y-1/2 transform sm:right-16" />
       </div>
-      <div className="flex max-w-3xl flex-wrap justify-center gap-8">
+      <div className="mx-4 flex max-w-7xl flex-wrap justify-center gap-4 pb-16 sm:gap-8">
         <Separator className="my-8" />
         {isLoading && <h3>Loading...</h3>}
         {error && <h3>Error: {error.message}</h3>}
