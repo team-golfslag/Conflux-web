@@ -9,7 +9,6 @@ import ProjectPage from "./pages/projectPage.tsx";
 import SettingsPage from "./pages/settingsPage.tsx";
 import ProjectSearchPage from "@/pages/projectSearchPage.tsx";
 import ProjectEdit from "@/pages/ProjectEdit.tsx";
-import NewProject from "@/pages/NewProject.tsx";
 import Layout from "@/components/layout.tsx";
 import App from "@/pages/app.tsx";
 
@@ -25,7 +24,6 @@ const allRoutes = (
       <Route path="settings" element={<SettingsPage />} />
       <Route path="projects">
         <Route path="search" element={<ProjectSearchPage />} />
-        <Route path="new" element={<NewProject />} />
         <Route path=":id" element={<ProjectPage />} />
         <Route path=":id/edit" element={<ProjectEdit />} />
       </Route>
