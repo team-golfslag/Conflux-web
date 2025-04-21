@@ -44,7 +44,7 @@ const ProjectCard = (props: ProjectCardProps) => {
   let statusColor: string;
   if (status === "active") statusColor = "text-green-600";
   else if (status === "not started") statusColor = "text-zinc-600";
-  else statusColor = "text-blue-600";
+  else statusColor = "text-yellow-800";
 
   return (
     <Link
