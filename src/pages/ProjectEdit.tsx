@@ -4,12 +4,14 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { Project } from "@/types/project.ts";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import ProjectForm from "@/pageComponents/ProjectForm.tsx";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { editProjectQuery, projectQuery } from "@/api/projectService.tsx";
+import {
+  Project,
+  ProjectPutDTO,
+} from "@team-golfslag/conflux-api-client/src/client";
+import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 
 type ProjectEditParams = {
   id: string;
@@ -18,40 +20,47 @@ type ProjectEditParams = {
 const ProjectEdit = () => {
   const { id } = useParams<ProjectEditParams>();
 
+  const apiClient = useContext(ApiClientContext);
+
   const [project, setProject] = useState<Project>();
-  const {
-    data: initialData,
-    error,
-    isLoading,
-  } = useQuery<Project>(projectQuery(id as string));
+  const [initialProject, setInitialProject] = useState<Project>();
+  const [error, setError] = useState<Error>();
+  const [isPending, setIsPending] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!isLoading && !error) {
-      setProject(initialData);
-    }
-  }, [initialData, error, isLoading]);
+  async function mutate(id: string, p: Project): Promise<void> {
+    setIsPending(true);
 
-  const {
-    mutate,
-    error: mutationError,
-    isPending,
-    isSuccess,
-  } = useMutation(editProjectQuery(id as string, project));
+    const projectDTO: ProjectPutDTO = new ProjectPutDTO(p);
 
-  useEffect(() => {
-    if (isSuccess) {
-      navigate(`/projects/${id}`);
-    }
-  }, [isSuccess, navigate, id]);
-
-  if (isLoading) {
-    return <h1>Loading...</h1>;
+    return apiClient
+      .projects_PutProject(id, projectDTO)
+      .then(() => navigate(`/projects/${id}`))
+      .catch((e) => setError(e))
+      .finally(() => setIsPending(false));
   }
 
-  if (error) {
-    return <h1>Error loading data.</h1>;
+  useEffect(() => {
+    if (id) {
+      apiClient
+        .projects_GetProjectById(id)
+        .then((p) => {
+          setProject(p);
+          setInitialProject(p);
+        })
+        .catch((e) => {
+          setError(e);
+        });
+    }
+  }, [apiClient, id]);
+
+  if (!id) {
+    return <h1>No id given</h1>;
+  }
+
+  if (!initialProject) {
+    return <h1>Loading...</h1>;
   }
 
   return (
@@ -61,12 +70,10 @@ const ProjectEdit = () => {
           Edit project
         </h2>
       </div>
-      {mutationError && (
-        <h1>An error occurred during the request: {mutationError.message}</h1>
-      )}
+      {error && <h1>An error occurred during the request: {error.message}</h1>}
       <ProjectForm
         initialValue={project}
-        onSubmit={(p) => mutate(p)}
+        onSubmit={(p) => mutate(id, p)}
         disabled={isPending}
       />
     </>
