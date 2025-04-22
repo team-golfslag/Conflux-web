@@ -63,33 +63,33 @@ export default function ProjectPage() {
         </Link>
       </div>
 
-        <main className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="md:col-span-2">
-            <Tabs defaultValue="overview" className="h-full w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="contributors">Contributors</TabsTrigger>
-                <TabsTrigger value="works">Works</TabsTrigger>
-              </TabsList>
-              <TabsContent value="overview">
-                <ProjectOverview description={project.description} />
-              </TabsContent>
-              <TabsContent value="contributors">
-                <ProjectContributors contributors={project.contributors} />
-              </TabsContent>
-              <TabsContent value="works">
-                <ProjectWorks products={project.products} />
-              </TabsContent>
-            </Tabs>
+      <main className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="md:col-span-2">
+          <Tabs defaultValue="overview" className="h-full w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="contributors">Contributors</TabsTrigger>
+              <TabsTrigger value="works">Works</TabsTrigger>
+            </TabsList>
+            <TabsContent value="overview">
+              <ProjectOverview description={project.description} />
+            </TabsContent>
+            <TabsContent value="contributors">
+              <ProjectContributors contributors={project.contributors} />
+            </TabsContent>
+            <TabsContent value="works">
+              <ProjectWorks products={project.products} />
+            </TabsContent>
+          </Tabs>
+        </div>
+        {/* Side Panel */}
+        <aside className="space-y-6">
+          <div className="rounded-lg bg-white p-4 shadow">
+            <h3 className="text-lg font-semibold">Start Date</h3>
+            <p>{project.start_date?.toDateString()}</p>
+            <h3 className="mt-4 text-lg font-semibold">End Date</h3>
+            <p>{project.end_date?.toDateString()}</p>
           </div>
-          {/* Side Panel */}
-          <aside className="space-y-6">
-            <div className="rounded-lg bg-white p-4 shadow">
-              <h3 className="text-lg font-semibold">Start Date</h3>
-              <p>{project.start_date?.toDateString()}</p>
-              <h3 className="mt-4 text-lg font-semibold">End Date</h3>
-              <p>{project.end_date?.toDateString()}</p>
-            </div>
 
           {/* Contributors Section */}
           <div className="rounded-lg bg-white p-4 shadow">

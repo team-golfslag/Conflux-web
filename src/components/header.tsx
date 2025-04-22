@@ -46,7 +46,11 @@ export default function Header() {
         <Link to="/dashboard">
           <div className="flex items-center gap-4">
             <div className="h-8 w-8 rounded-full">
-              <img src={logo} alt="Logo" className="h-full w-full rounded-full" />
+              <img
+                src={logo}
+                alt="Logo"
+                className="h-full w-full rounded-full"
+              />
             </div>
             <span className="text-xl font-bold uppercase">Conflux</span>
           </div>
