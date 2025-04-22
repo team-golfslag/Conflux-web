@@ -3,6 +3,9 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-type Guid = string;
+import { createContext } from "react";
+import { ApiClient } from "@team-golfslag/conflux-api-client/src/client";
 
-export type { Guid };
+const ApiClientContext = createContext<ApiClient>(new ApiClient());
+
+export { ApiClientContext };

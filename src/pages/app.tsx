@@ -5,6 +5,7 @@
  */
 import { Button } from "@/components/ui/button.tsx";
 import logo from "@/assets/golfslag.png";
+import config from "@/config.ts";
 
 function App() {
   return (
@@ -28,6 +29,10 @@ function App() {
   );
 }
 
-const validation = () => (window.location.href = "/projects/search");
+const validation = () =>
+  (window.location.href =
+    config.apiBaseURL +
+    "/session/login?redirect=" +
+    encodeURIComponent(`${config.webUIUrl}/dashboard`));
 
 export default App;
