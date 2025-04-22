@@ -8,8 +8,6 @@ import { Input } from "@/components/ui/input.tsx";
 import { useContext, useEffect, useState } from "react";
 import { Project } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
-import { useQuery } from "@tanstack/react-query";
-import { searchQuery } from "@/api/searchService.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
 import { Search } from "lucide-react";
 
@@ -66,9 +64,9 @@ const ProjectSearchPage = () => {
         {projects && !error && projects.length === 0 && (
           <h3>No results found</h3>
         )}
-        {projects?.slice(0, 10).map((project) => (
-          <ProjectCard project={project} key={project.id} />
-        ))}
+        {projects
+          ?.slice(0, 10)
+          .map((project) => <ProjectCard project={project} key={project.id} />)}
       </div>
     </>
   );
