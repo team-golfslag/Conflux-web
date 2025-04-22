@@ -4,7 +4,6 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import Header from "@/components/header.tsx";
 import { Edit } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProjectOverview from "@/components/projectOverview.tsx";
@@ -33,27 +32,19 @@ export default function ProjectPage() {
   const { data, error, isLoading } = useQuery<Project>(projectQuery(projectId));
   if (isLoading)
     return (
-      <>
-        <Header />
-        <div className="bg-secondary min-h-full p-8">
-          <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
-            <span>Loading...</span>
-          </div>
-        </div>
-      </>
+      <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
+        <span>Loading...</span>
+      </div>
     );
   if (error)
     return (
       <>
-        <Header />
-        <div className="bg-secondary min-h-full p-8">
-          <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
-            <span>{error.name}</span>
-          </div>
-          <div className="p-10" />
-          <div className="text-l flex items-center justify-between rounded-lg bg-white p-3">
-            <span>{error.message}</span>
-          </div>
+        <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
+          <span>{error.name}</span>
+        </div>
+        <div className="p-10" />
+        <div className="text-l flex items-center justify-between rounded-lg bg-white p-3">
+          <span>{error.message}</span>
         </div>
       </>
     );
@@ -61,18 +52,16 @@ export default function ProjectPage() {
 
   return (
     <>
-      <Header />
-      <div className="bg-secondary min-h-full p-8">
-        {/* Title */}
-        <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
-          <span>{project.title}</span>
-          <Link
-            to="edit"
-            className="bg-primary text-primary-foreground m-2 flex items-center justify-center rounded-lg p-2 transition-colors duration-300"
-          >
-            <Edit size={24} />
-          </Link>
-        </div>
+      {/* Title */}
+      <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
+        <span>{project.title}</span>
+        <Link
+          to="edit"
+          className="bg-primary text-primary-foreground m-2 flex items-center justify-center rounded-lg p-2 transition-colors duration-300"
+        >
+          <Edit size={24} />
+        </Link>
+      </div>
 
         <main className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
           <div className="md:col-span-2">
@@ -102,16 +91,15 @@ export default function ProjectPage() {
               <p>{project.end_date?.toDateString()}</p>
             </div>
 
-            {/* Contributors Section */}
-            <div className="rounded-lg bg-white p-4 shadow">
-              <h3 className="text-lg font-semibold">Timeline</h3>
-              <div className="mt-4 ml-3 space-y-4">
-                <Timeline items={timelineData} />
-              </div>
+          {/* Contributors Section */}
+          <div className="rounded-lg bg-white p-4 shadow">
+            <h3 className="text-lg font-semibold">Timeline</h3>
+            <div className="mt-4 ml-3 space-y-4">
+              <Timeline items={timelineData} />
             </div>
-          </aside>
-        </main>
-      </div>
+          </div>
+        </aside>
+      </main>
     </>
   );
 }
