@@ -4,9 +4,9 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { Project } from "../types/project.ts";
 import { Link } from "react-router";
 import logo from "@/assets/golfslag.png";
+import { Project } from "@team-golfslag/conflux-api-client/src/client";
 
 type ProjectCardProps = {
   project: Project;

@@ -9,20 +9,26 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import allRoutes from "./routes";
 import "./index.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ApiClient } from "@team-golfslag/conflux-api-client/src/client";
+import config from "@/config.ts";
+import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 
 /*
 This is the main entry point into the program
 */
 
-const queryClient = new QueryClient();
+const apiClient = new ApiClient(config.apiBaseURL, {
+  fetch(url: RequestInfo, init?: RequestInit): Promise<Response> {
+    return fetch(url, { ...init, credentials: "include" });
+  },
+});
 
 const root = document.getElementById("root");
 
 createRoot(root!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
+    <ApiClientContext value={apiClient}>
       <BrowserRouter>{allRoutes}</BrowserRouter>
-    </QueryClientProvider>
+    </ApiClientContext>
   </StrictMode>,
 );
