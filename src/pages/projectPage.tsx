@@ -10,10 +10,10 @@ import ProjectOverview from "@/components/projectOverview.tsx";
 import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
 import Timeline, { TimelineItem } from "@/components/timeline";
-import { Project } from "@/types/project.ts";
 import { Link, useParams } from "react-router";
-import { useQuery } from "@tanstack/react-query";
-import { projectQuery } from "@/api/projectService.tsx";
+import { useContext, useEffect, useState } from "react";
+import { Project } from "@team-golfslag/conflux-api-client/src/client";
+import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 
 /** List of timeline data as dummy data */
 const timelineData: TimelineItem[] = [
@@ -28,14 +28,24 @@ const timelineData: TimelineItem[] = [
  */
 export default function ProjectPage() {
   const { id } = useParams();
-  const projectId = id ?? "";
-  const { data, error, isLoading } = useQuery<Project>(projectQuery(projectId));
-  if (isLoading)
-    return (
-      <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
-        <span>Loading...</span>
-      </div>
-    );
+
+  const [project, setProject] = useState<Project>();
+  const [error, setError] = useState<Error>();
+
+  const apiClient = useContext(ApiClientContext);
+
+  useEffect(() => {
+    if (id) {
+      apiClient
+        .projects_GetProjectById(id)
+        .then((p) => {
+          setProject(p);
+          setError(undefined);
+        })
+        .catch((e) => setError(e));
+    }
+  }, [apiClient, id]);
+
   if (error)
     return (
       <>
@@ -48,7 +58,13 @@ export default function ProjectPage() {
         </div>
       </>
     );
-  const project = data as Project;
+
+  if (!project)
+    return (
+      <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
+        <span>Loading...</span>
+      </div>
+    );
 
   return (
     <>

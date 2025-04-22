@@ -3,12 +3,13 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { Project } from "../types/project.ts";
 import ProjectCard from "@/components/projectCard.tsx";
 import { Input } from "@/components/ui/input.tsx";
+import { useContext, useEffect, useState } from "react";
+import { Project } from "@team-golfslag/conflux-api-client/src/client";
+import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { useQuery } from "@tanstack/react-query";
 import { searchQuery } from "@/api/searchService.tsx";
-import { useState } from "react";
 import { Separator } from "@/components/ui/separator.tsx";
 import { Search } from "lucide-react";
 
@@ -18,9 +19,34 @@ import { Search } from "lucide-react";
  */
 const ProjectSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data, error, isLoading } = useQuery(searchQuery(searchTerm));
+  const [projects, setProjects] = useState<Project[]>();
+  const [cancelRequest, setCancelRequest] = useState<() => void>();
+  const [error, setError] = useState<Error>();
 
-  const projects = (data as Project[]) || [];
+  const apiClient = useContext(ApiClientContext);
+
+  useEffect(() => {
+    let isCanceled = false;
+    if (cancelRequest) cancelRequest();
+    setCancelRequest(() => () => {
+      isCanceled = true;
+    });
+    apiClient
+      .projects_GetProjectByQuery(searchTerm)
+      .then((ps) => {
+        if (!isCanceled) {
+          setProjects(ps);
+          console.log(ps);
+          setCancelRequest(undefined);
+        }
+      })
+      .catch((e) => {
+        if (!isCanceled) {
+          setError(e);
+          setCancelRequest(undefined);
+        }
+      });
+  }, [apiClient, searchTerm]);
 
   return (
     <>
@@ -35,12 +61,12 @@ const ProjectSearchPage = () => {
       </div>
       <div className="mx-4 flex max-w-7xl flex-wrap justify-center gap-4 pb-16 sm:gap-8">
         <Separator className="my-8" />
-        {isLoading && <h3>Loading...</h3>}
+        {!projects && <h3>Loading...</h3>}
         {error && <h3>Error: {error.message}</h3>}
-        {!isLoading && !error && projects.length === 0 && (
+        {projects && !error && projects.length === 0 && (
           <h3>No results found</h3>
         )}
-        {projects.slice(0, 10).map((project) => (
+        {projects?.slice(0, 10).map((project) => (
           <ProjectCard project={project} key={project.id} />
         ))}
       </div>
