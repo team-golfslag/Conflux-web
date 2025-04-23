@@ -6,7 +6,7 @@
 import { truncate } from "lodash";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent, CardHeader } from "@/components/ui/card.tsx";
-import { Collaboration } from "@/types/collaboration.ts";
+import { Collaboration } from "@team-golfslag/conflux-api-client/src/client";
 
 const dashboardCard = (project: Collaboration, index: number) => {
   <Card key={index} className="flex flex-col shadow-md">
