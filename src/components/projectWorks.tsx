@@ -5,7 +5,7 @@
  */
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Product } from "@/types/product.ts";
+import { Product } from "@team-golfslag/conflux-api-client/src/client";
 
 type ProjectWorksProps = { products?: Product[] };
 
