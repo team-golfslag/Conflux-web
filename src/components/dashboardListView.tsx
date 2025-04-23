@@ -4,12 +4,12 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { User } from "@/types/user.ts";
+import { User } from "@team-golfslag/conflux-api-client/src/client";
 import dashboardCard from "@/components/ui/dashboardCard.tsx";
 
 const DashboardListView = (data: User) => {
   {
-    data?.collaborations.map((project, index) => dashboardCard(project, index));
+ //   data?.collaborations.map((project, index) => dashboardCard(project, index));
   }
 };
 

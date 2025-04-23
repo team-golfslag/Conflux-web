@@ -32,7 +32,7 @@ function App() {
 const validation = () =>
   (window.location.href =
     config.apiBaseURL +
-    "/session/login?redirect=" +
+    "/session/login?redirectUri=" +
     encodeURIComponent(`${config.webUIUrl}/dashboard`));
 
 export default App;
