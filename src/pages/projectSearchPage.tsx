@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/datepicker.tsx";
 
 /** Project Search Page component <br>
  * Fetches projects from the backend while typing using the refetch function.
@@ -29,6 +30,8 @@ import {
  */
 const ProjectSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [sort, setSort] = useState("");
   const [projects, setProjects] = useState<Project[]>();
   const [cancelRequest, setCancelRequest] = useState<() => void>();
@@ -55,6 +58,17 @@ const ProjectSearchPage = () => {
     }
   }
 
+  const handleStartDateChange = (date: Date | undefined) => {
+    console.log("Start Date selected:", date);
+    setStartDate(date);
+    // Now you have the date in the parent component's state
+  };
+
+  const handleEndDateChange = (date: Date | undefined) => {
+    console.log("End Date selected:", date);
+    setEndDate(date);
+  };
+
   useEffect(() => {
     let isCanceled = false;
     if (cancelRequest) cancelRequest();
@@ -64,8 +78,8 @@ const ProjectSearchPage = () => {
     apiClient
       .projects_GetProjectByQuery(
         searchTerm,
-        undefined,
-        undefined,
+        startDate,
+        endDate,
         parseOrderBy(sort),
       )
       .then((ps) => {
@@ -81,7 +95,7 @@ const ProjectSearchPage = () => {
           setCancelRequest(undefined);
         }
       });
-  }, [apiClient, searchTerm, sort]);
+  }, [apiClient, searchTerm, startDate, endDate, sort]);
 
   return (
     <>
@@ -94,25 +108,43 @@ const ProjectSearchPage = () => {
         />
         <Search className="text-muted-foreground absolute top-1/2 right-12 z-0 -translate-y-1/2" />
       </div>
-      <Select value={sort} onValueChange={setSort}>
-        <SelectTrigger className="mr-4 ml-auto w-50">
-          <SelectValue placeholder="Sort by.." />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Sort by</SelectLabel>
-            <SelectItem value=" ">Relevance</SelectItem>
-            <SelectItem value="title_asc">Title A-Z</SelectItem>
-            <SelectItem value="title_desc">Title Z-A</SelectItem>
-            <SelectItem value="start_date_asc">Start date ascending</SelectItem>
-            <SelectItem value="start_date_desc">
-              Start date descending
-            </SelectItem>
-            <SelectItem value="end_date_asc">End date ascending</SelectItem>
-            <SelectItem value="end_date_desc">End date descending</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+      <div className="flex w-full flex-col items-end justify-between gap-4 px-8 sm:flex-row">
+        <div className="flex flex-col items-start gap-1">
+          <div className="mx-4 flex items-center">
+            <span className="w-32 pr-2 text-sm font-semibold text-gray-600">
+              Start date after
+            </span>
+            <DatePicker onDateChange={handleStartDateChange} />
+          </div>
+          <div className="mx-4 flex items-center">
+            <span className="w-32 pr-2 text-sm font-semibold text-gray-600">
+              End date before
+            </span>
+            <DatePicker onDateChange={handleEndDateChange} />
+          </div>
+        </div>
+        <Select value={sort} onValueChange={setSort}>
+          <SelectTrigger className="mr-4 ml-auto w-50">
+            <SelectValue placeholder="Sort by.." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Sort by</SelectLabel>
+              <SelectItem value=" ">Relevance</SelectItem>
+              <SelectItem value="title_asc">Title A-Z</SelectItem>
+              <SelectItem value="title_desc">Title Z-A</SelectItem>
+              <SelectItem value="start_date_asc">
+                Start date ascending
+              </SelectItem>
+              <SelectItem value="start_date_desc">
+                Start date descending
+              </SelectItem>
+              <SelectItem value="end_date_asc">End date ascending</SelectItem>
+              <SelectItem value="end_date_desc">End date descending</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
       <div className="mx-4 flex max-w-7xl flex-wrap justify-center gap-4 pb-16 sm:gap-8">
         <Separator className="my-4" />
         {!projects && <h3>Loading...</h3>}
