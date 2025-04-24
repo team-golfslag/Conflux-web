@@ -52,10 +52,10 @@ const ProjectCard = (props: ProjectCardProps) => {
       className="group border-border flex h-[25rem] w-full max-w-md rounded-lg border-1 px-4 py-4 duration-200 hover:cursor-pointer hover:border-blue-700 hover:shadow-lg hover:shadow-gray-300 md:max-w-84"
     >
       <div className="flex w-full flex-col overflow-y-clip">
-        <h2 className="mb-3 text-2xl duration-200 group-hover:text-blue-800">
+        <h2 className="mb-3 line-clamp-4 text-2xl duration-200 group-hover:text-blue-800">
           {props.project.title}
         </h2>
-        <p className="line-clamp-6 text-left text-base">
+        <p className="line-clamp-5 text-left text-base">
           {props.project.description}
         </p>
         <div className="mt-4 flex items-center border-t-1 pt-4">
