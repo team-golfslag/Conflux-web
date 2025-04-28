@@ -5,9 +5,11 @@
  */
 import ProjectCard from "@/components/projectCard.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import { useState, useMemo } from "react";
+import { Separator } from "@/components/ui/separator.tsx";
+import { Search } from "lucide-react";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { LoadingWrapper } from "@/components/loadingWrapper";
+import { useMemo, useState } from "react";
 
 /** Project Search Page component <br>
  * Fetches all projects from the backend once and filters them client-side.
@@ -39,18 +41,18 @@ const ProjectSearchPage = () => {
 
   return (
     <LoadingWrapper isLoading={isLoading} loadingMessage="Loading projects...">
-      <div className="flex flex-row justify-center py-16">
+      <div className="relative w-full max-w-3xl px-4 py-8 sm:px-12 sm:py-16">
         <Input
-          className="w-1/3 rounded-2xl"
+          className="mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
           type="search"
           placeholder="Search for any project.."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        <Search className="text-muted-foreground absolute top-1/2 right-10 -translate-y-1/2 transform sm:right-16" />
       </div>
-      <div className="flex flex-col items-center">
-        <h2 className="mb-8 text-3xl font-bold">Results</h2>
-
+      <div className="mx-4 flex max-w-7xl flex-wrap justify-center gap-4 pb-16 sm:gap-8">
+        <Separator className="my-8" />
         {error && <h3 className="text-red-500">Error: {error.message}</h3>}
 
         {filteredProjects.length === 0 && !isLoading && !error ? (
