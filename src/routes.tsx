@@ -5,22 +5,24 @@
  */
 
 import { Routes, Route } from "react-router";
-import ProjectPage from "./pages/projectPage.tsx";
-import SettingsPage from "./pages/settingsPage.tsx";
-import ProjectSearchPage from "@/pages/projectSearchPage.tsx";
-import ProjectEdit from "@/pages/projectEditPage.tsx";
-import Layout from "@/components/layout.tsx";
-import App from "@/pages/app.tsx";
-import { Suspense } from "react";
+import { lazy, Suspense } from "react";
 import ScrollToTop from "./hooks/scrollToTop.tsx";
-import Dashboard from "./pages/dashboard.tsx";
-/**
- * This contains all different routes to the different pages. <br>
- * We might need to use ? and : (and others) later in order to create optional and branching routes.
- */
 
+// Lazy load all page components
+const App = lazy(() => import("./pages/app.tsx"));
+const Dashboard = lazy(() => import("./pages/dashboard.tsx"));
+const Layout = lazy(() => import("./components/layout.tsx"));
+const ProjectPage = lazy(() => import("./pages/projectPage.tsx"));
+const ProjectEdit = lazy(() => import("./pages/projectEditPage.tsx"));
+const ProjectSearchPage = lazy(() => import("./pages/projectSearchPage.tsx"));
+const SettingsPage = lazy(() => import("./pages/settingsPage.tsx"));
+
+/**
+ * This contains all different routes to the different pages.
+ * All route components are lazy loaded for better performance.
+ */
 const allRoutes = (
-  <Suspense fallback={<div>Loading...</div>}>
+  <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
     <ScrollToTop />
     <Routes>
       <Route index element={<App />} />
