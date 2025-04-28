@@ -5,14 +5,11 @@
  */
 import ProjectCard from "@/components/projectCard.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import { useContext, useEffect, useState } from "react";
-import {
-  Project,
-  OrderByType,
-} from "@team-golfslag/conflux-api-client/src/client";
-import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { Separator } from "@/components/ui/separator.tsx";
 import { Search } from "lucide-react";
+import { useApiQuery } from "@/hooks/useApiQuery";
+import { LoadingWrapper } from "@/components/loadingWrapper";
+import { useMemo, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -24,76 +21,94 @@ import {
 } from "@/components/ui/select";
 
 /** Project Search Page component <br>
- * Fetches projects from the backend while typing using the refetch function.
- * The first 10 projects matching the query are displayed.
+ * Fetches all projects from the backend once and filters them client-side.
+ * The first 15 projects matching the query are displayed.
  */
 const ProjectSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sort, setSort] = useState("");
-  const [projects, setProjects] = useState<Project[]>();
-  const [cancelRequest, setCancelRequest] = useState<() => void>();
-  const [error, setError] = useState<Error>();
 
-  const apiClient = useContext(ApiClientContext);
+  // Fetch all projects just once
+  const {
+    data: allProjects,
+    isLoading,
+    error,
+  } = useApiQuery((apiClient) => apiClient.projects_GetAllProjects(), []);
 
-  function parseOrderBy(sort: string): OrderByType | undefined {
+  // Filter and sort projects client-side based on search term and sort option
+  const filteredProjects = useMemo(() => {
+    if (!allProjects) return [];
+
+    // First filter by search term
+    let results = [...allProjects];
+
+    if (searchTerm.trim()) {
+      const lowercaseSearchTerm = searchTerm.toLowerCase();
+      results = results.filter(
+        (project) =>
+          project.title.toLowerCase().includes(lowercaseSearchTerm) ||
+          project.description?.toLowerCase().includes(lowercaseSearchTerm),
+      );
+    }
+
+    // Then sort the results
     switch (sort) {
       case "title_asc":
-        return OrderByType.TitleAsc;
+        return results.sort((a, b) => a.title.localeCompare(b.title));
       case "title_desc":
-        return OrderByType.TitleDesc;
+        return results.sort((a, b) => b.title.localeCompare(a.title));
       case "start_date_asc":
-        return OrderByType.StartDateAsc;
+        return results.sort((a, b) => {
+          if (!a.start_date) return 1;
+          if (!b.start_date) return -1;
+          return (
+            new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
+          );
+        });
       case "start_date_desc":
-        return OrderByType.StartDateDesc;
+        return results.sort((a, b) => {
+          if (!a.start_date) return 1;
+          if (!b.start_date) return -1;
+          return (
+            new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
+          );
+        });
       case "end_date_asc":
-        return OrderByType.EndDateAsc;
+        return results.sort((a, b) => {
+          if (!a.end_date) return 1;
+          if (!b.end_date) return -1;
+          return (
+            new Date(a.end_date).getTime() - new Date(b.end_date).getTime()
+          );
+        });
       case "end_date_desc":
-        return OrderByType.EndDateDesc;
+        return results.sort((a, b) => {
+          if (!a.end_date) return 1;
+          if (!b.end_date) return -1;
+          return (
+            new Date(b.end_date).getTime() - new Date(a.end_date).getTime()
+          );
+        });
+      // Use "relevance" as the default case
+      case "relevance":
       default:
-        return undefined;
+        return results;
     }
-  }
-
-  useEffect(() => {
-    let isCanceled = false;
-    if (cancelRequest) cancelRequest();
-    setCancelRequest(() => () => {
-      isCanceled = true;
-    });
-    apiClient
-      .projects_GetProjectByQuery(
-        searchTerm,
-        undefined,
-        undefined,
-        parseOrderBy(sort),
-      )
-      .then((ps) => {
-        if (!isCanceled) {
-          setProjects(ps);
-          console.log(ps);
-          setCancelRequest(undefined);
-        }
-      })
-      .catch((e) => {
-        if (!isCanceled) {
-          setError(e);
-          setCancelRequest(undefined);
-        }
-      });
-  }, [apiClient, searchTerm, sort]);
+  }, [allProjects, searchTerm, sort]);
 
   return (
-    <>
-      <div className="relative my-8 w-full max-w-2xl px-4 sm:mx-12 sm:mt-16">
+    <LoadingWrapper isLoading={isLoading} loadingMessage="Loading projects...">
+      <div className="relative w-full max-w-3xl px-4 py-8 sm:px-12 sm:py-16">
         <Input
           className="z-10 mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
           type="search"
-          placeholder="Search for title or description.."
+          placeholder="Search for any project.."
+          value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <Search className="text-muted-foreground absolute top-1/2 right-12 z-0 -translate-y-1/2" />
       </div>
+
       <Select value={sort} onValueChange={setSort}>
         <SelectTrigger className="mr-4 ml-auto w-50">
           <SelectValue placeholder="Sort by.." />
@@ -101,7 +116,7 @@ const ProjectSearchPage = () => {
         <SelectContent>
           <SelectGroup>
             <SelectLabel>Sort by</SelectLabel>
-            <SelectItem value=" ">Relevance</SelectItem>
+            <SelectItem value="relevance">Relevance</SelectItem>
             <SelectItem value="title_asc">Title A-Z</SelectItem>
             <SelectItem value="title_desc">Title Z-A</SelectItem>
             <SelectItem value="start_date_asc">Start date ascending</SelectItem>
@@ -113,18 +128,24 @@ const ProjectSearchPage = () => {
           </SelectGroup>
         </SelectContent>
       </Select>
+
       <div className="mx-4 flex max-w-7xl flex-wrap justify-center gap-4 pb-16 sm:gap-8">
-        <Separator className="my-4" />
-        {!projects && <h3>Loading...</h3>}
-        {error && <h3>Error: {error.message}</h3>}
-        {projects && !error && projects.length === 0 && (
-          <h3>No results found</h3>
+        <Separator className="my-8" />
+        {error && <h3 className="text-red-500">Error: {error.message}</h3>}
+
+        {filteredProjects.length === 0 && !isLoading && !error ? (
+          <p className="text-gray-500">
+            No projects found matching your search.
+          </p>
+        ) : (
+          filteredProjects
+            .slice(0, 15)
+            .map((project) => (
+              <ProjectCard project={project} key={project.id} />
+            ))
         )}
-        {projects
-          ?.slice(0, 15)
-          .map((project) => <ProjectCard project={project} key={project.id} />)}
       </div>
-    </>
+    </LoadingWrapper>
   );
 };
 

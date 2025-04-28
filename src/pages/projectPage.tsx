@@ -81,7 +81,7 @@ export default function ProjectPage() {
 
       <main className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="md:col-span-2">
-          <Tabs defaultValue="overview" className="h-fullw-full">
+          <Tabs defaultValue="overview" className="h-full w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="contributors">Contributors</TabsTrigger>
@@ -91,7 +91,7 @@ export default function ProjectPage() {
               <ProjectOverview description={project.description} />
             </TabsContent>
             <TabsContent value="contributors">
-              <ProjectContributors people={project.people} />
+              <ProjectContributors contributors={project.contributors} />
             </TabsContent>
             <TabsContent value="works">
               <ProjectWorks products={project.products} />
