@@ -42,7 +42,8 @@ const ProjectSearchPage = () => {
           setCancelRequest(undefined);
         }
       });
-  }, [apiClient, searchTerm]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [apiClient, searchTerm]); // we dont want to use cancelRequest as a dependency, because it will cause an infinite loop
 
   return (
     <>

@@ -11,24 +11,30 @@ import ProjectSearchPage from "@/pages/projectSearchPage.tsx";
 import ProjectEdit from "@/pages/ProjectEdit.tsx";
 import Layout from "@/components/layout.tsx";
 import App from "@/pages/app.tsx";
-
+import { Suspense } from "react";
+import ScrollToTop from "./hooks/scrollToTop.tsx";
+import Dashboard from "./pages/dashboard.tsx";
 /**
  * This contains all different routes to the different pages. <br>
  * We might need to use ? and : (and others) later in order to create optional and branching routes.
  */
 
 const allRoutes = (
-  <Routes>
-    <Route index element={<App />} />
-    <Route element={<Layout />}>
-      <Route path="settings" element={<SettingsPage />} />
-      <Route path="projects">
-        <Route path="search" element={<ProjectSearchPage />} />
-        <Route path=":id" element={<ProjectPage />} />
-        <Route path=":id/edit" element={<ProjectEdit />} />
+  <Suspense fallback={<div>Loading...</div>}>
+    <ScrollToTop />
+    <Routes>
+      <Route index element={<App />} />
+      <Route element={<Layout />}>
+        <Route path="settings" element={<SettingsPage />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="projects">
+          <Route path="search" element={<ProjectSearchPage />} />
+          <Route path=":id" element={<ProjectPage />} />
+          <Route path=":id/edit" element={<ProjectEdit />} />
+        </Route>
       </Route>
-    </Route>
-  </Routes>
+    </Routes>
+  </Suspense>
 );
 
 export default allRoutes;

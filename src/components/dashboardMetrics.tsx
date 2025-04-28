@@ -5,7 +5,7 @@
  */
 
 const dashboardMetrics = () => {
-    "hoi"
-}
+  "hoi";
+};
 
 export default dashboardMetrics;
