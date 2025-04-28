@@ -59,7 +59,7 @@ const ProjectSearchPage = () => {
           </p>
         ) : (
           filteredProjects
-            .slice(0, 10)
+            .slice(0, 15)
             .map((project) => (
               <ProjectCard project={project} key={project.id} />
             ))
