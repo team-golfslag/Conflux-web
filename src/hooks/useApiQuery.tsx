@@ -18,23 +18,35 @@ export function useApiQuery<T>(
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const result = await queryFn(apiClient);
-        setData(result);
-        setError(null);
+        if (isMounted) {
+          setData(result);
+          setError(null);
+        }
       } catch (err) {
-        setError(err instanceof Error ? err : new Error(String(err)));
-        console.error("Error fetching data:", err);
+        if (isMounted) {
+          setError(err instanceof Error ? err : new Error(String(err)));
+          console.error("Error fetching data:", err);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchData();
+
+    return () => {
+      isMounted = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiClient, ...dependencies, queryFn]);
+  }, [apiClient, ...dependencies]);
 
   return { data, isLoading, error };
 }
