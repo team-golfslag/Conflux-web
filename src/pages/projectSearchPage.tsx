@@ -6,9 +6,7 @@
 import ProjectCard from "@/components/projectCard.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { useState } from "react";
-import {
-  OrderByType,
-} from "@team-golfslag/conflux-api-client/src/client";
+import { OrderByType } from "@team-golfslag/conflux-api-client/src/client";
 import { Separator } from "@/components/ui/separator.tsx";
 import { Search } from "lucide-react";
 import {
@@ -117,9 +115,13 @@ const ProjectSearchPage = () => {
               <h3 className="text-gray-500">No results found</h3>
             )}
             {/* Display project cards - always render if projects exist */}
-            {projects && projects.length > 0 && projects
-              .slice(0, 15)
-              .map((project) => <ProjectCard project={project} key={project.id} />)}
+            {projects &&
+              projects.length > 0 &&
+              projects
+                .slice(0, 15)
+                .map((project) => (
+                  <ProjectCard project={project} key={project.id} />
+                ))}
           </>
         )}
       </div>
