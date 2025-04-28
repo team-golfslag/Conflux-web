@@ -70,15 +70,15 @@ const ProjectSearchPage = () => {
 
   return (
     <>
-      <div className="relative my-8 w-full max-w-2xl px-4 sm:mx-12 sm:mt-16">
+      <div className="relative w-full max-w-2xl px-4 py-8">
         <Input
-          className="z-10 mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
+          className="mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
           type="search"
           placeholder="Search for title or description.."
           value={searchTerm} // Controlled input
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Search className="text-muted-foreground absolute top-1/2 right-12 z-0 -translate-y-1/2" />
+        <Search className="text-muted-foreground absolute top-1/2 right-8 -translate-y-1/2" />
       </div>
       <Select value={sort} onValueChange={setSort}>
         <SelectTrigger className="mr-4 ml-auto w-50">
