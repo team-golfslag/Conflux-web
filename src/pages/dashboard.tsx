@@ -3,56 +3,60 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import DashboardListView from "@/components/dashboardListView.tsx";
-import dashboardMetrics from "@/components/dashboardMetrics.tsx";
-import {useContext, useEffect, useState} from "react";
-import {ApiClientContext} from "@/lib/ApiClientContext.ts";
-import {Project} from "@team-golfslag/conflux-api-client/src/client.ts";
+import DashboardListView from "@/components/dashboardListView";
+import { LoadingWrapper } from "@/components/loadingWrapper";
+import { useSession } from "@/hooks/SessionContext";
+import { useApiQuery } from "@/hooks/useApiQuery";
+import { DashboardCardProps } from "@/components/dashboardCard";
 
-export default function Dashboard() {
-    
-    const apiClient = useContext(ApiClientContext);
-    const [projects, setProjects] = useState<Project[]>();
-    const [cancelRequest, setCancelRequest] = useState<() => void>();
-    const [error, setError] = useState<Error>();
+const Dashboard = () => {
+  const { session } = useSession();
+  const { data: projects, isLoading } = useApiQuery(
+    (apiClient) => apiClient.projects_GetAllProjects(),
+    [],
+  );
 
-    useEffect(() => {
-        let isCanceled = false;
-        if (cancelRequest) cancelRequest();
-        setCancelRequest(() => () => {
-            isCanceled = true;
-        });
-        apiClient
-            .projects_GetAllProjects()
-            .then((ps) => {
-                if (!isCanceled) {
-                    setProjects(ps);
-                    console.log(ps);
-                    setCancelRequest(undefined);
-                }
-            })
-            .catch((e) => {
-                if (!isCanceled) {
-                    setError(e);
-                    setCancelRequest(undefined);
-                }
-            });
-    }, [apiClient]);
-    
-    return (
-        <>
-            <div>
-                <main className="mx-6 mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div className="md:col-span-1 flex flex-col items-center rounded-lg bg-white p-4 shadow max-h-screen">
-                        {!projects && <h3>Loading...</h3>}
-                        {DashboardListView(projects)}
-                        {error && <h3>Error: {error.message}</h3>}
-                    </div>
-                    <div className="md:col-span-1 flex flex-col items-center rounded-lg bg-white p-4 shadow max-h-1/2">
-                        {dashboardMetrics()}
-                    </div>
-                </main>
-            </div>
-        </>
-    );
-}
+  // Transform the API response to match DashboardCardProps format
+  const projectCards: DashboardCardProps[] | undefined = projects?.map(
+    (project) => {
+      // Find the current user in the project
+      const currentUser = project.users.find(
+        (user) => user.id === session?.user?.id,
+      );
+
+      // Extract roles if the user is found, otherwise use default text
+      const roleText = currentUser?.roles
+        ? currentUser.roles.map((role) => role.name).join(", ")
+        : "No role assigned";
+
+      return {
+        project: project,
+        role: roleText,
+      };
+    },
+  );
+
+  return (
+    <LoadingWrapper
+      isLoading={isLoading}
+      loadingMessage="Loading your projects..."
+    >
+      <div className="h-full space-y-6 p-6">
+        {/* Welcome Banner */}
+        <div className="rounded-m bg-primary rounded-lg p-4 text-white shadow-md">
+          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+            Welcome, {session?.name}!
+          </h3>
+          <p className="leading-7 [&:not(:first-child)]:mt-6">
+            Here's an overview of your current projects:
+          </p>
+        </div>
+
+        {/* User's Projects Section */}
+        <DashboardListView data={projectCards} />
+      </div>
+    </LoadingWrapper>
+  );
+};
+
+export default Dashboard;

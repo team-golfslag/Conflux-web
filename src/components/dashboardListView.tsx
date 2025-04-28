@@ -4,13 +4,21 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
-import dashboardCard from "@/components/ui/dashboardCard.tsx";
+import DashboardCard, { DashboardCardProps } from "@/components/dashboardCard";
+import { JSX } from "react";
 
-const DashboardListView = (ps?: Project[]) => {
-  {
-    return ps?.map((p: Project, index: number) => dashboardCard(p, index));
-  }
+interface DashboardListViewProps {
+  data: DashboardCardProps[] | undefined;
+}
+
+const DashboardListView = ({ data }: DashboardListViewProps): JSX.Element => {
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {data?.map((cardProps, index) => (
+        <DashboardCard key={index} {...cardProps} />
+      ))}
+    </div>
+  );
 };
 
 export default DashboardListView;
