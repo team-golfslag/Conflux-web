@@ -6,6 +6,7 @@
 
 import { Routes, Route } from "react-router";
 import ProjectPage from "./pages/projectPage.tsx";
+import Dashboard from "./pages/dashboard.tsx";
 import SettingsPage from "./pages/settingsPage.tsx";
 import ProjectSearchPage from "@/pages/projectSearchPage.tsx";
 import ProjectEdit from "@/pages/ProjectEdit.tsx";
@@ -21,6 +22,7 @@ const allRoutes = (
   <Routes>
     <Route index element={<App />} />
     <Route element={<Layout />}>
+        <Route path="dashboard" element={<Dashboard />}></Route>
       <Route path="settings" element={<SettingsPage />} />
       <Route path="projects">
         <Route path="search" element={<ProjectSearchPage />} />
