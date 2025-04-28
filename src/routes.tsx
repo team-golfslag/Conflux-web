@@ -22,7 +22,13 @@ const SettingsPage = lazy(() => import("./pages/settingsPage.tsx"));
  * All route components are lazy loaded for better performance.
  */
 const allRoutes = (
-  <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+  <Suspense
+    fallback={
+      <div className="flex h-screen items-center justify-center">
+        Loading...
+      </div>
+    }
+  >
     <ScrollToTop />
     <Routes>
       <Route index element={<App />} />
