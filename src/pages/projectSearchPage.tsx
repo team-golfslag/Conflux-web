@@ -5,64 +5,67 @@
  */
 import ProjectCard from "@/components/projectCard.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import { useContext, useEffect, useState } from "react";
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
-import { ApiClientContext } from "@/lib/ApiClientContext.ts";
+import { useState, useMemo } from "react";
+import { useApiQuery } from "@/hooks/useApiQuery";
+import { LoadingWrapper } from "@/components/loadingWrapper";
 
 /** Project Search Page component <br>
- * Fetches projects from the backend while typing using the refetch function.
+ * Fetches all projects from the backend once and filters them client-side.
  * The first 10 projects matching the query are displayed.
  */
 const ProjectSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [projects, setProjects] = useState<Project[]>();
-  const [cancelRequest, setCancelRequest] = useState<() => void>();
-  const [error, setError] = useState<Error>();
 
-  const apiClient = useContext(ApiClientContext);
+  // Fetch all projects just once
+  const {
+    data: allProjects,
+    isLoading,
+    error,
+  } = useApiQuery((apiClient) => apiClient.projects_GetAllProjects(), []);
 
-  useEffect(() => {
-    let isCanceled = false;
-    if (cancelRequest) cancelRequest();
-    setCancelRequest(() => () => {
-      isCanceled = true;
-    });
-    apiClient
-      .projects_GetProjectByQuery(searchTerm)
-      .then((ps) => {
-        if (!isCanceled) {
-          setProjects(ps);
-          console.log(ps);
-          setCancelRequest(undefined);
-        }
-      })
-      .catch((e) => {
-        if (!isCanceled) {
-          setError(e);
-          setCancelRequest(undefined);
-        }
-      });
-  }, [apiClient, searchTerm]);
+  // Filter projects client-side based on search term
+  const filteredProjects = useMemo(() => {
+    if (!allProjects) return [];
+
+    if (!searchTerm.trim()) return allProjects;
+
+    const lowercaseSearchTerm = searchTerm.toLowerCase();
+    return allProjects.filter(
+      (project) =>
+        project.title.toLowerCase().includes(lowercaseSearchTerm) ||
+        project.description?.toLowerCase().includes(lowercaseSearchTerm),
+    );
+  }, [allProjects, searchTerm]);
 
   return (
-    <>
+    <LoadingWrapper isLoading={isLoading} loadingMessage="Loading projects...">
       <div className="flex flex-row justify-center py-16">
         <Input
           className="w-1/3 rounded-2xl"
           type="search"
           placeholder="Search for any project.."
+          value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
       <div className="flex flex-col items-center">
         <h2 className="mb-8 text-3xl font-bold">Results</h2>
-        {!projects && <h3>Loading...</h3>}
-        {error && <h3>Error: {error.message}</h3>}
-        {projects
-          ?.slice(0, 15)
-          .map((project) => <ProjectCard project={project} key={project.id} />)}
+
+        {error && <h3 className="text-red-500">Error: {error.message}</h3>}
+
+        {filteredProjects.length === 0 && !isLoading && !error ? (
+          <p className="text-gray-500">
+            No projects found matching your search.
+          </p>
+        ) : (
+          filteredProjects
+            .slice(0, 10)
+            .map((project) => (
+              <ProjectCard project={project} key={project.id} />
+            ))
+        )}
       </div>
-    </>
+    </LoadingWrapper>
   );
 };
 
