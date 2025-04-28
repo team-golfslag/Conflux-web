@@ -8,7 +8,7 @@ import { Routes, Route } from "react-router";
 import ProjectPage from "./pages/projectPage.tsx";
 import SettingsPage from "./pages/settingsPage.tsx";
 import ProjectSearchPage from "@/pages/projectSearchPage.tsx";
-import ProjectEdit from "@/pages/ProjectEdit.tsx";
+import ProjectEdit from "@/pages/projectEditPage.tsx";
 import Layout from "@/components/layout.tsx";
 import App from "@/pages/app.tsx";
 import { Suspense } from "react";
