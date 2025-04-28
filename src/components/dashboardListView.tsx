@@ -4,14 +4,19 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { Collaboration } from "@team-golfslag/conflux-api-client/src/client";
-import dashboardCard from "@/components/dashboardCard";
+import DashboardCard, { DashboardCardProps } from "@/components/dashboardCard";
 import { JSX } from "react";
 
-const DashboardListView = (data: Collaboration[] | undefined): JSX.Element => {
+interface DashboardListViewProps {
+  data: DashboardCardProps[] | undefined;
+}
+
+const DashboardListView = ({ data }: DashboardListViewProps): JSX.Element => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-      {data?.map((project, index) => dashboardCard(project, index))}
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {data?.map((cardProps, index) => (
+        <DashboardCard key={index} {...cardProps} />
+      ))}
     </div>
   );
 };
