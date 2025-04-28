@@ -8,7 +8,7 @@ import React from "react";
 interface LoadingWrapperProps {
   isLoading: boolean;
   children: React.ReactNode;
-  loadingMessage?: string;
+  loadingMessage?: React.ReactNode;
 }
 
 export function LoadingWrapper({
@@ -20,7 +20,7 @@ export function LoadingWrapper({
     return (
       <div className="bg-secondary min-h-full p-8">
         <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
-          <span>{loadingMessage}</span>
+          {loadingMessage}
         </div>
       </div>
     );
