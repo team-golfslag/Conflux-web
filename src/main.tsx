@@ -12,6 +12,7 @@ import "./index.css";
 import { ApiClient } from "@team-golfslag/conflux-api-client/src/client";
 import config from "@/config.ts";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
+import { SessionProvider } from "@/lib/SessionContext";
 
 /*
 This is the main entry point into the program
@@ -27,8 +28,10 @@ const root = document.getElementById("root");
 
 createRoot(root!).render(
   <StrictMode>
-    <ApiClientContext value={apiClient}>
-      <BrowserRouter>{allRoutes}</BrowserRouter>
-    </ApiClientContext>
+    <ApiClientContext.Provider value={apiClient}>
+      <BrowserRouter>
+        <SessionProvider>{allRoutes}</SessionProvider>
+      </BrowserRouter>
+    </ApiClientContext.Provider>
   </StrictMode>,
 );
