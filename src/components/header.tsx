@@ -15,7 +15,7 @@ import config from "@/config";
  */
 export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [isScrollingUp, setIsScrollingUp] = useState(false);
+  const [isScrollingUp, setIsScrollingUp] = useState(true);
   const [lastScrollTop, setLastScrollTop] = useState(0);
 
   // When scrolling up, the header becomes sticky. When scrolling down, the header stays behind.

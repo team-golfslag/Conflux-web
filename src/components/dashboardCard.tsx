@@ -6,12 +6,12 @@
 import { truncate } from "lodash";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent, CardHeader } from "@/components/ui/card.tsx";
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
+import { IProject } from "@team-golfslag/conflux-api-client/src/client";
 import { Link } from "react-router";
 import { JSX } from "react";
 
 export interface DashboardCardProps {
-  project: Project;
+  project: IProject;
   role: string;
 }
 

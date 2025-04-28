@@ -5,10 +5,10 @@
  */
 
 import { Link } from "react-router";
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
+import { IProject } from "@team-golfslag/conflux-api-client/src/client";
 
 type ProjectCardProps = {
-  project: Project;
+  project: IProject;
 };
 
 const determineStatus = (
