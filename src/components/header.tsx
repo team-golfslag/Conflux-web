@@ -5,15 +5,15 @@
  */
 import logo from "@/assets/golfslag.png";
 import { useState, useEffect } from "react";
-import { Menu, Search, User } from "lucide-react";
+import { Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { Link } from "react-router";
 import config from "@/config";
+
 /** Header component <br>
  * Displays the main pages, search icon and the profile menu with fold-out functionality. <br>On mobile, the menu folds to a menu icon.
  */
 export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
   const [lastScrollTop, setLastScrollTop] = useState(0);
@@ -43,33 +43,21 @@ export default function Header() {
       } z-1`}
     >
       <div className="flex w-full max-w-6xl items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="h-8 w-8 rounded-full">
-            <img src={logo} alt="Logo" className="h-full w-full rounded-full" />
+        <Link to="/dashboard">
+          <div className="flex items-center gap-4">
+            <div className="h-8 w-8 rounded-full">
+              <img
+                src={logo}
+                alt="Logo"
+                className="h-full w-full rounded-full"
+              />
+            </div>
+            <span className="text-xl font-bold uppercase">Conflux</span>
           </div>
-          <span className="text-xl font-bold uppercase">Conflux</span>
-        </div>
+        </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 md:flex">
-          <Link to="/getting-started">
-            <Button
-              variant="ghost"
-              className="text-primary-foreground bg-primary"
-            >
-              Getting Started
-            </Button>
-          </Link>
-          <Link to="/recent-projects">
-            <Button variant="ghost" className="text-primary-foreground">
-              Recent Projects
-            </Button>
-          </Link>
-          <Link to="/my-projects">
-            <Button variant="ghost" className="text-primary-foreground">
-              My Projects
-            </Button>
-          </Link>
           <Link to="/projects/search">
             <Button variant="ghost">
               <Search className="h-6 w-6" />
@@ -113,15 +101,13 @@ export default function Header() {
 
       {/* Mobile Navigation */}
       <div className="flex gap-4 md:hidden">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          <div className="hover:text-secondary">
-            <Menu className="text-primary-foreground h-6 w-6" />
-          </div>
-        </Button>
+        <Link to="/projects/search">
+          <Button variant="ghost">
+            <div className="hover:text-secondary">
+              <Search className="text-primary-foreground h-6 w-6" />
+            </div>
+          </Button>
+        </Link>
         <Link to="/profile">
           <Button variant="ghost" size="icon">
             <div className="hover:text-secondary">
@@ -130,27 +116,6 @@ export default function Header() {
           </Button>
         </Link>
       </div>
-
-      {/* Mobile Menu Drawer */}
-      {mobileMenuOpen && (
-        <div className="bg-primary absolute top-16 left-0 flex w-full flex-col gap-4 p-4">
-          <Link to="/getting-started">
-            <Button variant="ghost" className="text-primary-foreground w-full">
-              Getting Started
-            </Button>
-          </Link>
-          <Link to="/recent-projects">
-            <Button variant="ghost" className="text-primary-foreground w-full">
-              Recent Projects
-            </Button>
-          </Link>
-          <Link to="/projects/search">
-            <Button variant="ghost" className="text-primary-foreground w-full">
-              My Projects
-            </Button>
-          </Link>
-        </div>
-      )}
     </header>
   );
 }
