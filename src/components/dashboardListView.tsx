@@ -8,7 +8,7 @@ import DashboardCard, { DashboardCardProps } from "@/components/dashboardCard";
 import { JSX } from "react";
 
 interface DashboardListViewProps {
-  data: DashboardCardProps[] | undefined;
+  data?: DashboardCardProps[];
 }
 
 const DashboardListView = ({ data }: DashboardListViewProps): JSX.Element => {
