@@ -70,7 +70,7 @@ const ProjectSearchPage = () => {
 
   return (
     <>
-      <div className="relative w-full max-w-2xl px-4 py-8">
+      <div className="relative mx-auto w-full max-w-2xl px-4 py-8">
         <Input
           className="mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
           type="search"

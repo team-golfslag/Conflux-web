@@ -3,7 +3,6 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { truncate } from "lodash";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent, CardHeader } from "@/components/ui/card.tsx";
 import { Project } from "@team-golfslag/conflux-api-client/src/client";
@@ -17,20 +16,16 @@ export interface DashboardCardProps {
 
 const DashboardCard = ({ project, role }: DashboardCardProps): JSX.Element => {
   return (
-    <Card className="m-3 flex h-60 flex-col gap-0 py-0 pt-6 shadow-md">
-      <CardHeader className="bg-gray-100 p-4">
-        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
+    <Card className="m-3 flex h-64 flex-col gap-0 py-0 shadow-md">
+      <CardHeader className="rounded-t-xl bg-gray-100 px-4 py-2">
+        <h4 className="line-clamp-3 scroll-m-20 text-xl font-semibold tracking-tight">
           {project.title}
         </h4>
       </CardHeader>
       <CardContent className="flex flex-grow flex-col p-4 wrap-break-word">
-        {/* Project Description (truncated if too long) */}
-        <p className="leading-7 [&:not(:first-child)]:mt-6">
-          {truncate(project.description, {
-            length: 100,
-            separator: " ",
-            omission: "...",
-          })}
+        {/* Project Description (clamped if too long) */}
+        <p className="line-clamp-3 leading-7 [&:not(:first-child)]:mt-6">
+          {project.description}
         </p>
         <div className="flex-grow"></div>
         <div className="flex justify-end">
