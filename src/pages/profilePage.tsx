@@ -26,10 +26,13 @@ import {
 import { useSession } from "@/hooks/SessionContext";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import config from "@/config";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import OrcidIcon from "@/components/icons/orcidIcon";
+import { ApiClientContext } from "@/lib/ApiClientContext";
 
 const ProfilePage = () => {
+  const apiClient = useContext(ApiClientContext);
+
   const { session, loading, logout } = useSession();
   const [isUnlinkDialogOpen, setIsUnlinkDialogOpen] = useState(false);
 
@@ -40,11 +43,13 @@ const ProfilePage = () => {
   const handleUnlinkOrcid = () => {
     // TODO: Use unlink api call when it is available
     // for now close the dialog and empty the session orcid_id
-    // apiClient.orcid_OrcidUnlink().then(...);
-    if (session?.user) {
-      session.user.orcid_id = undefined;
-    }
-    setIsUnlinkDialogOpen(false);
+    apiClient.orcid_OrcidUnlink().then(() => {
+      console.log("ORCID unlinked successfully");
+      if (session?.user) {
+        session.user.orcid_id = undefined;
+      }
+      setIsUnlinkDialogOpen(false);
+    });
   };
 
   const handleDeleteData = () => {
