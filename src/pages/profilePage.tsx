@@ -26,12 +26,24 @@ import {
 import { useSession } from "@/hooks/SessionContext";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import config from "@/config";
+import { useState } from "react";
 
 const ProfilePage = () => {
   const { session, loading, logout } = useSession();
+  const [isUnlinkDialogOpen, setIsUnlinkDialogOpen] = useState(false);
 
   const handleLinkOrcid = () => {
     window.location.href = `${config.apiBaseURL}/orcid/link?redirectUri=${encodeURIComponent(window.location.href)}`;
+  };
+
+  const handleUnlinkOrcid = () => {
+    // TODO: Use unlink api call when it is available
+    // for now close the dialog and empty the session orcid_id
+    // apiClient.orcid_OrcidUnlink().then(...);
+    if (session?.user) {
+      session.user.orcid_id = undefined;
+    }
+    setIsUnlinkDialogOpen(false);
   };
 
   const handleDeleteData = () => {
@@ -64,10 +76,34 @@ const ProfilePage = () => {
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">ORCID</p>
                 <p>{session.user?.orcid_id || "Not linked"}</p>
-                {/* TODO: Conditionally render button based on whether ORCID is linked */}
-                <Button variant="outline" size="sm" onClick={handleLinkOrcid}>
-                  Link ORCID
-                </Button>
+                {session.user?.orcid_id ? (
+                  <AlertDialog open={isUnlinkDialogOpen} onOpenChange={setIsUnlinkDialogOpen}>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        Unlink ORCID
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Unlink ORCID?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to unlink your ORCID account?
+                          This action cannot be undone easily.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleUnlinkOrcid}>
+                          Unlink
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                ) : (
+                  <Button variant="outline" size="sm" onClick={handleLinkOrcid}>
+                    Link ORCID
+                  </Button>
+                )}
               </div>
             </CardContent>
             <CardFooter className="flex flex-col items-start space-y-4 border-t px-6 py-4">
