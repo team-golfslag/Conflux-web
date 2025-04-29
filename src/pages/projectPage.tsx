@@ -69,7 +69,7 @@ export default function ProjectPage() {
   return (
     <>
       {/* Title */}
-      <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
+      <div className="flex items-center justify-self-start rounded-lg bg-white p-3 text-2xl font-semibold">
         <span>{project.title}</span>
         <Link
           to="edit"
