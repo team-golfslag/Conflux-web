@@ -5,65 +5,149 @@
  */
 import ProjectCard from "@/components/projectCard.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import { useContext, useEffect, useState } from "react";
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
-import { ApiClientContext } from "@/lib/ApiClientContext.ts";
+import { useState } from "react";
+import { OrderByType } from "@team-golfslag/conflux-api-client/src/client";
+import { Separator } from "@/components/ui/separator.tsx";
+import { Search } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useApiQuery } from "@/hooks/useApiQuery";
+import { useDebounce } from "@/hooks/useDebounce"; // Assuming you have or create this hook
 
 /** Project Search Page component <br>
- * Fetches projects from the backend while typing using the refetch function.
- * The first 10 projects matching the query are displayed.
+ * Fetches projects from the backend using a debounced search term and selected sort order.
+ * The first 15 projects matching the query are displayed.
  */
 const ProjectSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [projects, setProjects] = useState<Project[]>();
-  const [cancelRequest, setCancelRequest] = useState<() => void>();
-  const [error, setError] = useState<Error>();
+  const [sort, setSort] = useState("relevance"); // Default to relevance
 
-  const apiClient = useContext(ApiClientContext);
+  // Debounce the search term to avoid excessive API calls
+  const debouncedSearchTerm = useDebounce(searchTerm, 200); // 300ms delay
 
-  useEffect(() => {
-    let isCanceled = false;
-    if (cancelRequest) cancelRequest();
-    setCancelRequest(() => () => {
-      isCanceled = true;
-    });
-    apiClient
-      .projects_GetProjectByQuery(searchTerm)
-      .then((ps) => {
-        if (!isCanceled) {
-          setProjects(ps);
-          console.log(ps);
-          setCancelRequest(undefined);
-        }
-      })
-      .catch((e) => {
-        if (!isCanceled) {
-          setError(e);
-          setCancelRequest(undefined);
-        }
-      });
-  }, [apiClient, searchTerm]);
+  function parseOrderBy(sortValue: string): OrderByType | undefined {
+    switch (sortValue) {
+      case "title_asc":
+        return OrderByType.TitleAsc;
+      case "title_desc":
+        return OrderByType.TitleDesc;
+      case "start_date_asc":
+        return OrderByType.StartDateAsc;
+      case "start_date_desc":
+        return OrderByType.StartDateDesc;
+      case "end_date_asc":
+        return OrderByType.EndDateAsc;
+      case "end_date_desc":
+        return OrderByType.EndDateDesc;
+      case "relevance": // Handle relevance case
+      default:
+        return undefined;
+    }
+  }
+
+  // Use useApiQuery to fetch data based on debounced search term and sort order
+  const {
+    data: projects,
+    isLoading,
+    error,
+  } = useApiQuery(
+    (apiClient) =>
+      apiClient.projects_GetProjectByQuery(
+        debouncedSearchTerm,
+        undefined, // page, if needed
+        undefined, // limit, if needed
+        parseOrderBy(sort),
+      ),
+    [debouncedSearchTerm, sort], // Dependencies for the query
+  );
 
   return (
     <>
-      <div className="flex flex-row justify-center py-16">
+      <div className="relative w-full max-w-2xl px-4 py-8">
         <Input
-          className="w-1/3 rounded-2xl"
+          className="mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
           type="search"
-          placeholder="Search for any project.."
+          placeholder="Search for title or description.."
+          value={searchTerm} // Controlled input
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        <Search className="text-muted-foreground absolute top-1/2 right-8 -translate-y-1/2" />
       </div>
-      <div className="flex flex-col items-center">
-        <h2 className="mb-8 text-3xl font-bold">Results</h2>
-        {!projects && <h3>Loading...</h3>}
-        {error && <h3>Error: {error.message}</h3>}
-        {projects
-          ?.slice(0, 10)
-          .map((project) => <ProjectCard project={project} key={project.id} />)}
+      <Select value={sort} onValueChange={setSort}>
+        <SelectTrigger className="mr-4 ml-auto w-50">
+          <SelectValue placeholder="Sort by.." />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Sort by</SelectLabel>
+            {/* Use "relevance" as the value */}
+            <SelectItem value="relevance">Relevance</SelectItem>
+            <SelectItem value="title_asc">Title A-Z</SelectItem>
+            <SelectItem value="title_desc">Title Z-A</SelectItem>
+            <SelectItem value="start_date_asc">Start date ascending</SelectItem>
+            <SelectItem value="start_date_desc">
+              Start date descending
+            </SelectItem>
+            <SelectItem value="end_date_asc">End date ascending</SelectItem>
+            <SelectItem value="end_date_desc">End date descending</SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      <div className="mx-4 flex max-w-7xl flex-wrap justify-center gap-4 pb-16 sm:gap-8">
+        {/* Show loading only on initial load or if projects array is empty */}
+        {isLoading && (!projects || projects.length === 0) ? (
+          <p className="text-muted-foreground">Searching projects...</p>
+        ) : (
+          <>
+            <Separator className="my-4" />
+            {/* Display error message if fetch fails */}
+            {error && <h3 className="text-red-500">Error: {error.message}</h3>}
+            {/* Display message if no results are found (and not loading/error) */}
+            {/* Ensure projects is defined before checking length */}
+            {!isLoading && projects && !error && projects.length === 0 && (
+              <h3 className="text-gray-500">No results found</h3>
+            )}
+            {/* Display project cards - always render if projects exist */}
+            {projects &&
+              projects.length > 0 &&
+              projects
+                .slice(0, 15)
+                .map((project) => (
+                  <ProjectCard project={project} key={project.id} />
+                ))}
+          </>
+        )}
       </div>
     </>
   );
 };
 
 export default ProjectSearchPage;
+
+// Example useDebounce hook (create this in e.g., src/hooks/useDebounce.ts)
+/*
+import { useState, useEffect } from 'react';
+
+export function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+*/
