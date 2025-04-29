@@ -27,6 +27,7 @@ import { useSession } from "@/hooks/SessionContext";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import config from "@/config";
 import { useState } from "react";
+import OrcidIcon from "@/components/icons/orcidIcon";
 
 const ProfilePage = () => {
   const { session, loading, logout } = useSession();
@@ -77,10 +78,13 @@ const ProfilePage = () => {
                 <p className="text-sm font-medium text-gray-500">ORCID</p>
                 <p>{session.user?.orcid_id || "Not linked"}</p>
                 {session.user?.orcid_id ? (
-                  <AlertDialog open={isUnlinkDialogOpen} onOpenChange={setIsUnlinkDialogOpen}>
+                  <AlertDialog
+                    open={isUnlinkDialogOpen}
+                    onOpenChange={setIsUnlinkDialogOpen}
+                  >
                     <AlertDialogTrigger asChild>
                       <Button variant="outline" size="sm">
-                        Unlink ORCID
+                        <OrcidIcon className="mr-2" /> Unlink ORCID
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
@@ -101,7 +105,7 @@ const ProfilePage = () => {
                   </AlertDialog>
                 ) : (
                   <Button variant="outline" size="sm" onClick={handleLinkOrcid}>
-                    Link ORCID
+                    <OrcidIcon className="mr-2" /> Link ORCID
                   </Button>
                 )}
               </div>
