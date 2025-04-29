@@ -12,6 +12,7 @@ import {
   ProjectPutDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
+import ContributorSelect from "@/components/contributorSelect.tsx";
 
 type ProjectEditParams = {
   id: string;
@@ -76,6 +77,8 @@ const ProjectEdit = () => {
         onSubmit={(p) => mutate(id, p)}
         disabled={isPending}
       />
+      <ContributorSelect projectId={id} />
+
     </>
   );
 };
