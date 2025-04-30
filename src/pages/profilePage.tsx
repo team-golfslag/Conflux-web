@@ -29,11 +29,15 @@ import config from "@/config";
 import { useContext, useState } from "react";
 import OrcidIcon from "@/components/icons/orcidIcon";
 import { ApiClientContext } from "@/lib/ApiClientContext";
+import {
+  User,
+  UserSession,
+} from "@team-golfslag/conflux-api-client/src/client";
 
 const ProfilePage = () => {
   const apiClient = useContext(ApiClientContext);
 
-  const { session, loading, logout } = useSession();
+  const { session, loading, logout, saveSession } = useSession();
   const [isUnlinkDialogOpen, setIsUnlinkDialogOpen] = useState(false);
 
   const handleLinkOrcid = () => {
@@ -41,12 +45,18 @@ const ProfilePage = () => {
   };
 
   const handleUnlinkOrcid = () => {
-    // TODO: Use unlink api call when it is available
-    // for now close the dialog and empty the session orcid_id
     apiClient.orcid_OrcidUnlink().then(() => {
       console.log("ORCID unlinked successfully");
       if (session?.user) {
-        session.user.orcid_id = undefined;
+        // Create a new session object with the updated user data
+        const updatedSession = new UserSession({
+          ...session,
+          user: new User({
+            ...session.user,
+            orcid_id: undefined,
+          }),
+        });
+        saveSession(updatedSession); // Pass the new object to saveSession
       }
       setIsUnlinkDialogOpen(false);
     });

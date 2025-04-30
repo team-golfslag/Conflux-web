@@ -110,13 +110,31 @@ export function SessionProvider({ children }: SessionProviderProps) {
     fetchSession();
   }, [apiClient, navigate, location.pathname]);
 
+  const saveSession = (userData: UserSession) => {
+    const sessionWithTimestamp: StoredSession = {
+      userData,
+      timestamp: new Date().getTime(),
+    };
+    localStorage.setItem(
+      SESSION_STORAGE_KEY,
+      JSON.stringify(sessionWithTimestamp),
+    );
+    setSession(userData);
+  };
+
   const logout = () => {
     setSession(null);
     localStorage.removeItem(SESSION_STORAGE_KEY);
     navigate("/");
   };
 
-  const contextValue: SessionContextType = { session, loading, error, logout };
+  const contextValue: SessionContextType = {
+    session,
+    loading,
+    error,
+    logout,
+    saveSession,
+  };
   return (
     <SessionContext.Provider value={contextValue}>
       {children}
