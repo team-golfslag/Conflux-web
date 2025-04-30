@@ -84,7 +84,7 @@ const DashboardCard = ({ project, role }: DashboardCardProps): JSX.Element => {
               <div className="group-hover:text-primary/70 flex items-center text-xs text-gray-500">
                 <UsersIcon
                   size={14}
-                  className="mr-2 text-gray-400 group-hover:text-blue-800"
+                  className="group-hover:text-primary/70 mr-2 text-gray-400"
                 />
                 <span>
                   {contributorCount} contributor
@@ -92,9 +92,11 @@ const DashboardCard = ({ project, role }: DashboardCardProps): JSX.Element => {
                 </span>
               </div>
 
-              <div className="text-primary bg-primary/10 rounded-full px-2 py-1 text-xs font-medium">
-                {role}
-              </div>
+              {role && role.trim() !== "" && (
+                <div className="text-primary bg-primary/10 rounded-full px-2 py-1 text-xs font-medium">
+                  {role}
+                </div>
+              )}
             </div>
           </div>
         </CardContent>

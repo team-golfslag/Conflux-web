@@ -7,7 +7,7 @@ import DashboardListView from "@/components/dashboardListView";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import { useSession } from "@/hooks/SessionContext";
 import { useApiQuery } from "@/hooks/useApiQuery";
-import { DashboardCardProps } from "@/components/dashboardCard";
+import { ProjectCardProps } from "@/components/projectCard";
 
 const Dashboard = () => {
   const { session } = useSession();
@@ -17,7 +17,7 @@ const Dashboard = () => {
   );
 
   // Transform the API response to match DashboardCardProps format
-  const projectCards: DashboardCardProps[] | undefined = projects?.map(
+  const projectCards: ProjectCardProps[] | undefined = projects?.map(
     (project) => {
       // Find the current user in the project
       const currentUser = project.users.find(
