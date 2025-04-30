@@ -100,7 +100,7 @@ const ProjectSearchPage = () => {
           </SelectGroup>
         </SelectContent>
       </Select>
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
+      <div className="p-6 mx-auto grid max-w-7xl grid-cols-1 gap-4 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
         {/* Show loading only on initial load or if projects array is empty */}
         {isLoading && (!projects || projects.length === 0) ? (
           <p className="text-muted-foreground col-span-full text-center">
