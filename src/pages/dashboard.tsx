@@ -41,19 +41,33 @@ const Dashboard = () => {
       isLoading={isLoading}
       loadingMessage="Loading your projects..."
     >
-      <div className="h-full space-y-6 p-6">
-        {/* Welcome Banner */}
-        <div className="rounded-m bg-primary rounded-lg p-4 text-white shadow-md">
-          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-            Welcome, {session?.name}!
-          </h3>
-          <p className="leading-7 [&:not(:first-child)]:mt-6">
-            Here's an overview of your current projects:
-          </p>
-        </div>
+      <div className="min-h-screen pb-12">
+        <div className="mx-auto max-w-7xl space-y-8 p-6">
+          {/* Welcome Banner with Action Button */}
+          <div className="from-primary/90 to-primary flex items-center justify-between rounded-lg bg-gradient-to-r p-6 shadow-md">
+            <div className="text-primary-foreground">
+              <h1 className="text-3xl font-bold">
+                {session?.user?.name || session?.name}
+              </h1>
+              <p className="mt-2 opacity-90">
+                Manage and track your research projects in one place
+              </p>
+            </div>
+          </div>
 
-        {/* User's Projects Section */}
-        <DashboardListView data={projectCards} />
+          {/* Projects Section with Header */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-foreground text-2xl font-semibold">
+                Your Projects
+              </h2>
+              <div className="flex gap-2">
+                {/* Additional controls could go here */}
+              </div>
+            </div>
+            <DashboardListView data={projectCards} />
+          </div>
+        </div>
       </div>
     </LoadingWrapper>
   );

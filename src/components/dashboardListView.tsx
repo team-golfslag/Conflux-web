@@ -13,9 +13,9 @@ interface DashboardListViewProps {
 
 const DashboardListView = ({ data }: DashboardListViewProps): JSX.Element => {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {data?.map((cardProps, index) => (
-        <DashboardCard key={index} {...cardProps} />
+        <DashboardCard key={cardProps.project.id || index} {...cardProps} />
       ))}
     </div>
   );
