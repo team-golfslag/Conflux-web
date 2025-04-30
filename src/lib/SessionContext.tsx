@@ -13,6 +13,7 @@ import {
   SessionContext,
   SessionContextType,
 } from "@/hooks/SessionContext";
+import config from "@/config";
 
 // Session expiration time in milliseconds (30 minutes)
 const SESSION_EXPIRATION_TIME = 30 * 60 * 1000;
@@ -125,6 +126,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
   const logout = () => {
     setSession(null);
     localStorage.removeItem(SESSION_STORAGE_KEY);
+    window.location.href = `${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(config.webUIUrl)}`;
     navigate("/");
   };
 
