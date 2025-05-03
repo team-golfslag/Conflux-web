@@ -5,30 +5,44 @@
  */
 
 import { Routes, Route } from "react-router";
-import ProjectPage from "./pages/projectPage.tsx";
-import SettingsPage from "./pages/settingsPage.tsx";
-import ProjectSearchPage from "@/pages/projectSearchPage.tsx";
-import ProjectEdit from "@/pages/ProjectEdit.tsx";
-import Layout from "@/components/layout.tsx";
-import App from "@/pages/app.tsx";
+import { lazy, Suspense } from "react";
+import ScrollToTop from "./hooks/scrollToTop.tsx";
+
+// Lazy load all page components
+const App = lazy(() => import("./pages/app.tsx"));
+const Dashboard = lazy(() => import("./pages/dashboard.tsx"));
+const Layout = lazy(() => import("./components/layout.tsx"));
+const ProjectPage = lazy(() => import("./pages/projectPage.tsx"));
+const ProjectEdit = lazy(() => import("./pages/projectEditPage.tsx"));
+const ProjectSearchPage = lazy(() => import("./pages/projectSearchPage.tsx"));
+const SettingsPage = lazy(() => import("./pages/settingsPage.tsx"));
 
 /**
- * This contains all different routes to the different pages. <br>
- * We might need to use ? and : (and others) later in order to create optional and branching routes.
+ * This contains all different routes to the different pages.
+ * All route components are lazy loaded for better performance.
  */
-
 const allRoutes = (
-  <Routes>
-    <Route index element={<App />} />
-    <Route element={<Layout />}>
-      <Route path="settings" element={<SettingsPage />} />
-      <Route path="projects">
-        <Route path="search" element={<ProjectSearchPage />} />
-        <Route path=":id" element={<ProjectPage />} />
-        <Route path=":id/edit" element={<ProjectEdit />} />
+  <Suspense
+    fallback={
+      <div className="flex h-screen items-center justify-center">
+        Loading...
+      </div>
+    }
+  >
+    <ScrollToTop />
+    <Routes>
+      <Route index element={<App />} />
+      <Route element={<Layout />}>
+        <Route path="settings" element={<SettingsPage />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="projects">
+          <Route path="search" element={<ProjectSearchPage />} />
+          <Route path=":id" element={<ProjectPage />} />
+          <Route path=":id/edit" element={<ProjectEdit />} />
+        </Route>
       </Route>
-    </Route>
-  </Routes>
+    </Routes>
+  </Suspense>
 );
 
 export default allRoutes;

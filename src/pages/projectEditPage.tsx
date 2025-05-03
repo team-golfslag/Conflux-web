@@ -11,9 +11,7 @@ import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
 import Timeline, { TimelineItem } from "@/components/timeline";
 import { Link, useParams } from "react-router";
-import { useContext, useEffect, useState } from "react";
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
-import { ApiClientContext } from "@/lib/ApiClientContext.ts";
+import { useApiQuery } from "@/hooks/useApiQuery";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 
 /** List of timeline data as dummy data */
@@ -30,42 +28,32 @@ const timelineData: TimelineItem[] = [
 export default function ProjectPage() {
   const { id } = useParams();
 
-  const [project, setProject] = useState<Project>();
-  const [error, setError] = useState<Error>();
+  const {
+    data: project,
+    isLoading,
+    error,
+  } = useApiQuery((apiClient) => apiClient.projects_GetProjectById(id!), [id]);
 
-  const apiClient = useContext(ApiClientContext);
-
-  useEffect(() => {
-    if (id) {
-      apiClient
-        .projects_GetProjectById(id)
-        .then((p) => {
-          setProject(p);
-          setError(undefined);
-        })
-        .catch((e) => setError(e));
-    }
-  }, [apiClient, id]);
+  if (error) {
+    return (
+      <>
+        <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
+          <span>{error.name}</span>
+        </div>
+        <div className="p-10" />
+        <div className="text-l flex items-center justify-between rounded-lg bg-white p-3">
+          <span>{error.message}</span>
+        </div>
+      </>
+    );
+  }
 
   return (
-    <LoadingWrapper
-      isLoading={!project && !error}
-      loadingMessage="Loading project..."
-    >
-      {error ? (
-        <>
-          <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
-            <span>{error.name}</span>
-          </div>
-          <div className="p-10" />
-          <div className="text-l flex items-center justify-between rounded-lg bg-white p-3">
-            <span>{error.message}</span>
-          </div>
-        </>
-      ) : project ? (
+    <LoadingWrapper isLoading={isLoading} loadingMessage="Loading project...">
+      {project && (
         <>
           {/* Title */}
-          <div className="flex items-center justify-self-start rounded-lg bg-white p-3 text-2xl font-semibold">
+          <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
             <span>{project.title}</span>
             <Link
               to="edit"
@@ -77,7 +65,7 @@ export default function ProjectPage() {
 
           <main className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
             <div className="md:col-span-2">
-              <Tabs defaultValue="overview" className="h-full w-full">
+              <Tabs defaultValue="overview" className="h-fullw-full">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
                   <TabsTrigger value="contributors">Contributors</TabsTrigger>
@@ -113,7 +101,7 @@ export default function ProjectPage() {
             </aside>
           </main>
         </>
-      ) : null}
+      )}
     </LoadingWrapper>
   );
 }
