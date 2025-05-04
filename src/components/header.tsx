@@ -38,11 +38,11 @@ export default function Header() {
 
   return (
     <header
-      className={`bg-primary text-primary-foreground sticky flex w-full items-center justify-center py-2 transition-all duration-400 ease-in-out ${
+      className={`bg-primary text-primary-foreground sticky flex w-full items-center justify-center py-3 transition-all duration-400 ease-in-out ${
         isScrollingUp ? "top-0" : "-top-20"
       } z-1`}
     >
-      <div className="flex w-full max-w-6xl items-center justify-between">
+      <div className="flex w-full max-w-7xl items-center justify-between">
         <Link to="/dashboard">
           <div className="flex items-center gap-4">
             <div className="h-8 w-8 rounded-full">
