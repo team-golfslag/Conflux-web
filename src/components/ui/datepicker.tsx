@@ -8,7 +8,6 @@
 import * as React from "react";
 import { format, getMonth, getYear, setMonth, setYear } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -29,8 +28,16 @@ interface DatePickerProps {
   startYear?: number;
   endYear?: number;
   onDateChange?: (date: Date | undefined) => void;
-  initialDate?: Date | undefined;
+  initialDate?: Date;
 }
+
+/**
+ * DatePicker component with added month and year selection.
+ * @param startYear The starting year for the year selection
+ * @param endYear The ending year for the year selection
+ * @param onDateChange Callback function to handle date changes
+ * @param initialDate The initial date to be displayed in the date picker
+ */
 export function DatePicker({
   startYear = getYear(new Date()) - 20,
   endYear = getYear(new Date()) + 20,
@@ -56,6 +63,7 @@ export function DatePicker({
     "November",
     "December",
   ];
+
   const years = Array.from(
     { length: endYear - startYear + 1 },
     (_, i) => startYear + i,

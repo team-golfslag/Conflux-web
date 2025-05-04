@@ -30,14 +30,14 @@ const ProjectSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [projects, setProjects] = useState<Project[]>();
-  const [cancelRequest, setCancelRequest] = useState<() => void>();
-  const [error, setError] = useState<Error>();
   const [sort, setSort] = useState("relevance"); // Default to relevance
 
   // Debounce the search term to avoid excessive API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 200); // 300ms delay
 
+  /*
+   * Function to parse the sort value from the select input
+   */
   function parseOrderBy(sortValue: string): OrderByType | undefined {
     switch (sortValue) {
       case "title_asc":
@@ -52,7 +52,7 @@ const ProjectSearchPage = () => {
         return OrderByType.EndDateAsc;
       case "end_date_desc":
         return OrderByType.EndDateDesc;
-      case "relevance": // Handle relevance case
+      case "relevance":
       default:
         return undefined;
     }
@@ -61,7 +61,6 @@ const ProjectSearchPage = () => {
   const handleStartDateChange = (date: Date | undefined) => {
     console.log("Start Date selected:", date);
     setStartDate(date);
-    // Now you have the date in the parent component's state
   };
 
   const handleEndDateChange = (date: Date | undefined) => {
@@ -119,8 +118,7 @@ const ProjectSearchPage = () => {
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Sort by</SelectLabel>
-            {/* Use "relevance" as the value */}
-            <SelectItem value="relevance">Relevance</SelectItem>
+              <SelectItem value="relevance">Relevance</SelectItem>
               <SelectItem value="title_asc">Title A-Z</SelectItem>
               <SelectItem value="title_desc">Title Z-A</SelectItem>
               <SelectItem value="start_date_asc">
@@ -145,7 +143,6 @@ const ProjectSearchPage = () => {
             {/* Display error message if fetch fails */}
             {error && <h3 className="text-red-500">Error: {error.message}</h3>}
             {/* Display message if no results are found (and not loading/error) */}
-            {/* Ensure projects is defined before checking length */}
             {!isLoading && projects && !error && projects.length === 0 && (
               <h3 className="text-gray-500">No results found</h3>
             )}
@@ -165,24 +162,3 @@ const ProjectSearchPage = () => {
 };
 
 export default ProjectSearchPage;
-
-// Example useDebounce hook (create this in e.g., src/hooks/useDebounce.ts)
-/*
-import { useState, useEffect } from 'react';
-
-export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
-*/
