@@ -59,9 +59,7 @@ export default function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 md:flex">
           <Link to="/projects/search">
-            <Button variant="ghost">
-              <Search className="h-6 w-6" />
-            </Button>
+            <Button variant="ghost">Search Projects</Button>
           </Link>
           <div className="relative">
             <Button
