@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "./select";
 
-interface DatePickerProps {
+export interface DatePickerProps {
   startYear?: number;
   endYear?: number;
   onDateChange?: (date: Date | undefined) => void;

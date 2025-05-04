@@ -74,8 +74,8 @@ const ProjectForm = ({
           <div className="min-w-1/2">
             <LabeledDatePicker
               label="Start date:"
-              value={currentProject.start_date}
-              onChange={(startDate) => {
+              initialDate={currentProject.start_date}
+              onDateChange={(startDate: Date | undefined) => {
                 setCurrentProject(
                   (old: Project) =>
                     new Project({
@@ -84,14 +84,13 @@ const ProjectForm = ({
                     }),
                 );
               }}
-              disabled={disabled}
             />
           </div>
           <div className="min-w-1/2">
             <LabeledDatePicker
               label="End date:"
-              value={currentProject.end_date}
-              onChange={(endDate) => {
+              initialDate={currentProject.end_date}
+              onDateChange={(endDate: Date | undefined) => {
                 setCurrentProject(
                   (old: Project) =>
                     new Project({
@@ -100,7 +99,6 @@ const ProjectForm = ({
                     }),
                 );
               }}
-              disabled={disabled}
             />
           </div>
         </div>

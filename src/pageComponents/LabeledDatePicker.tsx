@@ -12,14 +12,11 @@ type LabeledDatePickerProps = DatePickerProps & {
 };
 
 const LabeledDatePicker = (props: LabeledDatePickerProps) => {
-  const inputId = useId();
-
+  useId();
   return (
     <div>
-      <Label htmlFor={inputId} className="mb-1">
-        {props.label}
-      </Label>
-      <DatePicker id={inputId} {...props} />
+      <Label className="mb-1">{props.label}</Label>
+      <DatePicker {...props} />
     </div>
   );
 };
