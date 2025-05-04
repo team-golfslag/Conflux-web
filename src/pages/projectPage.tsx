@@ -47,73 +47,81 @@ export default function ProjectPage() {
     }
   }, [apiClient, id]);
 
+  let content: React.ReactNode = null;
+
+  if (error) {
+    content = (
+      <>
+        <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
+          <span>{error.name}</span>
+        </div>
+        <div className="p-10" />
+        <div className="text-l flex items-center justify-between rounded-lg bg-white p-3">
+          <span>{error.message}</span>
+        </div>
+      </>
+    );
+  } else if (project) {
+    content = (
+      <>
+        {/* Title */}
+        <div className="flex items-center justify-self-start rounded-lg bg-white p-3 text-2xl font-semibold">
+          <span>{project.title}</span>
+          <Link
+            to="edit"
+            className="bg-primary text-primary-foreground m-2 flex items-center justify-center rounded-lg p-2 transition-colors duration-300"
+          >
+            <Edit size={24} />
+          </Link>
+        </div>
+
+        <main className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="md:col-span-2">
+            <Tabs defaultValue="overview" className="h-full w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="contributors">Contributors</TabsTrigger>
+                <TabsTrigger value="works">Works</TabsTrigger>
+              </TabsList>
+              <TabsContent value="overview">
+                <ProjectOverview description={project.description} />
+              </TabsContent>
+              <TabsContent value="contributors">
+                <ProjectContributors contributors={project.contributors} />
+              </TabsContent>
+              <TabsContent value="works">
+                <ProjectWorks products={project.products} />
+              </TabsContent>
+            </Tabs>
+          </div>
+          {/* Side Panel */}
+          <aside className="space-y-6">
+            <div className="rounded-lg bg-white p-4 shadow">
+              <h3 className="text-lg font-semibold">Start Date</h3>
+              <p>{project.start_date?.toDateString()}</p>
+              <h3 className="mt-4 text-lg font-semibold">End Date</h3>
+              <p>{project.end_date?.toDateString()}</p>
+            </div>
+
+            {/* Contributors Section */}
+            <div className="rounded-lg bg-white p-4 shadow">
+              <h3 className="text-lg font-semibold">Timeline</h3>
+              <div className="mt-4 ml-3 space-y-4">
+                <Timeline items={timelineData} />
+              </div>
+            </div>
+          </aside>
+        </main>
+      </>
+    );
+  }
+
   return (
     <LoadingWrapper
       isLoading={!project && !error}
       loadingMessage="Loading project..."
     >
-      {error ? (
-        <>
-          <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
-            <span>{error.name}</span>
-          </div>
-          <div className="p-10" />
-          <div className="text-l flex items-center justify-between rounded-lg bg-white p-3">
-            <span>{error.message}</span>
-          </div>
-        </>
-      ) : project ? (
-        <>
-          {/* Title */}
-          <div className="flex items-center justify-self-start rounded-lg bg-white p-3 text-2xl font-semibold">
-            <span>{project.title}</span>
-            <Link
-              to="edit"
-              className="bg-primary text-primary-foreground m-2 flex items-center justify-center rounded-lg p-2 transition-colors duration-300"
-            >
-              <Edit size={24} />
-            </Link>
-          </div>
-
-          <main className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-            <div className="md:col-span-2">
-              <Tabs defaultValue="overview" className="h-full w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="contributors">Contributors</TabsTrigger>
-                  <TabsTrigger value="works">Works</TabsTrigger>
-                </TabsList>
-                <TabsContent value="overview">
-                  <ProjectOverview description={project.description} />
-                </TabsContent>
-                <TabsContent value="contributors">
-                  <ProjectContributors contributors={project.contributors} />
-                </TabsContent>
-                <TabsContent value="works">
-                  <ProjectWorks products={project.products} />
-                </TabsContent>
-              </Tabs>
-            </div>
-            {/* Side Panel */}
-            <aside className="space-y-6">
-              <div className="rounded-lg bg-white p-4 shadow">
-                <h3 className="text-lg font-semibold">Start Date</h3>
-                <p>{project.start_date?.toDateString()}</p>
-                <h3 className="mt-4 text-lg font-semibold">End Date</h3>
-                <p>{project.end_date?.toDateString()}</p>
-              </div>
-
-              {/* Contributors Section */}
-              <div className="rounded-lg bg-white p-4 shadow">
-                <h3 className="text-lg font-semibold">Timeline</h3>
-                <div className="mt-4 ml-3 space-y-4">
-                  <Timeline items={timelineData} />
-                </div>
-              </div>
-            </aside>
-          </main>
-        </>
-      ) : null}
+      {content}
     </LoadingWrapper>
   );
 }
