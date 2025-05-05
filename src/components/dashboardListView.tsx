@@ -50,25 +50,29 @@ const DashboardListView = ({ data }: DashboardListViewProps): JSX.Element => {
             .map((rowProps) => (
               <AccordionItem value={rowProps.project.id}>
                 <AccordionTrigger>{rowProps.project.title}</AccordionTrigger>
-                <AccordionContent className="w-full text-right">
-                  <div className="ml-3 flex h-5 items-center space-x-10 text-sm">
-                    <h3 className="font-semibold">Roles</h3>
-                    <p>{rowProps.role}</p>
+                <AccordionContent className="w-full text-right flex flex-row">
+                  <div className="flex flex-col w-full">
+                    <div className="ml-3 flex h-5 items-center space-x-10 text-sm">
+                      <h3 className="font-semibold">Roles</h3>
+                      <p>{rowProps.role}</p>
+                    </div>
+                    <div className="mt-2 ml-3 flex h-5 items-center space-x-4 text-sm">
+                      <h3 className="font-semibold">Start Date</h3>
+                      <p>{rowProps.project.start_date?.toDateString()}</p>
+                      <h3 className="font-semibold">End Date</h3>
+                      <p>{rowProps.project.end_date?.toDateString()}</p>
+                    </div>
                   </div>
-                  <div className="mt-2 ml-3 flex h-5 items-center space-x-4 text-sm">
-                    <h3 className="font-semibold">Start Date</h3>
-                    <p>{rowProps.project.start_date?.toDateString()}</p>
-                    <h3 className="font-semibold">End Date</h3>
-                    <p>{rowProps.project.end_date?.toDateString()}</p>
+                  <div className="text-right mt-3">
+                    <Link
+                      to={`/projects/${rowProps.project.id}`}
+                      className="mr-4"
+                    >
+                      <Button className="bg-primary right-0 font-semibold">
+                        See more
+                      </Button>
+                    </Link>
                   </div>
-                  <Link
-                    to={`/projects/${rowProps.project.id}`}
-                    className="mr-4"
-                  >
-                    <Button className="bg-primary right-0 font-semibold">
-                      See more
-                    </Button>
-                  </Link>
                 </AccordionContent>
               </AccordionItem>
             ))}
