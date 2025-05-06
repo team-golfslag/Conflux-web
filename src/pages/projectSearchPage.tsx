@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import ProjectCard from "@/components/projectCard.tsx";
+import ProjectCard from "@/components/projectCard";
 import { Input } from "@/components/ui/input.tsx";
 import { useState } from "react";
 import { OrderByType } from "@team-golfslag/conflux-api-client/src/client";
@@ -100,19 +100,25 @@ const ProjectSearchPage = () => {
           </SelectGroup>
         </SelectContent>
       </Select>
-      <div className="mx-4 flex max-w-7xl flex-wrap justify-center gap-4 pb-16 sm:gap-8">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-6 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
         {/* Show loading only on initial load or if projects array is empty */}
         {isLoading && (!projects || projects.length === 0) ? (
-          <p className="text-muted-foreground">Searching projects...</p>
+          <p className="text-muted-foreground col-span-full text-center">
+            Searching projects...
+          </p>
         ) : (
           <>
-            <Separator className="my-4" />
-            {/* Display error message if fetch fails */}
-            {error && <h3 className="text-red-500">Error: {error.message}</h3>}
-            {/* Display message if no results are found (and not loading/error) */}
+            <Separator className="col-span-full my-4" />
+            {error && (
+              <h3 className="col-span-full text-center text-red-500">
+                Error: {error.message}
+              </h3>
+            )}
             {/* Ensure projects is defined before checking length */}
             {!isLoading && projects && !error && projects.length === 0 && (
-              <h3 className="text-gray-500">No results found</h3>
+              <h3 className="col-span-full text-center text-gray-500">
+                No results found
+              </h3>
             )}
             {/* Display project cards - always render if projects exist */}
             {projects &&
