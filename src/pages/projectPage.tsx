@@ -127,12 +127,12 @@ export default function ProjectPage() {
 
     content = (
       <>
-        <ul className="mt-6 mr-auto flex w-auto items-baseline gap-3 divide-x px-4 py-2">
+        <ul className="mt-6 mr-auto flex w-auto items-baseline gap-3 divide-x divide-gray-400 px-4 py-2">
           <li className="pr-3">
             <button
               onClick={scrollToOverview}
               onKeyDown={scrollToOverview}
-              className="block w-full cursor-pointer text-gray-700 decoration-gray-500 hover:text-black hover:underline hover:decoration-black"
+              className="block w-full cursor-pointer font-semibold text-gray-500 decoration-gray-500 hover:underline"
             >
               Overview
             </button>
@@ -141,7 +141,7 @@ export default function ProjectPage() {
             <button
               onClick={scrollToContributors}
               onKeyDown={scrollToContributors}
-              className="block w-full cursor-pointer text-gray-700 decoration-gray-500 hover:text-black hover:underline hover:decoration-black"
+              className="block w-full cursor-pointer font-semibold text-gray-500 decoration-gray-500 hover:underline"
             >
               Contributors
             </button>
@@ -150,19 +150,15 @@ export default function ProjectPage() {
             <button
               onClick={scrollToWorks}
               onKeyDown={scrollToWorks}
-              className="block w-full cursor-pointer text-gray-700 decoration-gray-500 hover:text-black hover:underline hover:decoration-black"
+              className="block w-full cursor-pointer font-semibold text-gray-500 decoration-gray-500 hover:underline"
             >
               Works
             </button>
           </li>
         </ul>
-        <main className="my-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+        <main className="my-6 grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="flex flex-col gap-4 md:col-span-2">
-            <Card
-              ref={overviewRef}
-              className="scroll-mt-12 rounded-lg bg-white px-10 py-8"
-              title="Overview"
-            >
+            <Card ref={overviewRef} className="scroll-mt-12" title="Overview">
               <ProjectOverview
                 title={project.title}
                 description={project.description}
@@ -170,16 +166,12 @@ export default function ProjectPage() {
             </Card>
             <Card
               ref={contributorsRef}
-              className="scroll-mt-12 rounded-lg bg-white px-10 py-8"
+              className="scroll-mt-12"
               title="Contributors"
             >
               <ProjectContributors contributors={project.contributors} />
             </Card>
-            <Card
-              ref={worksRef}
-              className="scroll-mt-12 rounded-lg bg-white px-10 py-8"
-              title="Works"
-            >
+            <Card ref={worksRef} className="scroll-mt-12" title="Works">
               <ProjectWorks products={project.products} />
             </Card>
           </div>
