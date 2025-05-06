@@ -62,13 +62,6 @@ const ProfilePage = () => {
     });
   };
 
-  const handleDeleteData = () => {
-    // TODO: Implement data deletion logic after confirmation
-    console.log("Data deletion confirmed");
-    // Example: Call an API endpoint to request data deletion
-    // apiClient.users_DeleteUserData().then(...);
-  };
-
   return (
     <LoadingWrapper isLoading={loading} loadingMessage="Loading profile...">
       {session ? (
@@ -129,28 +122,6 @@ const ProfilePage = () => {
               <Button variant="outline" onClick={logout}>
                 Log Out
               </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive">Delete My Data</Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      your account and remove your data from our servers.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteData}>
-                      Continue
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
             </CardFooter>
           </Card>
         </div>
