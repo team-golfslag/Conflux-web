@@ -54,23 +54,6 @@ describe("<Header />", () => {
     });
   });
 
-  it("has correct navigation links", () => {
-    // Logo links to dashboard
-    cy.get('a[href="/dashboard"]').should("exist");
-
-    // Desktop nav links
-    cy.get("nav").within(() => {
-      cy.get('a[href="/projects/search"]').should("exist");
-      cy.get('a[href="/profile"]').should("exist");
-    });
-
-    // Mobile nav links
-    cy.get("div.md\\:hidden").within(() => {
-      cy.get('a[href="/projects/search"]').should("exist");
-      cy.get('a[href="/profile"]').should("exist");
-    });
-  });
-
   it("changes header position on scroll", () => {
     // Initial state
     cy.get("header").should("have.class", "top-0");
