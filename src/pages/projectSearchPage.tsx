@@ -3,72 +3,157 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import ProjectCard from "@/components/projectCard.tsx";
+import ProjectCard from "@/components/projectCard";
 import { Input } from "@/components/ui/input.tsx";
+import { useState } from "react";
+import { OrderByType } from "@team-golfslag/conflux-api-client/src/client";
 import { Separator } from "@/components/ui/separator.tsx";
 import { Search } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useApiQuery } from "@/hooks/useApiQuery";
-import { LoadingWrapper } from "@/components/loadingWrapper";
-import { useMemo, useState } from "react";
+import { useDebounce } from "@/hooks/useDebounce"; // Assuming you have or create this hook
 
 /** Project Search Page component <br>
- * Fetches all projects from the backend once and filters them client-side.
- * The first 10 projects matching the query are displayed.
+ * Fetches projects from the backend using a debounced search term and selected sort order.
+ * The first 15 projects matching the query are displayed.
  */
 const ProjectSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [sort, setSort] = useState("relevance"); // Default to relevance
 
-  // Fetch all projects just once
+  // Debounce the search term to avoid excessive API calls
+  const debouncedSearchTerm = useDebounce(searchTerm, 200); // 300ms delay
+
+  function parseOrderBy(sortValue: string): OrderByType | undefined {
+    switch (sortValue) {
+      case "title_asc":
+        return OrderByType.TitleAsc;
+      case "title_desc":
+        return OrderByType.TitleDesc;
+      case "start_date_asc":
+        return OrderByType.StartDateAsc;
+      case "start_date_desc":
+        return OrderByType.StartDateDesc;
+      case "end_date_asc":
+        return OrderByType.EndDateAsc;
+      case "end_date_desc":
+        return OrderByType.EndDateDesc;
+      case "relevance": // Handle relevance case
+      default:
+        return undefined;
+    }
+  }
+
+  // Use useApiQuery to fetch data based on debounced search term and sort order
   const {
-    data: allProjects,
+    data: projects,
     isLoading,
     error,
-  } = useApiQuery((apiClient) => apiClient.projects_GetAllProjects(), []);
-
-  // Filter projects client-side based on search term
-  const filteredProjects = useMemo(() => {
-    if (!allProjects) return [];
-
-    if (!searchTerm.trim()) return allProjects;
-
-    const lowercaseSearchTerm = searchTerm.toLowerCase();
-    return allProjects.filter(
-      (project) =>
-        project.title.toLowerCase().includes(lowercaseSearchTerm) ||
-        project.description?.toLowerCase().includes(lowercaseSearchTerm),
-    );
-  }, [allProjects, searchTerm]);
+  } = useApiQuery(
+    (apiClient) =>
+      apiClient.projects_GetProjectByQuery(
+        debouncedSearchTerm,
+        undefined, // page, if needed
+        undefined, // limit, if needed
+        parseOrderBy(sort),
+      ),
+    [debouncedSearchTerm, sort], // Dependencies for the query
+  );
 
   return (
-    <LoadingWrapper isLoading={isLoading} loadingMessage="Loading projects...">
-      <div className="relative w-full max-w-3xl px-4 py-8 sm:px-12 sm:py-16">
+    <>
+      <div className="relative mx-auto w-full max-w-2xl px-4 py-8">
         <Input
           className="mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
           type="search"
-          placeholder="Search for any project.."
-          value={searchTerm}
+          placeholder="Search for title or description.."
+          value={searchTerm} // Controlled input
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Search className="text-muted-foreground absolute top-1/2 right-10 -translate-y-1/2 transform sm:right-16" />
+        <Search className="text-muted-foreground absolute top-1/2 right-8 -translate-y-1/2" />
       </div>
-      <div className="mx-4 flex max-w-7xl flex-wrap justify-center gap-4 pb-16 sm:gap-8">
-        <Separator className="my-8" />
-        {error && <h3 className="text-red-500">Error: {error.message}</h3>}
-
-        {filteredProjects.length === 0 && !isLoading && !error ? (
-          <p className="text-gray-500">
-            No projects found matching your search.
+      <Select value={sort} onValueChange={setSort}>
+        <SelectTrigger className="mr-4 ml-auto w-50">
+          <SelectValue placeholder="Sort by.." />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Sort by</SelectLabel>
+            {/* Use "relevance" as the value */}
+            <SelectItem value="relevance">Relevance</SelectItem>
+            <SelectItem value="title_asc">Title A-Z</SelectItem>
+            <SelectItem value="title_desc">Title Z-A</SelectItem>
+            <SelectItem value="start_date_asc">Start date ascending</SelectItem>
+            <SelectItem value="start_date_desc">
+              Start date descending
+            </SelectItem>
+            <SelectItem value="end_date_asc">End date ascending</SelectItem>
+            <SelectItem value="end_date_desc">End date descending</SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-6 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
+        {/* Show loading only on initial load or if projects array is empty */}
+        {isLoading && (!projects || projects.length === 0) ? (
+          <p className="text-muted-foreground col-span-full text-center">
+            Searching projects...
           </p>
         ) : (
-          filteredProjects
-            .slice(0, 15)
-            .map((project) => (
-              <ProjectCard project={project} key={project.id} />
-            ))
+          <>
+            <Separator className="col-span-full my-4" />
+            {error && (
+              <h3 className="col-span-full text-center text-red-500">
+                Error: {error.message}
+              </h3>
+            )}
+            {/* Ensure projects is defined before checking length */}
+            {!isLoading && projects && !error && projects.length === 0 && (
+              <h3 className="col-span-full text-center text-gray-500">
+                No results found
+              </h3>
+            )}
+            {/* Display project cards - always render if projects exist */}
+            {projects &&
+              projects.length > 0 &&
+              projects
+                .slice(0, 15)
+                .map((project) => (
+                  <ProjectCard project={project} key={project.id} />
+                ))}
+          </>
         )}
       </div>
-    </LoadingWrapper>
+    </>
   );
 };
 
 export default ProjectSearchPage;
+
+// Example useDebounce hook (create this in e.g., src/hooks/useDebounce.ts)
+/*
+import { useState, useEffect } from 'react';
+
+export function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+*/
