@@ -16,6 +16,8 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@cypress/react": "^9.0.1",
+    "@cypress/webpack-dev-server": "^4.0.2",
     "@icons-pack/react-simple-icons": "^12.7.0",
     "@radix-ui/react-alert-dialog": "^1.1.13",
     "@radix-ui/react-label": "^2.1.6",
@@ -29,6 +31,7 @@
     "@team-golfslag/conflux-api-client": "^1.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cypress": "^14.3.2",
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
     "eslint-plugin-headers": "^1.2.1",

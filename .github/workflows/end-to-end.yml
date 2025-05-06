@@ -12,6 +12,47 @@ env:
   NODE_VERSION: 20.18.3
 
 jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel workflow on draft PR
+        if: github.event.pull_request.draft
+        uses: potiuk/cancel-workflow-runs@master
+        with:
+          cancelMode: self
+          selfPreservation: false
+          notifyPRCancel: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: "**/package.json"
+
+      - name: Get node_modules cache
+        id: cache
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/prisma/migrations/**') }}
+
+      - name: Install deps
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          component: true
   end-to-end:
     name: Build Frontend and Analyse with SonarCloud
     runs-on: ubuntu-latest
