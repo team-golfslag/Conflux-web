@@ -126,7 +126,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
   const logout = () => {
     setSession(null);
     localStorage.removeItem(SESSION_STORAGE_KEY);
-    window.location.href = `${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(config.webUIUrl)+ "/dashboard"}`;
+    window.location.href = `${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(config.webUIUrl) + "/dashboard"}`;
   };
 
   const contextValue: SessionContextType = {
