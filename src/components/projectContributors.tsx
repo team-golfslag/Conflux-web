@@ -5,9 +5,9 @@
  */
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Contributor } from "@team-golfslag/conflux-api-client/src/client";
+import { ContributorDTO } from "@team-golfslag/conflux-api-client/src/client";
 
-type ProjectContributorsProps = { contributors?: Contributor[] };
+type ProjectContributorsProps = { contributors?: ContributorDTO[] };
 
 /**
  * Project Contributors component
@@ -20,13 +20,13 @@ export default function ProjectContributors({
     <section className="h-full space-y-4 rounded-lg bg-white p-6 shadow">
       <h2 className="mb-4 text-xl font-semibold">Contributors</h2>
       {contributors?.map((contributor) => (
-        <Card key={contributor.id} className="bg-gray-200">
+        <Card key={contributor.person.id} className="bg-gray-200">
           <CardContent className="flex items-center gap-4 p-3">
             <div className="h-12 w-12 rounded-full bg-gray-500" />
             <div>
-              <p className="font-semibold">{contributor.name}</p>
+              <p className="font-semibold">{contributor.person.name}</p>
               <p className="text-sm text-gray-600">
-                {contributor.roles.map((role) => role.name).join(", ")}
+                {contributor.roles.join(", ")}
               </p>
             </div>
           </CardContent>

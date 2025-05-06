@@ -5,9 +5,9 @@
  */
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Product } from "@team-golfslag/conflux-api-client/src/client";
+import { ProductDTO } from "@team-golfslag/conflux-api-client/src/client";
 
-type ProjectWorksProps = { products?: Product[] };
+type ProjectWorksProps = { products?: ProductDTO[] };
 
 /**
  * Project Works component

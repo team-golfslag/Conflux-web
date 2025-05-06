@@ -4,14 +4,14 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import { Card, CardContent, CardHeader } from "@/components/ui/card.tsx";
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
+import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
 import { Link } from "react-router-dom";
 import { JSX } from "react";
 import { CalendarIcon, UsersIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export interface ProjectCardProps {
-  project: Project;
+  project: ProjectDTO;
   role?: string;
 }
 
@@ -52,7 +52,7 @@ const ProjectCard = ({ project, role }: ProjectCardProps): JSX.Element => {
         <CardHeader className="bg-white px-4 pt-4 pb-2">
           <div className="flex items-start justify-between">
             <h3 className="line-clamp-2 text-xl font-semibold tracking-tight text-gray-900 group-hover:text-blue-800">
-              {project.title}
+              {project.primary_title?.text ?? "No title available"}
             </h3>
             <Badge
               className={`${status.color} ml-2 font-medium whitespace-nowrap`}
@@ -65,7 +65,7 @@ const ProjectCard = ({ project, role }: ProjectCardProps): JSX.Element => {
         <CardContent className="flex flex-grow flex-col p-4 pt-0">
           {/* Project Description */}
           <p className="mt-2 mb-4 line-clamp-3 flex-grow text-sm text-gray-600 duration-200">
-            {project.description ?? "No description available"}
+            {project.primary_description?.text ?? "No description available"}
           </p>
 
           {/* Project Metadata */}
@@ -76,7 +76,8 @@ const ProjectCard = ({ project, role }: ProjectCardProps): JSX.Element => {
                 className="mr-2 text-gray-400 group-hover:text-blue-800"
               />
               <span>
-                {startDate} {endDate !== "Ongoing" ? `- ${endDate}` : ""}
+                {startDate}{" "}
+                {endDate !== "Ongoing" ? `- ${endDate}` : ": Ongoing"}
               </span>
             </div>
 
