@@ -14,7 +14,12 @@
 import { mount } from "cypress/react";
 import { BrowserRouter } from "react-router-dom";
 import ProjectCard from "./projectCard";
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
+import {
+  DescriptionType,
+  ProjectDTO,
+  ProjectTitleDTO,
+  TitleType,
+} from "@team-golfslag/conflux-api-client/src/client";
 
 // Helper function to create dates relative to today (at 00:00:00.000)
 const getDateRelativeToToday = (daysOffset: number): Date => {
@@ -26,16 +31,83 @@ const getDateRelativeToToday = (daysOffset: number): Date => {
 };
 
 // --- Test Data ---
-const mockProjectBase: Project = {
+const mockProjectBase: ProjectDTO = {
   id: "proj-123",
-  title: "Test Project Alpha",
-  description:
-    "This is the description for Test Project Alpha. It should be visible.",
+  primary_title: {
+    text: "Test Project Alpha",
+    type: TitleType.Primary,
+    start_date: new Date("2023-01-01"),
+    init: function (this: ProjectTitleDTO, _data?: unknown) {
+      if (_data) {
+        for (const property in _data) {
+          if (Object.prototype.hasOwnProperty.call(_data, property)) {
+            if (property !== "init" && property !== "toJSON") {
+              (this as unknown as Record<string, unknown>)[property] = (
+                _data as unknown as Record<string, unknown>
+              )[property];
+            }
+          }
+        }
+      }
+    },
+    toJSON: function (this: ProjectTitleDTO): Record<string, unknown> {
+      const output: Record<string, unknown> = {};
+      for (const key in this) {
+        if (Object.prototype.hasOwnProperty.call(this, key)) {
+          if (key === "init" || key === "toJSON") {
+            continue;
+          }
+          const value = this[key as keyof ProjectTitleDTO];
+          if (value instanceof Date) {
+            output[key] = value.toISOString();
+          } else {
+            output[key] = value;
+          }
+        }
+      }
+      return output;
+    },
+  },
+  primary_description: {
+    text: "This is a test project description.",
+    type: DescriptionType.Primary,
+    init: function (this: ProjectTitleDTO, _data?: unknown) {
+      if (_data) {
+        for (const property in _data) {
+          if (Object.prototype.hasOwnProperty.call(_data, property)) {
+            if (property !== "init" && property !== "toJSON") {
+              (this as unknown as Record<string, unknown>)[property] = (
+                _data as unknown as Record<string, unknown>
+              )[property];
+            }
+          }
+        }
+      }
+    },
+    toJSON: function (this: ProjectTitleDTO): Record<string, unknown> {
+      const output: Record<string, unknown> = {};
+      for (const key in this) {
+        if (Object.prototype.hasOwnProperty.call(this, key)) {
+          if (key === "init" || key === "toJSON") {
+            continue;
+          }
+          const value = this[key as keyof ProjectTitleDTO];
+          if (value instanceof Date) {
+            output[key] = value.toISOString();
+          } else {
+            output[key] = value;
+          }
+        }
+      }
+      return output;
+    },
+  },
+  titles: [],
+  descriptions: [],
   users: [],
   contributors: [],
   products: [],
-  parties: [],
-  init: function (this: Project, _data?: unknown) {
+  init: function (this: ProjectDTO, _data?: unknown) {
     if (_data) {
       for (const property in _data) {
         if (Object.prototype.hasOwnProperty.call(_data, property)) {
@@ -49,14 +121,14 @@ const mockProjectBase: Project = {
       }
     }
   },
-  toJSON: function (this: Project): Record<string, unknown> {
+  toJSON: function (this: ProjectDTO): Record<string, unknown> {
     const output: Record<string, unknown> = {};
     for (const key in this) {
       if (Object.prototype.hasOwnProperty.call(this, key)) {
         if (key === "init" || key === "toJSON") {
           continue; // Skip methods
         }
-        const value = this[key as keyof Project];
+        const value = this[key as keyof ProjectDTO];
         if (value instanceof Date) {
           output[key] = value.toISOString();
         } else {
@@ -66,61 +138,58 @@ const mockProjectBase: Project = {
     }
     return output;
   },
+  start_date: new Date("2023-01-01"),
+  organisations: [],
 };
 
-const projectUpcoming: Project = {
+const projectUpcoming: ProjectDTO = {
   ...mockProjectBase,
   id: "proj-upcoming",
-  title: "Upcoming Project",
   start_date: getDateRelativeToToday(5), // Starts in 5 days
   end_date: getDateRelativeToToday(10),
   init: mockProjectBase.init,
   toJSON: mockProjectBase.toJSON,
 };
 
-const projectActive: Project = {
+const projectActive: ProjectDTO = {
   ...mockProjectBase,
   id: "proj-active",
-  title: "Active Project",
   start_date: getDateRelativeToToday(-5), // Started 5 days ago
   end_date: getDateRelativeToToday(10), // Ends in 10 days
   init: mockProjectBase.init,
   toJSON: mockProjectBase.toJSON,
 };
 
-const projectInProgress: Project = {
+const projectInProgress: ProjectDTO = {
   ...mockProjectBase,
   id: "proj-active-no-end",
-  title: "Ongoing Project",
   start_date: getDateRelativeToToday(-5), // Started 5 days ago
   end_date: undefined,
   init: mockProjectBase.init,
   toJSON: mockProjectBase.toJSON,
 };
 
-const projectCompleted: Project = {
+const projectCompleted: ProjectDTO = {
   ...mockProjectBase,
   id: "proj-ended",
-  title: "Completed Project",
   start_date: getDateRelativeToToday(-10), // Started 10 days ago
   end_date: getDateRelativeToToday(-5), // Ended 5 days ago
   init: mockProjectBase.init,
   toJSON: mockProjectBase.toJSON,
 };
 
-const projectNoDates: Project = {
+const projectNoDates: ProjectDTO = {
   ...mockProjectBase,
   id: "proj-no-dates",
-  title: "Project Without Dates",
-  start_date: undefined,
-  end_date: undefined,
+  start_date: null as unknown as Date, // Handle null as Date for testing
+  end_date: null as unknown as Date, // Handle null as Date for testing
   init: mockProjectBase.init,
   toJSON: mockProjectBase.toJSON,
 };
 
 // --- Test Suite ---
 describe("<ProjectCard /> Component Rendering", () => {
-  const mountCard = (project: Project, role?: string) => {
+  const mountCard = (project: ProjectDTO, role?: string) => {
     mount(
       <BrowserRouter>
         <ProjectCard project={project} role={role} />
@@ -130,8 +199,10 @@ describe("<ProjectCard /> Component Rendering", () => {
 
   it("renders basic project information", () => {
     mountCard(projectActive);
-    cy.contains("h3", projectActive.title).should("be.visible");
-    cy.contains("p", projectActive.description!).should("be.visible");
+    cy.contains("h3", projectActive.primary_title!.text).should("be.visible");
+    cy.contains("p", projectActive.primary_description!.text).should(
+      "be.visible",
+    );
     cy.get("a").should("have.attr", "href", `/projects/${projectActive.id}`);
   });
 
@@ -166,7 +237,12 @@ describe("<ProjectCard /> Component Rendering", () => {
     cy.contains(
       new Date(projectInProgress.start_date!).toLocaleDateString(),
     ).should("be.visible");
-    cy.contains("Ongoing").should("be.visible");
+    // Check for the combined date display that includes "Ongoing"
+    cy.contains(
+      `${new Date(projectInProgress.start_date!).toLocaleDateString()}`,
+    ).should("be.visible");
+    // The "Ongoing" text might be part of the date line, so we need to check more specifically
+    cy.get(".text-xs.text-gray-500").contains("Ongoing").should("be.visible");
   });
 
   it('renders "Completed" status when end date is in the past', () => {
@@ -181,29 +257,56 @@ describe("<ProjectCard /> Component Rendering", () => {
   });
 
   it("shows the correct contributor count", () => {
-    const projectWithContributors = {
+    const projectWithContributors: ProjectDTO = {
       ...mockProjectBase,
       contributors: [
         {
-          id: "1",
-          name: "Contributor 1",
+          person: {
+            id: "1",
+            name: "Contributor 1",
+            init: mockProjectBase.init,
+            toJSON: mockProjectBase.toJSON,
+            schema_uri: "",
+          },
           roles: [],
           init: mockProjectBase.init,
           toJSON: mockProjectBase.toJSON,
+          project_id: "",
+          positions: [],
+          leader: false,
+          contact: false,
         },
         {
-          id: "2",
-          name: "Contributor 2",
+          person: {
+            id: "2",
+            name: "Contributor 2",
+            init: mockProjectBase.init,
+            toJSON: mockProjectBase.toJSON,
+            schema_uri: "",
+          },
           roles: [],
           init: mockProjectBase.init,
           toJSON: mockProjectBase.toJSON,
+          project_id: "",
+          positions: [],
+          leader: false,
+          contact: false,
         },
         {
-          id: "3",
-          name: "Contributor 3",
+          person: {
+            id: "3",
+            name: "Contributor 3",
+            init: mockProjectBase.init,
+            toJSON: mockProjectBase.toJSON,
+            schema_uri: "",
+          },
           roles: [],
           init: mockProjectBase.init,
           toJSON: mockProjectBase.toJSON,
+          project_id: "",
+          positions: [],
+          leader: false,
+          contact: false,
         },
       ],
       init: mockProjectBase.init,
@@ -214,15 +317,24 @@ describe("<ProjectCard /> Component Rendering", () => {
   });
 
   it("shows singular 'contributor' text when count is 1", () => {
-    const projectWithOneContributor = {
+    const projectWithOneContributor: ProjectDTO = {
       ...mockProjectBase,
       contributors: [
         {
-          id: "1",
-          name: "Contributor 1",
+          person: {
+            id: "1",
+            name: "Single Contributor",
+            init: mockProjectBase.init,
+            toJSON: mockProjectBase.toJSON,
+            schema_uri: "",
+          },
           roles: [],
           init: mockProjectBase.init,
           toJSON: mockProjectBase.toJSON,
+          project_id: "",
+          positions: [],
+          leader: false,
+          contact: false,
         },
       ],
       init: mockProjectBase.init,
