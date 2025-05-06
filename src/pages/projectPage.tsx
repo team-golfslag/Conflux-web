@@ -4,17 +4,22 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { Edit } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProjectOverview from "@/components/projectOverview.tsx";
 import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
 import Timeline, { TimelineItem } from "@/components/timeline";
-import { Link, useParams } from "react-router";
-import { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router";
+import {
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  RefObject,
+  ReactNode,
 import { Project } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { LoadingWrapper } from "@/components/loadingWrapper";
+import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 /** List of timeline data as dummy data */
 const timelineData: TimelineItem[] = [
@@ -24,6 +29,22 @@ const timelineData: TimelineItem[] = [
   { date: "22-09-2023", name: "Event Four" },
 ];
 
+/**
+ * Creates an event handler function that scrolls the element
+ * referenced by the provided ref into view smoothly.
+ *
+ * @param ref - The React ref object pointing to the target HTML element.
+ * @returns An event handler function.
+ */
+function createScrollHandler(ref: RefObject<HTMLElement | null>) {
+  return () => {
+    // Use optional chaining to safely access current and scrollIntoView
+    ref.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+      inline: "center",
+    });
+  };
 /** Project page component <br>
  * Uses the 'id' param from the react routing to get the correct page from the backend
  */
@@ -47,7 +68,14 @@ export default function ProjectPage() {
     }
   }, [apiClient, id]);
 
-  let content: React.ReactNode = null;
+  // Consider specifying the element type for better type safety, e.g., useRef<HTMLDivElement>(null)
+  // This depends on what element the 'Card' component forwards its ref to.
+  const overviewRef = useRef<HTMLDivElement>(null);
+  const contributorsRef = useRef<HTMLDivElement>(null);
+  const worksRef = useRef<HTMLDivElement>(null);
+
+  const [isOpen, setIsOpen] = useState(false);
+
 
   if (error) {
     content = (
@@ -62,37 +90,65 @@ export default function ProjectPage() {
       </>
     );
   } else if (project) {
+    const scrollToOverview = createScrollHandler(overviewRef);
+    const scrollToContributors = createScrollHandler(contributorsRef);
+    const scrollToWorks = createScrollHandler(worksRef);
     content = (
       <>
-        {/* Title */}
-        <div className="flex items-center justify-self-start rounded-lg bg-white p-3 text-2xl font-semibold">
-          <span>{project.title}</span>
-          <Link
-            to="edit"
-            className="bg-primary text-primary-foreground m-2 flex items-center justify-center rounded-lg p-2 transition-colors duration-300"
-          >
-            <Edit size={24} />
-          </Link>
-        </div>
-
-        <main className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="md:col-span-2">
-            <Tabs defaultValue="overview" className="h-full w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="contributors">Contributors</TabsTrigger>
-                <TabsTrigger value="works">Works</TabsTrigger>
-              </TabsList>
-              <TabsContent value="overview">
-                <ProjectOverview description={project.description} />
-              </TabsContent>
-              <TabsContent value="contributors">
-                <ProjectContributors contributors={project.contributors} />
-              </TabsContent>
-              <TabsContent value="works">
-                <ProjectWorks products={project.products} />
-              </TabsContent>
-            </Tabs>
+        <ul className="mt-6 mr-auto flex w-auto items-baseline gap-3 divide-x px-4 py-2">
+          <li className="pr-3">
+            <button
+              onClick={scrollToOverview}
+              onKeyDown={scrollToOverview}
+              className="block w-full cursor-pointer text-gray-700 decoration-gray-500 hover:text-black hover:underline hover:decoration-black"
+            >
+              Overview
+            </button>
+          </li>
+          <li className="pr-3">
+            <button
+              onClick={scrollToContributors}
+              onKeyDown={scrollToContributors}
+              className="block w-full cursor-pointer text-gray-700 decoration-gray-500 hover:text-black hover:underline hover:decoration-black"
+            >
+              Contributors
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={scrollToWorks}
+              onKeyDown={scrollToWorks}
+              className="block w-full cursor-pointer text-gray-700 decoration-gray-500 hover:text-black hover:underline hover:decoration-black"
+            >
+              Works
+            </button>
+          </li>
+        </ul>
+        <main className="my-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="flex flex-col gap-4 md:col-span-2">
+            <Card
+              ref={overviewRef}
+              className="scroll-mt-12 rounded-lg bg-white px-10 py-8"
+              title="Overview"
+            >
+              <ProjectOverview
+                title={project.title}
+                description={project.description}
+              />
+            </Card>
+            <Card
+              ref={contributorsRef}
+              className="scroll-mt-12 rounded-lg bg-white px-10 py-8"
+              title="Contributors"
+            >
+              <ProjectContributors contributors={project.contributors} />
+            </Card>
+            <Card
+              ref={worksRef}
+              className="scroll-mt-12 rounded-lg bg-white px-10 py-8"
+              title="Works"
+            >
+              <ProjectWorks products={project.products} />
           </div>
           {/* Side Panel */}
           <aside className="space-y-6">
