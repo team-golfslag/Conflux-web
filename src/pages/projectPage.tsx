@@ -170,7 +170,7 @@ export default function ProjectPage() {
               className="scroll-mt-12"
               title="Contributors"
             >
-              <ProjectContributors contributors={project.contributors} />
+              <ProjectContributors project={project} />
             </Card>
             <Card ref={worksRef} className="scroll-mt-12" title="Works">
               <ProjectWorks products={project.products} />
