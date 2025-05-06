@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/datepicker.tsx";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { useDebounce } from "@/hooks/useDebounce"; // Assuming you have or create this hook
 
@@ -27,11 +28,16 @@ import { useDebounce } from "@/hooks/useDebounce"; // Assuming you have or creat
  */
 const ProjectSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sort, setSort] = useState("relevance"); // Default to relevance
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [sort, setSort] = useState(""); // Default to relevance
 
   // Debounce the search term to avoid excessive API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 200); // 300ms delay
 
+  /*
+   * Function to parse the sort value from the select input
+   */
   function parseOrderBy(sortValue: string): OrderByType | undefined {
     switch (sortValue) {
       case "title_asc":
@@ -46,11 +52,21 @@ const ProjectSearchPage = () => {
         return OrderByType.EndDateAsc;
       case "end_date_desc":
         return OrderByType.EndDateDesc;
-      case "relevance": // Handle relevance case
+      case "relevance":
       default:
         return undefined;
     }
   }
+
+  const handleStartDateChange = (date: Date | undefined) => {
+    console.log("Start Date selected:", date);
+    setStartDate(date);
+  };
+
+  const handleEndDateChange = (date: Date | undefined) => {
+    console.log("End Date selected:", date);
+    setEndDate(date);
+  };
 
   // Use useApiQuery to fetch data based on debounced search term and sort order
   const {
@@ -61,16 +77,16 @@ const ProjectSearchPage = () => {
     (apiClient) =>
       apiClient.projects_GetProjectByQuery(
         debouncedSearchTerm,
-        undefined, // page, if needed
-        undefined, // limit, if needed
+        startDate,
+        endDate,
         parseOrderBy(sort),
       ),
-    [debouncedSearchTerm, sort], // Dependencies for the query
+    [debouncedSearchTerm, startDate, endDate, sort], // Dependencies for the query
   );
 
   return (
     <>
-      <div className="relative mx-auto w-full max-w-2xl px-4 py-8">
+      <div className="relative mx-auto mb-4 w-full max-w-2xl p-4">
         <Input
           className="mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
           type="search"
@@ -80,27 +96,45 @@ const ProjectSearchPage = () => {
         />
         <Search className="text-muted-foreground absolute top-1/2 right-8 -translate-y-1/2" />
       </div>
-      <Select value={sort} onValueChange={setSort}>
-        <SelectTrigger className="mr-4 ml-auto w-50">
-          <SelectValue placeholder="Sort by.." />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Sort by</SelectLabel>
-            {/* Use "relevance" as the value */}
-            <SelectItem value="relevance">Relevance</SelectItem>
-            <SelectItem value="title_asc">Title A-Z</SelectItem>
-            <SelectItem value="title_desc">Title Z-A</SelectItem>
-            <SelectItem value="start_date_asc">Start date ascending</SelectItem>
-            <SelectItem value="start_date_desc">
-              Start date descending
-            </SelectItem>
-            <SelectItem value="end_date_asc">End date ascending</SelectItem>
-            <SelectItem value="end_date_desc">End date descending</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-6 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
+      <div className="flex w-full flex-col items-start gap-4 sm:flex-row sm:items-end">
+        <div className="flex flex-wrap gap-4">
+          <div className="flex items-center">
+            <span className="w-32 pr-2 text-sm font-semibold text-gray-600">
+              Start date after
+            </span>
+            <DatePicker onDateChange={handleStartDateChange} />
+          </div>
+          <div className="flex items-center">
+            <span className="w-32 pr-2 text-sm font-semibold text-gray-600">
+              End date before
+            </span>
+            <DatePicker onDateChange={handleEndDateChange} />
+          </div>
+        </div>
+        <Select value={sort} onValueChange={setSort}>
+          <SelectTrigger className="w-50 sm:ml-auto">
+            <SelectValue placeholder="Sort by.." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Sort by</SelectLabel>
+              <SelectItem value="relevance">Relevance</SelectItem>
+              <SelectItem value="title_asc">Title A-Z</SelectItem>
+              <SelectItem value="title_desc">Title Z-A</SelectItem>
+              <SelectItem value="start_date_asc">
+                Start date ascending
+              </SelectItem>
+              <SelectItem value="start_date_desc">
+                Start date descending
+              </SelectItem>
+              <SelectItem value="end_date_asc">End date ascending</SelectItem>
+              <SelectItem value="end_date_desc">End date descending</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+      <Separator className="col-span-full my-4" />
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
         {/* Show loading only on initial load or if projects array is empty */}
         {isLoading && (!projects || projects.length === 0) ? (
           <p className="text-muted-foreground col-span-full text-center">
@@ -108,13 +142,11 @@ const ProjectSearchPage = () => {
           </p>
         ) : (
           <>
-            <Separator className="col-span-full my-4" />
             {error && (
               <h3 className="col-span-full text-center text-red-500">
                 Error: {error.message}
               </h3>
             )}
-            {/* Ensure projects is defined before checking length */}
             {!isLoading && projects && !error && projects.length === 0 && (
               <h3 className="col-span-full text-center text-gray-500">
                 No results found
@@ -136,24 +168,3 @@ const ProjectSearchPage = () => {
 };
 
 export default ProjectSearchPage;
-
-// Example useDebounce hook (create this in e.g., src/hooks/useDebounce.ts)
-/*
-import { useState, useEffect } from 'react';
-
-export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
-*/
