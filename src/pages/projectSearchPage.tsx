@@ -30,7 +30,7 @@ const ProjectSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [sort, setSort] = useState("relevance"); // Default to relevance
+  const [sort, setSort] = useState(""); // Default to relevance
 
   // Debounce the search term to avoid excessive API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 200); // 300ms delay
@@ -86,7 +86,7 @@ const ProjectSearchPage = () => {
 
   return (
     <>
-      <div className="relative mx-auto w-full max-w-2xl px-4 py-8">
+      <div className="relative mx-auto mb-4 w-full max-w-2xl p-4">
         <Input
           className="mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
           type="search"
@@ -96,15 +96,15 @@ const ProjectSearchPage = () => {
         />
         <Search className="text-muted-foreground absolute top-1/2 right-8 -translate-y-1/2" />
       </div>
-      <div className="flex w-full flex-col items-end justify-between gap-4 px-8 sm:flex-row">
-        <div className="flex flex-col items-start gap-1">
-          <div className="mx-4 flex items-center">
+      <div className="flex w-full flex-col items-start gap-4 sm:flex-row sm:items-end">
+        <div className="flex flex-wrap gap-4">
+          <div className="flex items-center">
             <span className="w-32 pr-2 text-sm font-semibold text-gray-600">
               Start date after
             </span>
             <DatePicker onDateChange={handleStartDateChange} />
           </div>
-          <div className="mx-4 flex items-center">
+          <div className="flex items-center">
             <span className="w-32 pr-2 text-sm font-semibold text-gray-600">
               End date before
             </span>
@@ -112,7 +112,7 @@ const ProjectSearchPage = () => {
           </div>
         </div>
         <Select value={sort} onValueChange={setSort}>
-          <SelectTrigger className="mr-4 ml-auto w-50">
+          <SelectTrigger className="w-50 sm:ml-auto">
             <SelectValue placeholder="Sort by.." />
           </SelectTrigger>
           <SelectContent>
@@ -133,7 +133,8 @@ const ProjectSearchPage = () => {
           </SelectContent>
         </Select>
       </div>
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 p-6 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
+      <Separator className="col-span-full my-4" />
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
         {/* Show loading only on initial load or if projects array is empty */}
         {isLoading && (!projects || projects.length === 0) ? (
           <p className="text-muted-foreground col-span-full text-center">
@@ -141,7 +142,6 @@ const ProjectSearchPage = () => {
           </p>
         ) : (
           <>
-            <Separator className="col-span-full my-4" />
             {error && (
               <h3 className="col-span-full text-center text-red-500">
                 Error: {error.message}
