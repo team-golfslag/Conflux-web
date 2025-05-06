@@ -4,7 +4,7 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import logo from "@/assets/golfslag.png";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { Link } from "react-router";
@@ -14,9 +14,10 @@ import config from "@/config";
  * Displays the main pages, search icon and the profile menu with fold-out functionality. <br>On mobile, the menu folds to a menu icon.
  */
 export default function Header() {
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [isUserMenuHovered, setIsUserMenuHovered] = useState(false);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
   const [lastScrollTop, setLastScrollTop] = useState(0);
+  const hideMenuTimer = useRef<NodeJS.Timeout | null>(null);
 
   // When scrolling up, the header becomes sticky. When scrolling down, the header stays behind.
   useEffect(() => {
@@ -35,6 +36,20 @@ export default function Header() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, [lastScrollTop]);
+
+  const handleMouseEnter = () => {
+    if (hideMenuTimer.current) {
+      clearTimeout(hideMenuTimer.current);
+      hideMenuTimer.current = null;
+    }
+    setIsUserMenuHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    hideMenuTimer.current = setTimeout(() => {
+      setIsUserMenuHovered(false);
+    }, 150);
+  };
 
   return (
     <header
@@ -63,25 +78,31 @@ export default function Header() {
               <Search className="h-6 w-6" />
             </Button>
           </Link>
-          <div className="relative">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-            >
-              <User className="h-6 w-6" />
-            </Button>
-            {userMenuOpen && (
-              <div className="bg-primary text-primary-foreground absolute right-0 mt-2 w-48 rounded-md shadow-lg">
+          <div
+            className="relative"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <Link to="/profile">
+              <Button variant="ghost" size="icon">
+                <User className="h-6 w-6" />
+              </Button>
+            </Link>
+            {isUserMenuHovered && (
+              <div
+                className="bg-background text-foreground absolute top-full right-0 mt-1 w-48 rounded-md border shadow-lg"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
                 <Link
                   to="/profile"
-                  className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
+                  className="hover:bg-secondary hover:text-secondary-foreground block rounded-t-md px-4 py-2"
                 >
                   Profile
                 </Link>
                 <Link
                   to="/settings"
-                  className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
+                  className="hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
                 >
                   Settings
                 </Link>
@@ -89,7 +110,7 @@ export default function Header() {
                   to={`${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(
                     config.webUIUrl,
                   )}`}
-                  className="text-primary-foreground hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
+                  className="hover:bg-secondary hover:text-secondary-foreground block rounded-b-md px-4 py-2"
                 >
                   Log Out
                 </Link>

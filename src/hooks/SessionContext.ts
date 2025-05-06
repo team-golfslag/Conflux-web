@@ -12,6 +12,7 @@ export type SessionContextType = {
   loading: boolean;
   error: Error | null;
   logout: () => void;
+  saveSession: (session: UserSession) => void;
 };
 
 // Create the context with a default value
@@ -20,6 +21,7 @@ export const SessionContext = createContext<SessionContextType>({
   loading: true,
   error: null,
   logout: () => {},
+  saveSession: () => {},
 });
 
 // Custom hook to use the session context
