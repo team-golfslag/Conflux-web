@@ -3,11 +3,11 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
+import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { format } from "date-fns";
 
-type ProjectDetailsProps = { project: Project };
+type ProjectDetailsProps = { project: ProjectDTO };
 
 const determineStatus = (
   startDate: Date | undefined,
@@ -58,7 +58,9 @@ export default function ProjectDetails({
           <h3 className="font-semibold">Lead Organisation</h3>
           <p className="text-gray-700">
             {/*TODO: make this the actual lead organisation*/}
-            {project.parties.length > 0 ? project.parties[0].name : "N/A"}
+            {project.organisations.length > 0
+              ? project.organisations[0].name
+              : "N/A"}
           </p>
         </div>
       </CardContent>
