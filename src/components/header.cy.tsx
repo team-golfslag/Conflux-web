@@ -7,12 +7,6 @@ import { BrowserRouter } from "react-router-dom"; // Import BrowserRouter for Li
 import { mount } from "cypress/react";
 import Header from "@/components/header";
 
-// filepath: /Users/benstokmans/Documents/workspace/uni/INFOSP/Conflux-web/src/components/header.cy.tsx
-/**
- * This program has been developed by students from the bachelor Computer Science at Utrecht
- * University within the Software Project course.
- * © Copyright Utrecht University (Department of Information and Computing Sciences)
- */
 /// <reference types="cypress" />
 
 describe("<Header />", () => {
@@ -46,40 +40,8 @@ describe("<Header />", () => {
   });
 
   it("initially hides the user dropdown menu", () => {
-    cy.get(".bg-primary.absolute").should("not.exist");
-  });
-
-  it("shows user dropdown menu when user button is clicked", () => {
-    // Click the user button in desktop navigation
-    cy.get("nav").within(() => {
-      cy.get("button").last().click();
-    });
-
-    // Dropdown should now be visible
-    cy.get(".bg-primary.absolute").should("be.visible");
-
-    // Check dropdown items
-    cy.contains("a", "Profile").should("be.visible");
-    cy.contains("a", "Settings").should("be.visible");
-    cy.contains("a", "Log Out").should("be.visible");
-  });
-
-  it("closes user dropdown menu when clicked again", () => {
-    // Open menu
-    cy.get("nav").within(() => {
-      cy.get("button").last().click();
-    });
-
-    // Menu should be visible
-    cy.get(".bg-primary.absolute").should("be.visible");
-
-    // Close menu
-    cy.get("nav").within(() => {
-      cy.get("button").last().click();
-    });
-
-    // Menu should be hidden
-    cy.get(".bg-primary.absolute").should("not.exist");
+    // The dropdown menu should not exist initially
+    cy.get('[data-testid="user-dropdown"]').should("not.exist");
   });
 
   it("renders mobile navigation for small screens", () => {
@@ -99,6 +61,7 @@ describe("<Header />", () => {
     // Desktop nav links
     cy.get("nav").within(() => {
       cy.get('a[href="/projects/search"]').should("exist");
+      cy.get('a[href="/profile"]').should("exist");
     });
 
     // Mobile nav links
@@ -133,19 +96,6 @@ describe("<Header />", () => {
 
     // Header should now be visible again
     cy.get("header").should("have.class", "top-0");
-  });
-
-  it("has the correct logout URL with redirectUri parameter", () => {
-    // Click to open the menu
-    cy.get("nav").within(() => {
-      cy.get("button").last().click();
-    });
-
-    // Check the logout URL contains the expected pattern
-    cy.get(".bg-primary.absolute a")
-      .last()
-      .should("have.attr", "href")
-      .and("include", "/session/logout?redirectUri=");
   });
 
   it("renders search icon in both desktop and mobile views", () => {

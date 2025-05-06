@@ -5,7 +5,7 @@
  */
 import { Card, CardContent, CardHeader } from "@/components/ui/card.tsx";
 import { Project } from "@team-golfslag/conflux-api-client/src/client";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { JSX } from "react";
 import { CalendarIcon, UsersIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

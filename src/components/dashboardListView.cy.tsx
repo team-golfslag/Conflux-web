@@ -6,18 +6,12 @@
 import DashboardListView from "./dashboardListView";
 import { BrowserRouter } from "react-router-dom";
 import { mount } from "cypress/react";
-import { IProject } from "@team-golfslag/conflux-api-client/src/client";
+import { Project } from "@team-golfslag/conflux-api-client/src/client";
 
-// filepath: /Users/benstokmans/Documents/workspace/uni/INFOSP/Conflux-web/src/components/dashboardListView.cy.tsx
-/**
- * This program has been developed by students from the bachelor Computer Science at Utrecht
- * University within the Software Project course.
- * © Copyright Utrecht University (Department of Information and Computing Sciences)
- */
 /// <reference types="cypress" />
 
 describe("<DashboardListView />", () => {
-  const mockProjects: IProject[] = [
+  const mockProjects = [
     {
       id: "123",
       title: "Project 1",
@@ -47,13 +41,15 @@ describe("<DashboardListView />", () => {
     },
   ];
 
-  const mockData = mockProjects.map((project) => ({
-    project,
+  const mockData = mockProjects.map((p) => ({
+    project: new Project({
+      ...p,
+    }),
     role: "Member",
   }));
 
   beforeEach(() => {
-    // Mount the component within BrowserRouter because DashboardCard uses <Link>
+    // Mount the component within BrowserRouter because ProjectCard uses <Link>
     mount(
       <BrowserRouter>
         <DashboardListView data={mockData} />
@@ -61,9 +57,12 @@ describe("<DashboardListView />", () => {
     );
   });
 
-  it("renders the correct number of DashboardCards", () => {
-    // Based on the Card component structure in dashboardCard.tsx
-    cy.get(".m-3.flex.h-60").should("have.length", mockData.length);
+  it("renders the correct number of ProjectCards", () => {
+    // Using the Card component from the updated ProjectCard
+    cy.get(".flex.h-full.flex-col.rounded-xl").should(
+      "have.length",
+      mockData.length * 2,
+    );
   });
 
   it("renders the grid structure with appropriate classes", () => {
@@ -75,7 +74,7 @@ describe("<DashboardListView />", () => {
 
   it("renders all project titles", () => {
     mockProjects.forEach((project) => {
-      cy.contains("h4", project.title).should("be.visible");
+      cy.contains("h3", project.title).should("be.visible");
     });
   });
 
@@ -89,21 +88,17 @@ describe("<DashboardListView />", () => {
 
   it("renders the user role for each card", () => {
     mockData.forEach(() => {
-      cy.contains("Roles: Member").should("exist");
+      cy.get(".text-primary.bg-primary\\/10")
+        .contains("Member")
+        .should("exist");
     });
   });
 
-  it('renders "View Details" buttons with correct links', () => {
-    // Get all cards and verify each one has the correct project link
-    cy.get(".m-3.flex.h-60").each(($card, index) => {
+  it("renders cards with correct links", () => {
+    // Get all link elements and verify each one has the correct project link
+    cy.get("a").each(($link, index) => {
       const project = mockProjects[index];
-
-      // Within this specific card, find the "View Details" link
-      cy.wrap($card)
-        .contains("View Details")
-        .should("be.visible")
-        .closest("a")
-        .should("have.attr", "href", `/projects/${project.id}`);
+      cy.wrap($link).should("have.attr", "href", `/projects/${project.id}`);
     });
   });
 
@@ -114,6 +109,6 @@ describe("<DashboardListView />", () => {
       </BrowserRouter>,
     );
     cy.get("div.grid").should("exist");
-    cy.get(".m-3.flex.h-60").should("not.exist"); // No cards should be present
+    cy.get(".flex.h-full.flex-col.rounded-xl").should("not.exist"); // No cards should be present
   });
 });

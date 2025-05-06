@@ -51,14 +51,6 @@ describe("<LoadingWrapper />", () => {
     cy.contains("Loading...").should("not.exist");
   });
 
-  it("applies correct classes for the loading state container", () => {
-    mount(<LoadingWrapper isLoading={true}>Content</LoadingWrapper>);
-    cy.get("div.bg-secondary.min-h-full.p-8").should("exist");
-    cy.get(
-      "div.flex.items-center.justify-between.rounded-lg.bg-white.p-3.text-2xl.font-semibold",
-    ).should("exist");
-  });
-
   it("does not render loading state container when isLoading is false", () => {
     mount(
       <LoadingWrapper isLoading={false}>

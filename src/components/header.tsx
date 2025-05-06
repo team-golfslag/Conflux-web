@@ -7,7 +7,7 @@ import logo from "@/assets/golfslag.png";
 import { useState, useEffect, useRef } from "react";
 import { Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import config from "@/config";
 
 /** Header component <br>
@@ -15,7 +15,7 @@ import config from "@/config";
  */
 export default function Header() {
   const [isUserMenuHovered, setIsUserMenuHovered] = useState(false);
-  const [isScrollingUp, setIsScrollingUp] = useState(false);
+  const [isScrollingUp, setIsScrollingUp] = useState(true);
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const hideMenuTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -82,6 +82,7 @@ export default function Header() {
             className="relative"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            data-testid="user-menu-container"
           >
             <Link to="/profile">
               <Button variant="ghost" size="icon">
@@ -90,7 +91,8 @@ export default function Header() {
             </Link>
             {isUserMenuHovered && (
               <div
-                className="bg-background text-foreground absolute top-full right-0 mt-1 w-48 rounded-md border shadow-lg"
+                className="bg-background absolute top-full right-0 mt-1 w-48 rounded-md border shadow-lg"
+                data-testid="user-dropdown"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
               >
