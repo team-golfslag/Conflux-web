@@ -41,7 +41,7 @@ const ProjectCard = ({ project, role }: ProjectCardProps): JSX.Element => {
   const status = getStatus();
 
   // Count contributors
-  const contributorCount = project.contributors?.length || 0;
+  const contributorCount = project.contributors?.length ?? 0;
 
   return (
     <Link
@@ -65,7 +65,7 @@ const ProjectCard = ({ project, role }: ProjectCardProps): JSX.Element => {
         <CardContent className="flex flex-grow flex-col p-4 pt-0">
           {/* Project Description */}
           <p className="mt-2 mb-4 line-clamp-3 flex-grow text-sm text-gray-600 duration-200">
-            {project.description || "No description available"}
+            {project.description ?? "No description available"}
           </p>
 
           {/* Project Metadata */}

@@ -18,6 +18,9 @@ export default function Header() {
   const [isScrollingUp, setIsScrollingUp] = useState(true);
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const hideMenuTimer = useRef<NodeJS.Timeout | null>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const userButtonRef = useRef<HTMLButtonElement>(null);
+  const firstMenuItemRef = useRef<HTMLAnchorElement>(null);
 
   // When scrolling up, the header becomes sticky. When scrolling down, the header stays behind.
   useEffect(() => {
@@ -51,6 +54,55 @@ export default function Header() {
     }, 150);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    switch (event.key) {
+      case "Escape":
+        setIsUserMenuHovered(false);
+        userButtonRef.current?.focus();
+        break;
+      case "ArrowDown":
+        if (isUserMenuHovered) {
+          event.preventDefault();
+          firstMenuItemRef.current?.focus();
+        } else {
+          setIsUserMenuHovered(true);
+        }
+        break;
+      case "Enter":
+      case " ":
+        if (!isUserMenuHovered) {
+          event.preventDefault();
+          setIsUserMenuHovered(true);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  const toggleMenu = () => {
+    setIsUserMenuHovered((prev) => !prev);
+  };
+
+  // Close the menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node) &&
+        userButtonRef.current &&
+        !userButtonRef.current.contains(event.target as Node)
+      ) {
+        setIsUserMenuHovered(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <header
       className={`bg-primary text-primary-foreground sticky flex w-full items-center justify-center py-2 transition-all duration-400 ease-in-out ${
@@ -83,28 +135,44 @@ export default function Header() {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             data-testid="user-menu-container"
+            ref={userMenuRef}
           >
-            <Link to="/profile">
-              <Button variant="ghost" size="icon">
-                <User className="h-6 w-6" />
-              </Button>
-            </Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMenu}
+              onKeyDown={handleKeyDown}
+              aria-haspopup="true"
+              aria-expanded={isUserMenuHovered}
+              aria-label="User menu"
+              ref={userButtonRef}
+            >
+              <User className="h-6 w-6" />
+            </Button>
             {isUserMenuHovered && (
               <div
-                className="bg-background absolute top-full right-0 mt-1 w-48 rounded-md border shadow-lg"
+                className="bg-background text-foreground absolute top-full right-0 mt-1 w-48 rounded-md border shadow-lg"
                 data-testid="user-dropdown"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
+                role="menu"
+                aria-orientation="vertical"
+                aria-labelledby="user-menu-button"
               >
                 <Link
                   to="/profile"
-                  className="hover:bg-secondary hover:text-secondary-foreground block rounded-t-md px-4 py-2"
+                  className="hover:bg-secondary hover:text-secondary-foreground text-foreground block rounded-t-md px-4 py-2"
+                  role="menuitem"
+                  ref={firstMenuItemRef}
+                  tabIndex={0}
                 >
                   Profile
                 </Link>
                 <Link
                   to="/settings"
-                  className="hover:bg-secondary hover:text-secondary-foreground block px-4 py-2"
+                  className="hover:bg-secondary hover:text-secondary-foreground text-foreground block px-4 py-2"
+                  role="menuitem"
+                  tabIndex={0}
                 >
                   Settings
                 </Link>
@@ -112,7 +180,9 @@ export default function Header() {
                   to={`${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(
                     config.webUIUrl,
                   )}`}
-                  className="hover:bg-secondary hover:text-secondary-foreground block rounded-b-md px-4 py-2"
+                  className="hover:bg-secondary hover:text-secondary-foreground text-foreground block rounded-b-md px-4 py-2"
+                  role="menuitem"
+                  tabIndex={0}
                 >
                   Log Out
                 </Link>

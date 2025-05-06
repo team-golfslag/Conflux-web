@@ -81,7 +81,7 @@ describe("<DashboardListView />", () => {
   it("renders all project descriptions (truncated)", () => {
     mockProjects.forEach((project) => {
       // Check for the beginning of each description, since they get truncated
-      const beginningOfDesc = project.description!.substring(0, 20);
+      const beginningOfDesc = project.description.substring(0, 20);
       cy.contains("p", beginningOfDesc).should("exist");
     });
   });
