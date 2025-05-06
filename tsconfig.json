@@ -5,9 +5,11 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "module": "ESNext",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+  "include": ["cypress/tsconfig.json"]
 }
