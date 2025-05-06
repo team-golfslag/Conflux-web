@@ -4,10 +4,11 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
+import { Card } from "@/components/ui/card";
 import ProjectOverview from "@/components/projectOverview.tsx";
 import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
-import Timeline, { TimelineItem } from "@/components/timeline";
+import { TimeLineImportance, TimelineItem } from "@/components/timeline";
 import { useParams } from "react-router";
 import {
   useContext,
@@ -20,16 +21,46 @@ import {
 import { Project } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { LoadingWrapper } from "@/components/loadingWrapper";
-import { format } from "date-fns";
-import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
+import ProjectDetails from "@/components/projectDetails.tsx";
+import ProjectTimeline from "@/components/projectTimeline.tsx";
 
 /** List of timeline data as dummy data */
 const timelineData: TimelineItem[] = [
-  { date: "01-01-2023", name: "Event One" },
-  { date: "15-03-2023", name: "Event Two" },
-  { date: "10-06-2023", name: "Event Three" },
-  { date: "22-09-2023", name: "Event Four" },
+  {
+    date: "01-01-2023",
+    name: "Project Start",
+    importance: TimeLineImportance.High,
+  },
+  {
+    date: "05-02-2023",
+    name: "Log Item",
+    importance: TimeLineImportance.Medium,
+  },
+  {
+    date: "15-03-2023",
+    name: "Event One",
+    importance: TimeLineImportance.High,
+  },
+  {
+    date: "10-06-2023",
+    name: "Event Two",
+    importance: TimeLineImportance.High,
+  },
+  {
+    date: "08-07-2023",
+    name: "Log Item 1",
+    importance: TimeLineImportance.Medium,
+  },
+  {
+    date: "02-08-2023",
+    name: "Log Item 2",
+    importance: TimeLineImportance.Medium,
+  },
+  {
+    date: "22-09-2023",
+    name: "Project End",
+    importance: TimeLineImportance.High,
+  },
 ];
 
 /**
@@ -50,29 +81,13 @@ function createScrollHandler(ref: RefObject<HTMLElement | null>) {
   };
 }
 
-const determineStatus = (
-  startDate: Date | undefined,
-  endDate: Date | undefined,
-) => {
-  const now = new Date();
-  if (!startDate || startDate > now) {
-    return "Not started";
-  } else if (endDate && endDate < now) {
-    return "Ended";
-  } else {
-    return "Active";
-  }
-};
-
 /** Project page component <br>
  * Uses the 'id' param from the react routing to get the correct page from the backend
  */
 export default function ProjectPage() {
   const { id } = useParams();
-
   const [project, setProject] = useState<Project>();
   const [error, setError] = useState<Error>();
-
   const apiClient = useContext(ApiClientContext);
 
   useEffect(() => {
@@ -87,13 +102,9 @@ export default function ProjectPage() {
     }
   }, [apiClient, id]);
 
-  // Consider specifying the element type for better type safety, e.g., useRef<HTMLDivElement>(null)
-  // This depends on what element the 'Card' component forwards its ref to.
   const overviewRef = useRef<HTMLDivElement>(null);
   const contributorsRef = useRef<HTMLDivElement>(null);
   const worksRef = useRef<HTMLDivElement>(null);
-
-  const [isOpen, setIsOpen] = useState(false);
 
   let content: ReactNode = null;
 
@@ -174,52 +185,8 @@ export default function ProjectPage() {
           </div>
           {/* Side Panel */}
           <aside className="space-y-6">
-            <Card className="">
-              <CardHeader>
-                <CardTitle>Project Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div>
-                  <h3 className="font-semibold">Status</h3>
-                  <p className="text-gray-700">
-                    {determineStatus(project.start_date, project.end_date)}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold">Project Lead</h3>
-                  {/* TODO: make this the actual project lead*/}
-                  <p className="text-gray-700">Dr. J. Doe</p>
-                </div>
-                <div>
-                  <h3 className="font-semibold">Dates</h3>
-                  <p className="flex text-gray-700">
-                    <div className="w-12 font-medium">Start:</div>
-                    {format(project.start_date ?? "N/A", "d MMMM yyyy")}
-                  </p>
-                  <p className="flex text-gray-700">
-                    <span className="w-12 font-medium">End:</span>
-                    {format(project.end_date ?? "N/A", "d MMMM yyyy")}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold">Lead Organisation</h3>
-                  <p className="text-gray-700">
-                    {/*TODO: make this the actual lead organisation*/}
-                    {project.parties.length > 0
-                      ? project.parties[0].name
-                      : "N/A"}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Contributors Section */}
-            <div className="rounded-lg bg-white p-4 shadow">
-              <h3 className="text-lg font-semibold">Timeline</h3>
-              <div className="mt-4 ml-3 space-y-4">
-                <Timeline items={timelineData} />
-              </div>
-            </div>
+            <ProjectDetails project={project}></ProjectDetails>
+            <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
           </aside>
         </main>
       </>
