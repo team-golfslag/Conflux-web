@@ -13,7 +13,6 @@ const App = lazy(() => import("./pages/app.tsx"));
 const Dashboard = lazy(() => import("./pages/dashboard.tsx"));
 const Layout = lazy(() => import("./components/layout.tsx"));
 const ProjectPage = lazy(() => import("./pages/projectPage.tsx"));
-const ProjectEdit = lazy(() => import("./pages/projectEditPage.tsx"));
 const ProjectSearchPage = lazy(() => import("./pages/projectSearchPage.tsx"));
 const SettingsPage = lazy(() => import("./pages/settingsPage.tsx"));
 const ProfilePage = lazy(() => import("./pages/profilePage.tsx"));
@@ -39,7 +38,6 @@ const allRoutes = (
         <Route path="projects">
           <Route path="search" element={<ProjectSearchPage />} />
           <Route path=":id" element={<ProjectPage />} />
-          <Route path=":id/edit" element={<ProjectEdit />} />
         </Route>
         <Route path="profile" element={<ProfilePage />} />
       </Route>
