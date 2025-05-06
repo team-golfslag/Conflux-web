@@ -4,7 +4,7 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Product } from "@team-golfslag/conflux-api-client/src/client";
 
 type ProjectWorksProps = { products?: Product[] };
@@ -17,19 +17,22 @@ export default function ProjectWorks({
   products,
 }: Readonly<ProjectWorksProps>) {
   return (
-    <section className="space-y-4 rounded-lg bg-white p-6 shadow">
-      <h2 className="mb-4 text-xl font-semibold">Works</h2>
-      {products?.map((product) => (
-        <Card key={product.id} className="bg-gray-200">
-          <CardContent className="flex items-center gap-4 p-3">
+    <>
+      <h2 className="text-xl font-semibold">Works</h2>
+      <div className="flex flex-col gap-4">
+        {products?.map((product) => (
+          <Card
+            key={product.id}
+            className="flex-row items-center gap-4 border border-gray-200 p-3 shadow-sm"
+          >
             <div>
               <p className="font-semibold">{product.title}</p>
               <p className="text-sm text-gray-600">Details</p>
               <p className="text-sm text-gray-600">{product.url}</p>
             </div>
-          </CardContent>
-        </Card>
-      ))}
-    </section>
+          </Card>
+        ))}
+      </div>
+    </>
   );
 }
