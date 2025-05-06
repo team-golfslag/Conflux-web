@@ -18,7 +18,7 @@ import {
   RefObject,
   ReactNode,
 } from "react";
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
+import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import ProjectDetails from "@/components/projectDetails.tsx";
@@ -86,7 +86,8 @@ function createScrollHandler(ref: RefObject<HTMLElement | null>) {
  */
 export default function ProjectPage() {
   const { id } = useParams();
-  const [project, setProject] = useState<Project>();
+
+  const [project, setProject] = useState<ProjectDTO>();
   const [error, setError] = useState<Error>();
   const apiClient = useContext(ApiClientContext);
 
@@ -160,8 +161,8 @@ export default function ProjectPage() {
           <div className="flex flex-col gap-4 md:col-span-2">
             <Card ref={overviewRef} className="scroll-mt-12" title="Overview">
               <ProjectOverview
-                title={project.title}
-                description={project.description}
+                title={project.primary_title?.text ?? "No title available"}
+                description={project.primary_description?.text}
               />
             </Card>
             <Card
