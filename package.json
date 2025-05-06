@@ -29,6 +29,7 @@
     "@react-router/fs-routes": "^7.5.3",
     "@tailwindcss/vite": "^4.1.5",
     "@team-golfslag/conflux-api-client": "^1.5.0",
+    "@radix-ui/react-collapsible": "^1.1.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cypress": "^14.3.2",
