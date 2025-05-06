@@ -16,10 +16,13 @@ import {
   useRef,
   RefObject,
   ReactNode,
+} from "react";
 import { Project } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { LoadingWrapper } from "@/components/loadingWrapper";
+import { format } from "date-fns";
 import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
 
 /** List of timeline data as dummy data */
 const timelineData: TimelineItem[] = [
@@ -45,6 +48,22 @@ function createScrollHandler(ref: RefObject<HTMLElement | null>) {
       inline: "center",
     });
   };
+}
+
+const determineStatus = (
+  startDate: Date | undefined,
+  endDate: Date | undefined,
+) => {
+  const now = new Date();
+  if (!startDate || startDate > now) {
+    return "Not started";
+  } else if (endDate && endDate < now) {
+    return "Ended";
+  } else {
+    return "Active";
+  }
+};
+
 /** Project page component <br>
  * Uses the 'id' param from the react routing to get the correct page from the backend
  */
@@ -76,6 +95,7 @@ export default function ProjectPage() {
 
   const [isOpen, setIsOpen] = useState(false);
 
+  let content: ReactNode = null;
 
   if (error) {
     content = (
@@ -93,6 +113,7 @@ export default function ProjectPage() {
     const scrollToOverview = createScrollHandler(overviewRef);
     const scrollToContributors = createScrollHandler(contributorsRef);
     const scrollToWorks = createScrollHandler(worksRef);
+
     content = (
       <>
         <ul className="mt-6 mr-auto flex w-auto items-baseline gap-3 divide-x px-4 py-2">
@@ -149,15 +170,48 @@ export default function ProjectPage() {
               title="Works"
             >
               <ProjectWorks products={project.products} />
+            </Card>
           </div>
           {/* Side Panel */}
           <aside className="space-y-6">
-            <div className="rounded-lg bg-white p-4 shadow">
-              <h3 className="text-lg font-semibold">Start Date</h3>
-              <p>{project.start_date?.toDateString()}</p>
-              <h3 className="mt-4 text-lg font-semibold">End Date</h3>
-              <p>{project.end_date?.toDateString()}</p>
-            </div>
+            <Card className="">
+              <CardHeader>
+                <CardTitle>Project Details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div>
+                  <h3 className="font-semibold">Status</h3>
+                  <p className="text-gray-700">
+                    {determineStatus(project.start_date, project.end_date)}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold">Project Lead</h3>
+                  {/* TODO: make this the actual project lead*/}
+                  <p className="text-gray-700">Dr. J. Doe</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold">Dates</h3>
+                  <p className="flex text-gray-700">
+                    <div className="w-12 font-medium">Start:</div>
+                    {format(project.start_date ?? "N/A", "d MMMM yyyy")}
+                  </p>
+                  <p className="flex text-gray-700">
+                    <span className="w-12 font-medium">End:</span>
+                    {format(project.end_date ?? "N/A", "d MMMM yyyy")}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold">Lead Organisation</h3>
+                  <p className="text-gray-700">
+                    {/*TODO: make this the actual lead organisation*/}
+                    {project.parties.length > 0
+                      ? project.parties[0].name
+                      : "N/A"}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Contributors Section */}
             <div className="rounded-lg bg-white p-4 shadow">
