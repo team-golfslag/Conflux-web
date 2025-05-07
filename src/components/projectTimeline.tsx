@@ -6,7 +6,7 @@
 import { Card, CardHeader, CardTitle } from "./ui/card";
 import { Collapsible, CollapsibleTrigger } from "@radix-ui/react-collapsible";
 import Timeline, { TimelineItem } from "@/components/timeline.tsx";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { useState } from "react";
 
@@ -27,12 +27,13 @@ export default function ProjectTimeline({
               <Button
                 variant="ghost"
                 size="sm"
-                className="group bg-primary text-primary-foreground hover:bg-accent hover:text-gray-700"
+                className="group hover:bg-accent hover:text-gray-700"
               >
-                <span className="text-primary-foreground transition-colors duration-200 group-hover:text-gray-700">
+                <span className="transition-colors duration-200 group-hover:text-gray-700">
                   {isOpen ? "Collapse" : "Expand"}
                 </span>
-                <ChevronsUpDown className="h-4 w-4" />
+                {isOpen && <ChevronUp className="h-4 w-4" />}
+                {!isOpen && <ChevronDown className="h-4 w-4" />}
                 <span className="sr-only">Toggle</span>
               </Button>
             </CollapsibleTrigger>
