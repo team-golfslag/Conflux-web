@@ -158,7 +158,7 @@ export default function ProjectPage() {
           </li>
         </ul>
         <main className="my-6 grid grid-cols-1 gap-8 md:grid-cols-3">
-          <div className="flex flex-col gap-4 md:col-span-2">
+          <div className="flex flex-col gap-8 md:col-span-2">
             <Card ref={overviewRef} className="scroll-mt-12" title="Overview">
               <ProjectOverview
                 title={project.primary_title?.text ?? "No title available"}
@@ -177,7 +177,7 @@ export default function ProjectPage() {
             </Card>
           </div>
           {/* Side Panel */}
-          <aside className="space-y-6">
+          <aside className="space-y-8">
             <ProjectDetails project={project}></ProjectDetails>
             <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
           </aside>
