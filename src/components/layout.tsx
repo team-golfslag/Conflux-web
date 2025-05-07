@@ -16,7 +16,7 @@ export default function Layout(): ReactElement {
   return (
     <>
       <Header />
-      <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-8">
+      <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-4 sm:px-8">
         <Outlet />
       </div>
       <Footer />

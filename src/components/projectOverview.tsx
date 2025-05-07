@@ -24,7 +24,6 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
     if (descriptionRef.current && props.description) {
       // Create a clone of the description element to measure its height
       const clone = descriptionRef.current.cloneNode(true) as HTMLElement;
-      // Remove the line clamp so we can measure the full height
       clone.classList.remove("line-clamp-10");
       clone.style.position = "absolute";
       clone.style.visibility = "hidden";
@@ -37,14 +36,11 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
         parseFloat(computedStyle.lineHeight) ||
         1.5 * parseFloat(computedStyle.fontSize);
 
-      // Calculate how many lines the text would take
       const fullHeight = clone.offsetHeight;
       const lineCount = Math.round(fullHeight / lineHeight);
 
-      // Clean up the clone
       document.body.removeChild(clone);
 
-      // Show expand button if there are more than 10 lines
       setShouldShowExpandButton(lineCount > 10);
     }
   }, [props.description]);
@@ -58,7 +54,7 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
       <CardHeader>
         {/* Title */}
         <div className="flex items-baseline rounded-lg pb-4">
-          <CardTitle className="text-5xl/14 font-bold tracking-tight">
+          <CardTitle className="text-3xl/8 font-bold tracking-tight sm:text-4xl/10 md:text-5xl/14">
             {props.title}
           </CardTitle>
           <div className="flex items-center justify-center rounded-lg p-2 transition-colors duration-100 hover:bg-gray-500">
@@ -70,7 +66,7 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
         <div className="relative">
           <p
             ref={descriptionRef}
-            className={`px-3 leading-7 text-gray-700 ${isExpanded ? "" : "line-clamp-10"}`}
+            className={`leading-7 text-gray-700 sm:px-3 ${isExpanded ? "" : "line-clamp-10"}`}
           >
             {props.description}
           </p>

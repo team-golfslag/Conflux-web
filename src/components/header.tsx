@@ -109,7 +109,7 @@ export default function Header() {
         isScrollingUp ? "top-0" : "-top-20"
       } z-1`}
     >
-      <div className="flex w-full max-w-7xl items-center justify-between px-8 py-3">
+      <div className="flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-8">
         <Link to="/dashboard">
           <div className="flex items-center gap-4">
             <div className="h-8 w-8 rounded-full">
@@ -191,7 +191,7 @@ export default function Header() {
       </div>
 
       {/* Mobile Navigation */}
-      <div className="flex gap-4 md:hidden">
+      <div className="flex gap-4 px-4 sm:px-8 md:hidden">
         <Link to="/projects/search">
           <Button variant="ghost">
             <div className="hover:text-secondary">
