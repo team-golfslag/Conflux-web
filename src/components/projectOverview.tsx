@@ -7,6 +7,7 @@ import { Edit, ChevronDown, ChevronUp } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
+import { truncate } from "lodash";
 
 type ProjectOverviewProps = { title?: string; description?: string };
 
@@ -17,35 +18,32 @@ type ProjectOverviewProps = { title?: string; description?: string };
 export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [shouldShowExpandButton, setShouldShowExpandButton] = useState(false);
+  const [description, setDescription] = useState<string | undefined>(
+    truncate(props.description, {
+      length: 880,
+      separator: /,? +/,
+    }),
+  );
   const descriptionRef = useRef<HTMLParagraphElement>(null);
 
   // Check if the description is long enough to need expansion
   useEffect(() => {
     if (descriptionRef.current && props.description) {
-      // Create a clone of the description element to measure its height
-      const clone = descriptionRef.current.cloneNode(true) as HTMLElement;
-      clone.classList.remove("line-clamp-10");
-      clone.style.position = "absolute";
-      clone.style.visibility = "hidden";
-      clone.style.height = "auto";
-      document.body.appendChild(clone);
+      const characterCount = props.description.length ?? 0;
 
-      // Get the line height in pixels
-      const computedStyle = window.getComputedStyle(descriptionRef.current);
-      const lineHeight =
-        parseFloat(computedStyle.lineHeight) ||
-        1.5 * parseFloat(computedStyle.fontSize);
-
-      const fullHeight = clone.offsetHeight;
-      const lineCount = Math.round(fullHeight / lineHeight);
-
-      document.body.removeChild(clone);
-
-      setShouldShowExpandButton(lineCount > 10);
+      setShouldShowExpandButton(characterCount > 880);
     }
   }, [props.description]);
 
   const toggleExpand = () => {
+    setDescription(
+      !isExpanded
+        ? (props.description ?? "")
+        : truncate(props.description, {
+            length: 880,
+            separator: /,? +/,
+          }),
+    );
     setIsExpanded(!isExpanded);
   };
 
@@ -58,7 +56,7 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
             {props.title}
           </CardTitle>
           <div className="flex items-center justify-center rounded-lg p-2 transition-colors duration-100 hover:bg-gray-500">
-            <Edit size={20} color="white" />
+            <Edit size={20} color="black" />
           </div>
         </div>
       </CardHeader>
@@ -66,9 +64,9 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
         <div className="relative">
           <p
             ref={descriptionRef}
-            className={`leading-7 text-gray-700 sm:px-3 ${isExpanded ? "" : "line-clamp-10"}`}
+            className={`text-sm/6 text-gray-700 sm:px-3 sm:text-base/7`}
           >
-            {props.description}
+            {description}
           </p>
 
           {shouldShowExpandButton && !isExpanded && (
