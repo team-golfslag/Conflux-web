@@ -8,13 +8,10 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ProjectDTO,
   ContributorDTO,
-  ContributorRoleType,
-  PersonDTO,
-  Person,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Edit, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useContext, useEffect, useCallback } from "react";
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,24 +22,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ApiClientContext } from "@/lib/ApiClientContext";
 import AddContributorModal from "@/components/addContributorModal";
 import EditContributorModal from "@/components/editContributorModal";
-import ContributorCard from "./contributorCard";
+import ContributorCard from "@/components/contributorCard";
 
 type ProjectContributorsProps = {
   project: ProjectDTO;
 };
-
-// Interface for the new contributor form
-interface ContributorFormData {
-  name: string;
-  email: string;
-  orcidId: string;
-  roles: ContributorRoleType[];
-  leader: boolean;
-  contact: boolean;
-}
 
 /**
  * Project Contributors component
@@ -59,235 +45,38 @@ export default function ProjectContributors({
   const [deleteContributor, setDeleteContributor] =
     useState<ContributorDTO | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [formData, setFormData] = useState<ContributorFormData>({
-    name: "",
-    email: "",
-    orcidId: "",
-    roles: [],
-    leader: false,
-    contact: false,
-  });
-  const [orcidSearchTerm, setOrcidSearchTerm] = useState("");
-  const [isLoadingOrcidSearch, setIsLoadingOrcidSearch] = useState(false);
-  const apiClient = useContext(ApiClientContext);
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<Person[]>([]);
-  const [, setIsSearching] = useState(false);
-  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
 
   const toggleEditMode = () => setEditMode(!editMode);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleRoleChange = (role: ContributorRoleType) => {
-    setFormData((prev) => ({
-      ...prev,
-      roles: prev.roles.includes(role)
-        ? prev.roles.filter((r) => r !== role)
-        : [...prev.roles, role],
-    }));
-  };
-
-  const searchByOrcid = async () => {
-    setIsLoadingOrcidSearch(true);
-    try {
-      alert("ORCID search functionality not yet implemented on the backend");
-      if (orcidSearchTerm) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setFormData((prev) => ({
-          ...prev,
-          name: "Jane Doe",
-          email: "jane.doe@example.com",
-          orcidId: orcidSearchTerm,
-        }));
-      }
-    } catch (error) {
-      console.error("Error searching ORCID:", error);
-    } finally {
-      setIsLoadingOrcidSearch(false);
-    }
-  };
-
-  const searchPeople = useCallback(
-    async (query: string) => {
-      if (query.length < 2) {
-        setSearchResults([]);
-        return;
-      }
-      setIsSearching(true);
-      try {
-        const people = await apiClient.people_GetPersonsByQuery(query);
-        setSearchResults(people);
-      } catch (error) {
-        console.error("Error searching for people:", error);
-        setSearchResults([]);
-      } finally {
-        setIsSearching(false);
-      }
-    },
-    [apiClient, setSearchResults, setIsSearching],
-  );
-
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      if (searchTerm) {
-        searchPeople(searchTerm);
-      } else {
-        setSearchResults([]);
-      }
-    }, 300);
-    return () => clearTimeout(debounceTimer);
-  }, [searchPeople, searchTerm]);
-
-  const selectPerson = (person: Person) => {
-    setSelectedPerson(person);
-    setFormData((prev) => ({
-      ...prev,
-      name: person.name,
-      email: person.email || "",
-      orcidId: person.orcid_id || "",
-    }));
-    setSearchResults([]);
-    setSearchTerm("");
-  };
-
-  const resetFormData = () => {
-    setFormData({
-      name: "",
-      email: "",
-      orcidId: "",
-      roles: [],
-      leader: false,
-      contact: false,
-    });
-    setSelectedPerson(null);
-    setOrcidSearchTerm("");
-    setSearchTerm("");
-  };
-
-  const addContributor = async () => {
-    try {
-      let personToUse: Person;
-      if (selectedPerson) {
-        personToUse = selectedPerson;
-      } else {
-        const personDTO = new PersonDTO({
-          name: formData.name,
-          email: formData.email,
-          or_ci_d: formData.orcidId || undefined,
-        });
-        personToUse = await apiClient.people_CreatePerson(personDTO);
-        if (!personToUse || !personToUse.id) {
-          throw new Error("Failed to create person");
-        }
-      }
-
-      const newContributor = new ContributorDTO({
-        person: personToUse,
-        project_id: project.id,
-        roles: formData.roles,
-        positions: [],
-        leader: formData.leader,
-        contact: formData.contact,
-      });
-
-      const createdContributor = await apiClient.contributors_CreateContributor(
-        project.id,
-        newContributor,
-      );
-
-      if (!createdContributor || !createdContributor.person) {
-        throw new Error("Server returned an invalid contributor");
-      }
-
-      project.contributors = [
-        ...(project.contributors || []),
-        createdContributor,
-      ];
-      setIsAddModalOpen(false);
-      resetFormData();
-    } catch (error) {
-      console.error("Error adding contributor:", error);
-      alert(
-        `Failed to add contributor: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
-      );
-    }
-  };
-
   const handleEditContributor = (contributor: ContributorDTO) => {
     setEditingContributor(contributor);
-    setFormData({
-      name: contributor.person.name,
-      email: contributor.person.email || "",
-      orcidId: contributor.person.orcid_id || "",
-      roles: contributor.roles,
-      leader: contributor.leader,
-      contact: contributor.contact,
-    });
     setIsEditModalOpen(true);
   };
 
-  const saveEditedContributor = async () => {
-    if (!editingContributor) return;
-    try {
-      const updatedPerson = new PersonDTO({
-        name: formData.name,
-        email: formData.email,
-        or_ci_d: formData.orcidId || undefined,
-      });
+  const handleContributorAdded = (newContributor: ContributorDTO) => {
+    project.contributors = [...(project.contributors || []), newContributor];
+  };
 
-      const updatedContributor = new ContributorDTO({
-        person: editingContributor.person,
-        project_id: project.id,
-        roles: formData.roles,
-        positions: editingContributor.positions || [],
-        leader: formData.leader,
-        contact: formData.contact,
-      });
-
-      await apiClient.people_UpdatePerson(
-        editingContributor.person.id,
-        updatedPerson,
+  const handleContributorUpdated = (updatedContributor: ContributorDTO) => {
+    if (project.contributors) {
+      const index = project.contributors.findIndex(
+        (c) => c.person.id === updatedContributor.person.id,
       );
-      const result = await apiClient.contributors_UpdateContributor(
-        project.id,
-        editingContributor.person.id,
-        updatedContributor,
-      );
-
-      if (project.contributors) {
-        const index = project.contributors.findIndex(
-          (c) => c.person.id === editingContributor.person.id,
-        );
-        if (index !== -1) {
-          project.contributors[index] = result;
-        }
+      if (index !== -1) {
+        project.contributors[index] = updatedContributor;
       }
-
-      setIsEditModalOpen(false);
-      setEditingContributor(null);
-      resetFormData();
-    } catch (error) {
-      console.error("Error updating contributor:", error);
-      alert(
-        `Failed to update contributor: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
-      );
     }
+    setEditingContributor(null);
   };
 
   const handleDeleteContributor = async () => {
     if (!deleteContributor) return;
 
     try {
-      // For now, we'll remove the contributor from the local state
+      // API call would go here to delete the contributor
+      // await apiClient.contributors_DeleteContributor(project.id, deleteContributor.person.id);
+
+      // Update local state
       if (project.contributors) {
         project.contributors = project.contributors.filter(
           (c) => c.person.id !== deleteContributor.person.id,
@@ -321,19 +110,8 @@ export default function ProjectContributors({
           <AddContributorModal
             isOpen={isAddModalOpen}
             onOpenChange={setIsAddModalOpen}
-            formData={formData}
-            setFormData={setFormData}
-            handleInputChange={handleInputChange}
-            handleRoleChange={handleRoleChange}
-            addContributor={addContributor}
-            orcidSearchTerm={orcidSearchTerm}
-            setOrcidSearchTerm={setOrcidSearchTerm}
-            searchByOrcid={searchByOrcid}
-            isLoadingOrcidSearch={isLoadingOrcidSearch}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            searchResults={searchResults}
-            selectPerson={selectPerson}
+            projectId={project.id}
+            onContributorAdded={handleContributorAdded}
           />
         </div>
       </CardHeader>
@@ -419,15 +197,9 @@ export default function ProjectContributors({
       <EditContributorModal
         isOpen={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
-        formData={formData}
-        setFormData={setFormData}
-        handleInputChange={handleInputChange}
-        handleRoleChange={handleRoleChange}
-        saveEditedContributor={saveEditedContributor}
-        resetForm={() => {
-          setEditingContributor(null);
-          resetFormData();
-        }}
+        contributor={editingContributor}
+        projectId={project.id}
+        onContributorUpdated={handleContributorUpdated}
       />
     </>
   );
