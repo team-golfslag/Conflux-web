@@ -59,12 +59,10 @@ const ProjectSearchPage = () => {
   }
 
   const handleStartDateChange = (date: Date | undefined) => {
-    console.log("Start Date selected:", date);
     setStartDate(date);
   };
 
   const handleEndDateChange = (date: Date | undefined) => {
-    console.log("End Date selected:", date);
     setEndDate(date);
   };
 
