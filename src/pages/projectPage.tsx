@@ -18,7 +18,13 @@ import {
   RefObject,
   ReactNode,
 } from "react";
-import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
+  DescriptionType,
+  ProjectDescriptionDTO,
+  ProjectDTO,
+  ProjectPatchDTO,
+  ProjectTitleDTO,
+  TitleType,
+} from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import ProjectDetails from "@/components/projectDetails.tsx";
@@ -103,6 +109,44 @@ export default function ProjectPage() {
     }
   }, [apiClient, id]);
 
+  /**
+   * Handles the editing of a project's overview by updating the title and description.
+   *
+   * @param {string} [title] - The new title for the project's overview. Defaults to an empty string if not provided.
+   * @param {string} [description] - The new description for the project's overview. Defaults to an empty string if not provided.
+   */
+  const handleEditOverview = (title?: string, description?: string) => {
+    const titleDto: ProjectTitleDTO[] = [
+      new ProjectTitleDTO({
+        text: title ?? "",
+        type: TitleType.Primary,
+        start_date: new Date(),
+      }),
+    ];
+    const descriptionDto: ProjectDescriptionDTO[] = [
+      new ProjectDescriptionDTO({
+        text: description ?? "",
+        type: DescriptionType.Primary,
+      }),
+    ];
+
+    if (id) {
+      apiClient
+        .projects_PatchProject(
+          id,
+          new ProjectPatchDTO({
+            titles: titleDto,
+            descriptions: descriptionDto,
+          }),
+        )
+        .then((p) => {
+          setProject(p);
+          setError(undefined);
+        })
+        .catch((e) => setError(e));
+    }
+  };
+
   const overviewRef = useRef<HTMLDivElement>(null);
   const contributorsRef = useRef<HTMLDivElement>(null);
   const worksRef = useRef<HTMLDivElement>(null);
@@ -163,6 +207,7 @@ export default function ProjectPage() {
               <ProjectOverview
                 title={project.primary_title?.text ?? "No title available"}
                 description={project.primary_description?.text}
+                onSave={handleEditOverview}
               />
             </Card>
             <Card

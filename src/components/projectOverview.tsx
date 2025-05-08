@@ -9,11 +9,15 @@ import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import { truncate } from "lodash";
 
-type ProjectOverviewProps = { title?: string; description?: string };
+type ProjectOverviewProps = {
+  title?: string;
+  description?: string;
+  onSave: (title: string, description: string) => void;
+};
 
 /**
  * Project Overview component
- * @param props the description to be displayed
+ * @param props title and description to be displayed, and onSave callback
  */
 export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -36,6 +40,11 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
   }, [props.description]);
 
   const toggleExpand = () => {
+
+  const handleSave = () => {
+    props.onSave(editTitle, editDescription);
+    setEditMode(false);
+  };
     setDescription(
       !isExpanded
         ? (props.description ?? "")
