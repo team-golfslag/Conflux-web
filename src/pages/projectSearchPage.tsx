@@ -70,14 +70,12 @@ const ProjectSearchPage = () => {
   }
 
   const handleStartDateChange = (date: Date | undefined) => {
-    console.log("Start Date selected:", date);
     setStartDate(date);
     // Force refresh the query when the date changes
     setRefreshKey((prev) => prev + 1);
   };
 
   const handleEndDateChange = (date: Date | undefined) => {
-    console.log("End Date selected:", date);
     setEndDate(date);
     // Force refresh the query when the date changes
     setRefreshKey((prev) => prev + 1);
