@@ -10,19 +10,13 @@ import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
 import { TimeLineImportance, TimelineItem } from "@/components/timeline";
 import { useParams } from "react-router";
-import {
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  RefObject,
-  ReactNode,
-} from "react";
+import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import ProjectDetails from "@/components/projectDetails.tsx";
 import ProjectTimeline from "@/components/projectTimeline.tsx";
+import PageLinks from "@/components/pageLinks";
 
 /** List of timeline data as dummy data */
 const timelineData: TimelineItem[] = [
@@ -62,24 +56,6 @@ const timelineData: TimelineItem[] = [
     importance: TimeLineImportance.High,
   },
 ];
-
-/**
- * Creates an event handler function that scrolls the element
- * referenced by the provided ref into view smoothly.
- *
- * @param ref - The React ref object pointing to the target HTML element.
- * @returns An event handler function.
- */
-function createScrollHandler(ref: RefObject<HTMLElement | null>) {
-  return () => {
-    // Use optional chaining to safely access current and scrollIntoView
-    ref.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-      inline: "center",
-    });
-  };
-}
 
 /** Project page component <br>
  * Uses the 'id' param from the react routing to get the correct page from the backend
@@ -122,41 +98,16 @@ export default function ProjectPage() {
       </>
     );
   } else if (project) {
-    const scrollToOverview = createScrollHandler(overviewRef);
-    const scrollToContributors = createScrollHandler(contributorsRef);
-    const scrollToWorks = createScrollHandler(worksRef);
-
     content = (
       <>
-        <ul className="mt-6 mr-auto flex w-auto items-baseline gap-3 divide-x divide-gray-400 px-4 py-2">
-          <li className="pr-3">
-            <button
-              onClick={scrollToOverview}
-              onKeyDown={scrollToOverview}
-              className="block w-full cursor-pointer font-semibold text-gray-500 decoration-gray-500 hover:underline"
-            >
-              Overview
-            </button>
-          </li>
-          <li className="pr-3">
-            <button
-              onClick={scrollToContributors}
-              onKeyDown={scrollToContributors}
-              className="block w-full cursor-pointer font-semibold text-gray-500 decoration-gray-500 hover:underline"
-            >
-              Contributors
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={scrollToWorks}
-              onKeyDown={scrollToWorks}
-              className="block w-full cursor-pointer font-semibold text-gray-500 decoration-gray-500 hover:underline"
-            >
-              Works
-            </button>
-          </li>
-        </ul>
+        <PageLinks
+          className="mt-6 mr-auto"
+          links={[
+            { label: "Overview", ref: overviewRef },
+            { label: "Contributors", ref: contributorsRef },
+            { label: "Works", ref: worksRef },
+          ]}
+        />
         <main className="my-6 grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="flex flex-col gap-8 md:col-span-2">
             <Card ref={overviewRef} className="scroll-mt-12" title="Overview">
