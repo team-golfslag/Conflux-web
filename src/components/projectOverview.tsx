@@ -165,8 +165,8 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
           {!editMode ? (
             <div className="relative">
               <Button
-                className="float-end border border-gray-50 bg-gray-50 hover:border-gray-200"
-                variant="ghost"
+                className="float-end"
+                variant="outline"
                 size="sm"
                 onClick={() => handleEditClick()}
               >
@@ -200,7 +200,7 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
               ref={descriptionTextAreaRef}
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
-              className="min-h-[200px] w-full resize-none overflow-hidden text-gray-700 md:text-base/7"
+              className="min-h-[200px] w-full resize-none overflow-hidden text-sm/6 text-gray-700 md:text-base/7"
               placeholder="Enter project description"
               onKeyDown={handleEditKeyDown}
               rows={10}
