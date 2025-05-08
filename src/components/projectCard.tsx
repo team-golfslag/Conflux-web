@@ -15,6 +15,15 @@ export interface ProjectCardProps {
   role?: string;
 }
 
+/**
+ * Represents a component that displays information about a project in a card layout. Used on dashboard and search page
+ *
+ * @param {ProjectCardProps} props - The properties required to render the project card.
+ * @param {ProjectDTO} props.project - The project data to display.
+ * @param {string} props.role - The user's role in the project, if available.
+ *
+ * @returns {JSX.Element} A styled card element showing project details, including title, description, dates, contributors count, and user role.
+ */
 const ProjectCard = ({ project, role }: ProjectCardProps): JSX.Element => {
   // Format dates for display
   const startDate = project.start_date

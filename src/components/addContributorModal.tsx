@@ -65,7 +65,6 @@ export default function AddContributorModal({
   const [isLoadingOrcidSearch, setIsLoadingOrcidSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Person[]>([]);
-  const [, setIsSearching] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
 
   const apiClient = useContext(ApiClientContext);
@@ -129,15 +128,12 @@ export default function AddContributorModal({
         setSearchResults([]);
         return;
       }
-      setIsSearching(true);
       try {
         const people = await apiClient.people_GetPersonsByQuery(query);
         setSearchResults(people);
       } catch (error) {
         console.error("Error searching for people:", error);
         setSearchResults([]);
-      } finally {
-        setIsSearching(false);
       }
     },
     [apiClient],
@@ -161,8 +157,8 @@ export default function AddContributorModal({
     setFormData((prev) => ({
       ...prev,
       name: person.name,
-      email: person.email || "",
-      orcidId: person.orcid_id || "",
+      email: person.email ?? "",
+      orcidId: person.orcid_id ?? "",
     }));
     setSearchResults([]);
     setSearchTerm("");
@@ -181,7 +177,7 @@ export default function AddContributorModal({
           or_ci_d: formData.orcidId || undefined,
         });
         personToUse = await apiClient.people_CreatePerson(personDTO);
-        if (!personToUse || !personToUse.id) {
+        if (!personToUse?.id) {
           throw new Error("Failed to create person");
         }
       }
@@ -200,7 +196,7 @@ export default function AddContributorModal({
         newContributor,
       );
 
-      if (!createdContributor || !createdContributor.person) {
+      if (!createdContributor?.person) {
         throw new Error("Server returned an invalid contributor");
       }
 
@@ -275,11 +271,11 @@ export default function AddContributorModal({
                 <Search className="absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
               </div>
               {searchResults.length > 0 && (
-                <div className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border bg-white shadow-md">
+                <div className="absolute z-10 mt-1 max-h-40 w-full max-w-md overflow-y-auto rounded-md border bg-white shadow-md">
                   {searchResults.map((person) => (
-                    <div
+                    <button
                       key={person.id}
-                      className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                      className="w-full cursor-pointer px-4 py-2 hover:bg-gray-100"
                       onClick={() => selectPerson(person)}
                     >
                       <div className="flex items-center gap-2">
@@ -291,7 +287,7 @@ export default function AddContributorModal({
                           {person.email}
                         </p>
                       )}
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}

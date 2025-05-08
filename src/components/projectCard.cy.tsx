@@ -16,6 +16,7 @@ import { BrowserRouter } from "react-router-dom";
 import ProjectCard from "./projectCard";
 import {
   DescriptionType,
+  ProjectDescriptionDTO,
   ProjectDTO,
   ProjectTitleDTO,
   TitleType,
@@ -31,116 +32,25 @@ const getDateRelativeToToday = (daysOffset: number): Date => {
 };
 
 // --- Test Data ---
-const mockProjectBase: ProjectDTO = {
+const mockProjectBase: ProjectDTO = new ProjectDTO({
   id: "proj-123",
-  primary_title: {
+  primary_title: new ProjectTitleDTO({
     text: "Test Project Alpha",
     type: TitleType.Primary,
     start_date: new Date("2023-01-01"),
-    init: function (this: ProjectTitleDTO, _data?: unknown) {
-      if (_data) {
-        for (const property in _data) {
-          if (Object.prototype.hasOwnProperty.call(_data, property)) {
-            if (property !== "init" && property !== "toJSON") {
-              (this as unknown as Record<string, unknown>)[property] = (
-                _data as unknown as Record<string, unknown>
-              )[property];
-            }
-          }
-        }
-      }
-    },
-    toJSON: function (this: ProjectTitleDTO): Record<string, unknown> {
-      const output: Record<string, unknown> = {};
-      for (const key in this) {
-        if (Object.prototype.hasOwnProperty.call(this, key)) {
-          if (key === "init" || key === "toJSON") {
-            continue;
-          }
-          const value = this[key as keyof ProjectTitleDTO];
-          if (value instanceof Date) {
-            output[key] = value.toISOString();
-          } else {
-            output[key] = value;
-          }
-        }
-      }
-      return output;
-    },
-  },
-  primary_description: {
+  }),
+  primary_description: new ProjectDescriptionDTO({
     text: "This is a test project description.",
     type: DescriptionType.Primary,
-    init: function (this: ProjectTitleDTO, _data?: unknown) {
-      if (_data) {
-        for (const property in _data) {
-          if (Object.prototype.hasOwnProperty.call(_data, property)) {
-            if (property !== "init" && property !== "toJSON") {
-              (this as unknown as Record<string, unknown>)[property] = (
-                _data as unknown as Record<string, unknown>
-              )[property];
-            }
-          }
-        }
-      }
-    },
-    toJSON: function (this: ProjectTitleDTO): Record<string, unknown> {
-      const output: Record<string, unknown> = {};
-      for (const key in this) {
-        if (Object.prototype.hasOwnProperty.call(this, key)) {
-          if (key === "init" || key === "toJSON") {
-            continue;
-          }
-          const value = this[key as keyof ProjectTitleDTO];
-          if (value instanceof Date) {
-            output[key] = value.toISOString();
-          } else {
-            output[key] = value;
-          }
-        }
-      }
-      return output;
-    },
-  },
+  }),
   titles: [],
   descriptions: [],
   users: [],
   contributors: [],
   products: [],
-  init: function (this: ProjectDTO, _data?: unknown) {
-    if (_data) {
-      for (const property in _data) {
-        if (Object.prototype.hasOwnProperty.call(_data, property)) {
-          // Avoid overwriting class methods if they are present in _data
-          if (property !== "init" && property !== "toJSON") {
-            (this as unknown as Record<string, unknown>)[property] = (
-              _data as unknown as Record<string, unknown>
-            )[property];
-          }
-        }
-      }
-    }
-  },
-  toJSON: function (this: ProjectDTO): Record<string, unknown> {
-    const output: Record<string, unknown> = {};
-    for (const key in this) {
-      if (Object.prototype.hasOwnProperty.call(this, key)) {
-        if (key === "init" || key === "toJSON") {
-          continue; // Skip methods
-        }
-        const value = this[key as keyof ProjectDTO];
-        if (value instanceof Date) {
-          output[key] = value.toISOString();
-        } else {
-          output[key] = value;
-        }
-      }
-    }
-    return output;
-  },
   start_date: new Date("2023-01-01"),
   organisations: [],
-};
+});
 
 const projectUpcoming: ProjectDTO = {
   ...mockProjectBase,
