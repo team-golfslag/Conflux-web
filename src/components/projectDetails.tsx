@@ -29,6 +29,7 @@ import {
 } from "./ui/select";
 import { Label } from "./ui/label";
 import { DatePicker } from "./ui/datepicker";
+import { EditButton } from "./ui/editButton";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 
 type ProjectDetailsProps = {
@@ -138,10 +139,26 @@ export default function ProjectDetails({
       ? contacts.map((contact) => contact.person.name).join(", ")
       : "N/A";
   };
+  const handleEditClick = () => {
+    setEditMode(true);
+  }
+
+  const handleCancelClick = () => {
+    setEditMode(false);
+  }
+
+  const handleSaveClick = () => {
+    onSave(editStartDate, editEndDate);
+    setEditMode(false);
+  }
+
+  const projectLead = project.contributors.find(
+    (contributor) => contributor.leader,
+  );
 
   return (
     <Card className="">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex items-center justify-between">
         <CardTitle>Project Details</CardTitle>
 
         <div className="flex items-center gap-2">
@@ -272,7 +289,7 @@ export default function ProjectDetails({
                     </SelectTrigger>
                     <SelectContent>
                       {project.organisations.map((org) => (
-                        <SelectItem key={org.ror_id} value={org.ror_id || ""}>
+                        <SelectItem key={org.ror_id} value={org.ror_id ?? ""}>
                           {org.name}
                         </SelectItem>
                       ))}
