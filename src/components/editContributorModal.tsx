@@ -62,8 +62,8 @@ export default function EditContributorModal({
     if (contributor) {
       setFormData({
         name: contributor.person.name,
-        email: contributor.person.email || "",
-        orcidId: contributor.person.orcid_id || "",
+        email: contributor.person.email ?? "",
+        orcidId: contributor.person.orcid_id ?? "",
         roles: contributor.roles,
         leader: contributor.leader,
         contact: contributor.contact,
@@ -90,8 +90,8 @@ export default function EditContributorModal({
     if (contributor) {
       setFormData({
         name: contributor.person.name,
-        email: contributor.person.email || "",
-        orcidId: contributor.person.orcid_id || "",
+        email: contributor.person.email ?? "",
+        orcidId: contributor.person.orcid_id ?? "",
         roles: contributor.roles,
         leader: contributor.leader,
         contact: contributor.contact,

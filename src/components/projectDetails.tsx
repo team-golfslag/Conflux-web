@@ -51,7 +51,7 @@ export default function ProjectDetails({
           </div>
           <p className="flex text-gray-700">
             <span className="w-12 font-medium">End:</span>
-            {/* {format(project.end_date ?? "N/A", "d MMMM yyyy")} */}
+            {format(project.end_date ?? "N/A", "d MMMM yyyy")}
           </p>
         </div>
         <div>
