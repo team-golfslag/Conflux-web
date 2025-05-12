@@ -94,7 +94,12 @@ export default function ProjectContributors({
     <>
       <CardHeader className="relative flex justify-between">
         <CardTitle className="text-xl font-semibold">Contributors</CardTitle>
-        <div className="absolute right-0 flex items-center justify-between space-x-4 px-4">
+        <div
+          className={
+            "absolute right-0 items-center justify-between space-x-4 px-4 group-hover:flex" +
+            (editMode ? "" : " hidden")
+          }
+        >
           <Button variant="outline" size="sm" onClick={toggleEditMode}>
             {editMode ? (
               <>
