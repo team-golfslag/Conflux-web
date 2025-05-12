@@ -87,33 +87,28 @@ export default function ProjectDetails({
         </div>
         <div>
           <h3 className="font-semibold">Dates</h3>
-          <button
-            className={editMode ? `` : `hover:bg-blue-100`}
-            onClick={handleEditClick}
-          >
-            <div className="mb-1 flex items-center text-gray-700">
-              <span className="w-12 text-start font-medium">Start:</span>
-              {editMode ? (
-                <DatePicker
-                  initialDate={project.start_date}
-                  onDateChange={setEditStartDate}
-                />
-              ) : (
-                startDate
-              )}
-            </div>
-            <div className="flex items-center text-gray-700">
-              <span className="w-12 text-start font-medium">End:</span>
-              {editMode ? (
-                <DatePicker
-                  initialDate={project.end_date}
-                  onDateChange={setEditEndDate}
-                />
-              ) : (
-                endDate
-              )}
-            </div>
-          </button>
+          <div className="mb-1 flex items-center text-gray-700">
+            <span className="w-12 text-start font-medium">Start:</span>
+            {editMode ? (
+              <DatePicker
+                initialDate={project.start_date}
+                onDateChange={setEditStartDate}
+              />
+            ) : (
+              startDate
+            )}
+          </div>
+          <div className="flex items-center text-gray-700">
+            <span className="w-12 text-start font-medium">End:</span>
+            {editMode ? (
+              <DatePicker
+                initialDate={project.end_date}
+                onDateChange={setEditEndDate}
+              />
+            ) : (
+              endDate
+            )}
+          </div>
         </div>
         <div>
           <h3 className="font-semibold">Lead Organisation</h3>
