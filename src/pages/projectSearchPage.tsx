@@ -87,7 +87,7 @@ const ProjectSearchPage = () => {
   );
 
   return (
-    <>
+    <search>
       <div className="relative mx-auto mb-4 w-full max-w-2xl p-4">
         <Input
           className="mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
@@ -176,7 +176,7 @@ const ProjectSearchPage = () => {
           </>
         )}
       </div>
-    </>
+    </search>
   );
 };
 

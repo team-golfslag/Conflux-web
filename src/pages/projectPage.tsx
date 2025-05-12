@@ -128,10 +128,10 @@ export default function ProjectPage() {
             </Card>
           </div>
           {/* Side Panel */}
-          <aside className="space-y-8">
+          <div className="space-y-8">
             <ProjectDetails project={project}></ProjectDetails>
             <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
-          </aside>
+          </div>
         </main>
       </>
     );
