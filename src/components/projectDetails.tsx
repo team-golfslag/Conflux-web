@@ -47,11 +47,13 @@ export default function ProjectDetails({
           <h3 className="font-semibold">Dates</h3>
           <div className="flex text-gray-700">
             <div className="w-12 font-medium">Start:</div>
-            {format(project.start_date ?? "N/A", "d MMMM yyyy")}
+            {project.start_date
+              ? format(project.start_date, "d MMMM yyyy")
+              : "N/A"}
           </div>
           <p className="flex text-gray-700">
             <span className="w-12 font-medium">End:</span>
-            {format(project.end_date ?? "N/A", "d MMMM yyyy")}
+            {project.end_date ? format(project.end_date, "d MMMM yyyy") : "N/A"}
           </p>
         </div>
         <div>

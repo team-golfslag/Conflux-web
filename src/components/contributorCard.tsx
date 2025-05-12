@@ -5,7 +5,10 @@
  */
 
 import { Card } from "@/components/ui/card";
-import { ContributorRoleType } from "@team-golfslag/conflux-api-client/src/client";
+import {
+  ContributorRoleType,
+  UserRoleDTO,
+} from "@team-golfslag/conflux-api-client/src/client";
 import { Check, Crown, Contact, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,17 +24,12 @@ import Logo from "./icons/logo";
 import { AlertDialog, AlertDialogTrigger } from "./ui/alert-dialog";
 import { useState } from "react";
 
-interface Role {
-  urn?: string;
-  name?: string;
-}
-
 type ContributorCardProps = {
   id: string;
   name: string;
   email?: string | null;
   orcidId?: string | null;
-  roles: ContributorRoleType[] | Role[];
+  roles: ContributorRoleType[] | UserRoleDTO[];
   isLeader?: boolean;
   isContact?: boolean;
   isConfluxUser?: boolean;
