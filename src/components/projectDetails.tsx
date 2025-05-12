@@ -6,8 +6,14 @@
 import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { format } from "date-fns";
+import { useState } from "react";
+import { EditButton } from "@/components/ui/editButton.tsx";
+import { DatePicker } from "@/components/ui/datepicker.tsx";
 
-type ProjectDetailsProps = { project: ProjectDTO };
+type ProjectDetailsProps = {
+  project: ProjectDTO;
+  onSave: (newStartDate?: Date, newEndDate?: Date) => void;
+};
 
 const determineStatus = (
   startDate: Date | undefined,
@@ -25,11 +31,40 @@ const determineStatus = (
 
 export default function ProjectDetails({
   project,
+  onSave,
 }: Readonly<ProjectDetailsProps>) {
+  const [editMode, setEditMode] = useState(false);
+  const [editStartDate, setEditStartDate] = useState<Date | undefined>();
+  const [editEndDate, setEditEndDate] = useState<Date | undefined>();
+
+  function handleEditClick() {
+    setEditMode(true);
+  }
+
+  function handleCancelClick() {
+    setEditMode(false);
+  }
+
+  function handleSaveClick() {
+    onSave(editStartDate, editEndDate);
+    setEditMode(false);
+  }
+
   return (
     <Card className="">
-      <CardHeader>
+      <CardHeader className="flex items-center justify-between">
         <CardTitle>Project Details</CardTitle>
+        {editMode ? (
+          <div className="flex gap-1">
+            <EditButton handleEditClick={handleSaveClick} editOrSave={"save"} />
+            <EditButton
+              handleEditClick={handleCancelClick}
+              editOrSave={"cancel"}
+            />
+          </div>
+        ) : (
+          <EditButton handleEditClick={handleEditClick} />
+        )}
       </CardHeader>
       <CardContent>
         <div>
@@ -45,14 +80,33 @@ export default function ProjectDetails({
         </div>
         <div>
           <h3 className="font-semibold">Dates</h3>
-          <div className="flex text-gray-700">
-            <div className="w-12 font-medium">Start:</div>
-            {format(project.start_date ?? "N/A", "d MMMM yyyy")}
-          </div>
-          <p className="flex text-gray-700">
-            <span className="w-12 font-medium">End:</span>
-            {format(project.end_date ?? "N/A", "d MMMM yyyy")}
-          </p>
+          <button
+            className={editMode ? `` : `hover:bg-blue-100`}
+            onClick={handleEditClick}
+          >
+            <div className="mb-1 flex items-center text-gray-700">
+              <span className="w-12 text-start font-medium">Start:</span>
+              {editMode ? (
+                <DatePicker
+                  initialDate={project.start_date}
+                  onDateChange={setEditStartDate}
+                />
+              ) : (
+                format(project.start_date ?? "N/A", "d MMMM yyyy")
+              )}
+            </div>
+            <div className="flex items-center text-gray-700">
+              <span className="w-12 text-start font-medium">End:</span>
+              {editMode ? (
+                <DatePicker
+                  initialDate={project.end_date}
+                  onDateChange={setEditEndDate}
+                />
+              ) : (
+                format(project.end_date ?? "N/A", "d MMMM yyyy")
+              )}
+            </div>
+          </button>
         </div>
         <div>
           <h3 className="font-semibold">Lead Organisation</h3>

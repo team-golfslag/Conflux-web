@@ -145,6 +145,33 @@ export default function ProjectPage() {
     }
   };
 
+  /**
+   * Handles the editing of project details by updating the project's start date and end date.
+   * Sends a patch request to update the project information in the backend.
+   *
+   * @function handleEditDetails
+   * @param {Date} [startDate] - The new start date for the project, if provided.
+   * @param {Date} [endDate] - The new end date for the project, if provided.
+   * @throws Will set an error state if the API request fails.
+   */
+  const handleEditDetails = (startDate?: Date, endDate?: Date) => {
+    if (id) {
+      apiClient
+        .projects_PatchProject(
+          id,
+          new ProjectPatchDTO({
+            start_date: startDate,
+            end_date: endDate,
+          }),
+        )
+        .then((p) => {
+          setProject(p);
+          setError(undefined);
+        })
+        .catch((e) => setError(e));
+    }
+  };
+
   const overviewRef = useRef<HTMLDivElement>(null);
   const contributorsRef = useRef<HTMLDivElement>(null);
   const worksRef = useRef<HTMLDivElement>(null);
@@ -197,7 +224,10 @@ export default function ProjectPage() {
           </div>
           {/* Side Panel */}
           <aside className="space-y-8">
-            <ProjectDetails project={project}></ProjectDetails>
+            <ProjectDetails
+              onSave={handleEditDetails}
+              project={project}
+            ></ProjectDetails>
             <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
           </aside>
         </main>
