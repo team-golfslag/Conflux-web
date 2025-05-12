@@ -87,12 +87,11 @@ export default function ProjectPage() {
   }, [apiClient, id]);
 
   /**
-   * Handles the editing of a project's overview by updating the title and description.
+   * Handles the editing of a project's title
    *
    * @param {string} [title] - The new title for the project's overview. Defaults to an empty string if not provided.
-   * @param {string} [description] - The new description for the project's overview. Defaults to an empty string if not provided.
    */
-  const handleEditOverview = (title?: string, description?: string) => {
+  const handleEditTitle = (title?: string) => {
     const titleDto: ProjectTitleDTO[] = [
       new ProjectTitleDTO({
         text: title ?? "",
@@ -100,6 +99,29 @@ export default function ProjectPage() {
         start_date: new Date(),
       }),
     ];
+
+    if (id) {
+      apiClient
+        .projects_PatchProject(
+          id,
+          new ProjectPatchDTO({
+            titles: titleDto,
+          }),
+        )
+        .then((p) => {
+          setProject(p);
+          setError(undefined);
+        })
+        .catch((e) => setError(e));
+    }
+  };
+
+  /**
+   * Handles the editing of a project's description
+   *
+   * @param {string} [description] - The new description for the project's overview. Defaults to an empty string if not provided.
+   */
+  const handleEditDescription = (description?: string) => {
     const descriptionDto: ProjectDescriptionDTO[] = [
       new ProjectDescriptionDTO({
         text: description ?? "",
@@ -112,7 +134,6 @@ export default function ProjectPage() {
         .projects_PatchProject(
           id,
           new ProjectPatchDTO({
-            titles: titleDto,
             descriptions: descriptionDto,
           }),
         )
@@ -159,7 +180,8 @@ export default function ProjectPage() {
               <ProjectOverview
                 title={project.primary_title?.text ?? "No title available"}
                 description={project.primary_description?.text}
-                onSave={handleEditOverview}
+                onSaveTitle={handleEditTitle}
+                onSaveDescription={handleEditDescription}
               />
             </Card>
             <Card

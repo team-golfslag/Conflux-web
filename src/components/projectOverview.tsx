@@ -13,7 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 type ProjectOverviewProps = {
   title?: string;
   description?: string;
-  onSave: (title: string, description: string) => void;
+  onSaveTitle: (title: string) => void;
+  onSaveDescription: (description: string) => void;
 };
 
 /**
@@ -123,12 +124,12 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
   };
 
   const handleSaveTitle = () => {
-    props.onSave(editTitle, editDescription);
+    props.onSaveTitle(editTitle);
     setEditTitleMode(false);
   };
 
   const handleSaveDescription = () => {
-    props.onSave(editTitle, editDescription);
+    props.onSaveDescription(editDescription);
     setEditDescriptionMode(false);
   };
 
