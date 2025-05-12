@@ -216,11 +216,7 @@ export default function AddContributorModal({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
-        >
+        <Button variant="outline" size="sm">
           <Plus className="h-4 w-4" />
         </Button>
       </DialogTrigger>
