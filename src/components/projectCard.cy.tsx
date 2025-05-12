@@ -99,10 +99,11 @@ const projectNoDates: ProjectDTO = {
 
 // --- Test Suite ---
 describe("<ProjectCard /> Component Rendering", () => {
-  const mountCard = (project: ProjectDTO, role?: string) => {
+  // Accept an optional array of roles
+  const mountCard = (project: ProjectDTO, roles?: string[]) => {
     mount(
       <BrowserRouter>
-        <ProjectCard project={project} role={role} />
+        <ProjectCard project={project} roles={roles} />
       </BrowserRouter>,
     );
   };
@@ -255,7 +256,7 @@ describe("<ProjectCard /> Component Rendering", () => {
   });
 
   it("shows the role when provided", () => {
-    mountCard(projectActive, "Owner");
+    mountCard(projectActive, ["Owner"]);
     cy.contains("Owner").should("be.visible");
   });
 
