@@ -50,6 +50,13 @@ export default function ProjectDetails({
     setEditMode(false);
   }
 
+  const startDate = project.start_date
+    ? format(project.start_date, "d MMMM yyyy")
+    : "N/A";
+  const endDate = project.end_date
+    ? format(project.end_date, "d MMMM yyyy")
+    : "N/A";
+
   return (
     <Card className="">
       <CardHeader className="flex items-center justify-between">
@@ -91,10 +98,8 @@ export default function ProjectDetails({
                   initialDate={project.start_date}
                   onDateChange={setEditStartDate}
                 />
-              ) : project.start_date ? (
-                format(project.start_date, "d MMMM yyyy")
               ) : (
-                "N/A"
+                startDate
               )}
             </div>
             <div className="flex items-center text-gray-700">
@@ -104,10 +109,8 @@ export default function ProjectDetails({
                   initialDate={project.end_date}
                   onDateChange={setEditEndDate}
                 />
-              ) : project.end_date ? (
-                format(project.end_date, "d MMMM yyyy")
               ) : (
-                "N/A"
+                endDate
               )}
             </div>
           </button>
