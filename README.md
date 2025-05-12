@@ -147,6 +147,13 @@ Once the image is built, you can run it as a container:
 docker run -p 80:80 conflux-web
 ```
 
+## Deployment
+
+For production deployment configuration and infrastructure setup, please refer to the dedicated deployment repository:
+[https://github.com/team-golfslag/conflux-deployment](https://github.com/team-golfslag/conflux-deployment)
+
+This repository contains all the necessary configuration files and documentation for deploying the Conflux application in a production environment.
+
 ## Environment Variables
 
 This project uses `.env` files to manage environment-specific configurations. Vite will automatically load variables from the appropriate file based on the command being run:
