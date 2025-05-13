@@ -19,6 +19,8 @@ import {
   ContributorRoleType,
   ContributorDTO,
   PersonDTO,
+  ContributorPositionDTO,
+  ContributorPositionType,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import {
@@ -31,6 +33,7 @@ interface ContributorFormData {
   email: string;
   orcidId: string;
   roles: ContributorRoleType[];
+  positions: ContributorPositionType[];
   leader: boolean;
   contact: boolean;
 }
@@ -55,6 +58,7 @@ export default function EditContributorModal({
     email: "",
     orcidId: "",
     roles: [],
+    positions: [],
     leader: false,
     contact: false,
   });
@@ -69,6 +73,7 @@ export default function EditContributorModal({
         email: contributor.person.email ?? "",
         orcidId: extractOrcidFromUrl(contributor.person.orcid_id) ?? "",
         roles: contributor.roles,
+        positions: contributor.positions?.map((p) => p.type) || [],
         leader: contributor.leader,
         contact: contributor.contact,
       });
@@ -90,6 +95,15 @@ export default function EditContributorModal({
     }));
   };
 
+  const handlePositionChange = (position: ContributorPositionType) => {
+    setFormData((prev) => ({
+      ...prev,
+      positions: prev.positions.includes(position)
+        ? prev.positions.filter((p) => p !== position)
+        : [...prev.positions, position],
+    }));
+  };
+
   const resetForm = () => {
     if (contributor) {
       setFormData({
@@ -97,6 +111,7 @@ export default function EditContributorModal({
         email: contributor.person.email ?? "",
         orcidId: extractOrcidFromUrl(contributor.person.orcid_id) ?? "",
         roles: contributor.roles,
+        positions: contributor.positions?.map((p) => p.type) || [],
         leader: contributor.leader,
         contact: contributor.contact,
       });
@@ -106,6 +121,7 @@ export default function EditContributorModal({
         email: "",
         orcidId: "",
         roles: [],
+        positions: [],
         leader: false,
         contact: false,
       });
@@ -127,7 +143,10 @@ export default function EditContributorModal({
         person: contributor.person,
         project_id: projectId,
         roles: formData.roles,
-        positions: contributor.positions || [],
+        positions: formData.positions.map(
+          (type) =>
+            new ContributorPositionDTO({ type, start_date: new Date() }),
+        ),
         leader: formData.leader,
         contact: formData.contact,
       });
@@ -166,6 +185,7 @@ export default function EditContributorModal({
           formData={formData}
           handleInputChange={handleInputChange}
           handleRoleChange={handleRoleChange}
+          handlePositionChange={handlePositionChange}
           setFormData={setFormData}
           isEdit={true}
         />

@@ -26,6 +26,8 @@ import {
   Person,
   PersonDTO,
   ContributorDTO,
+  ContributorPositionDTO,
+  ContributorPositionType,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import {
@@ -38,6 +40,7 @@ interface ContributorFormData {
   email: string;
   orcidId: string;
   roles: ContributorRoleType[];
+  positions: ContributorPositionType[]; // Added positions
   leader: boolean;
   contact: boolean;
 }
@@ -61,6 +64,7 @@ export default function AddContributorModal({
     email: "",
     orcidId: "",
     roles: [],
+    positions: [], // Initialize positions
     leader: false,
     contact: false,
   });
@@ -89,6 +93,15 @@ export default function AddContributorModal({
     }));
   };
 
+  const handlePositionChange = (position: ContributorPositionType) => {
+    setFormData((prev) => ({
+      ...prev,
+      positions: prev.positions.includes(position)
+        ? prev.positions.filter((p) => p !== position)
+        : [...prev.positions, position],
+    }));
+  };
+
   // Reset form
   const resetForm = () => {
     setFormData({
@@ -96,6 +109,7 @@ export default function AddContributorModal({
       email: "",
       orcidId: "",
       roles: [],
+      positions: [], // Reset positions
       leader: false,
       contact: false,
     });
@@ -194,7 +208,10 @@ export default function AddContributorModal({
         person: personToUse,
         project_id: projectId,
         roles: formData.roles,
-        positions: [],
+        positions: formData.positions.map(
+          (type) =>
+            new ContributorPositionDTO({ type, start_date: new Date() }),
+        ), // Map positions to DTOs
         leader: formData.leader,
         contact: formData.contact,
       });
@@ -302,6 +319,7 @@ export default function AddContributorModal({
             formData={formData}
             handleInputChange={handleInputChange}
             handleRoleChange={handleRoleChange}
+            handlePositionChange={handlePositionChange} // Pass handlePositionChange
             setFormData={setFormData}
           />
         </div>
