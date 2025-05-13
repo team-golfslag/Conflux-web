@@ -5,7 +5,7 @@
  */
 import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Product } from "@team-golfslag/conflux-api-client/src/client";
+import { ProductDTO } from "@team-golfslag/conflux-api-client/src/client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,7 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-type ProjectWorksProps = { products?: Product[] };
+type ProjectWorksProps = { products?: ProductDTO[] };
 
 /**
  * Project Works component

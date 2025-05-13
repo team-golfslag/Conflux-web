@@ -21,7 +21,8 @@ const Dashboard = () => {
     (project) => {
       // Find the current user in the project
       const currentUser = project.users.find(
-        (user) => user.id === session?.user?.id,
+        // TODO: make this id when Id is added to the user dto
+        (user) => user.scim_id === session?.user?.scim_id,
       );
 
       // Extract roles if the user is found, otherwise use default text

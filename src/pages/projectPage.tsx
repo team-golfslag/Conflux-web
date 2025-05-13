@@ -12,7 +12,7 @@ import ProjectWorks from "@/components/projectWorks";
 import Timeline, { TimelineItem } from "@/components/timeline";
 import { Link, useParams } from "react-router";
 import { useContext, useEffect, useState } from "react";
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
+import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 
@@ -30,7 +30,7 @@ const timelineData: TimelineItem[] = [
 export default function ProjectPage() {
   const { id } = useParams();
 
-  const [project, setProject] = useState<Project>();
+  const [project, setProject] = useState<ProjectDTO>();
   const [error, setError] = useState<Error>();
 
   const apiClient = useContext(ApiClientContext);
@@ -66,7 +66,7 @@ export default function ProjectPage() {
         <>
           {/* Title */}
           <div className="flex items-center justify-self-start rounded-lg bg-white p-3 text-2xl font-semibold">
-            <span>{project.title}</span>
+            <span>{project.primary_title?.text ?? "No title available"}</span>
             <Link
               to="edit"
               className="bg-primary text-primary-foreground m-2 flex items-center justify-center rounded-lg p-2 transition-colors duration-300"
@@ -84,7 +84,9 @@ export default function ProjectPage() {
                   <TabsTrigger value="works">Works</TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview">
-                  <ProjectOverview description={project.description} />
+                  <ProjectOverview
+                    description={project.primary_description?.text}
+                  />
                 </TabsContent>
                 <TabsContent value="contributors">
                   <ProjectContributors contributors={project.contributors} />

@@ -6,7 +6,13 @@
 import DashboardListView from "./dashboardListView";
 import { BrowserRouter } from "react-router-dom";
 import { mount } from "cypress/react";
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
+import {
+  ProjectDTO,
+  ProjectTitleDTO,
+  ProjectDescriptionDTO,
+  TitleType,
+  DescriptionType,
+} from "@team-golfslag/conflux-api-client/src/client";
 
 /// <reference types="cypress" />
 
@@ -20,6 +26,22 @@ describe("<DashboardListView />", () => {
       contributors: [],
       products: [],
       parties: [],
+      start_date: new Date().toISOString(),
+      organisations: [],
+      titles: [
+        new ProjectTitleDTO({
+          text: "Project 1",
+          type: TitleType.Primary,
+          start_date: new Date(),
+        }),
+      ],
+      descriptions: [
+        new ProjectDescriptionDTO({
+          text: "Description for project 1",
+          type: DescriptionType.Primary,
+        }),
+      ],
+      lastest_edit: new Date().toISOString(),
     },
     {
       id: "456",
@@ -29,6 +51,22 @@ describe("<DashboardListView />", () => {
       contributors: [],
       products: [],
       parties: [],
+      start_date: new Date().toISOString(),
+      organisations: [],
+      titles: [
+        new ProjectTitleDTO({
+          text: "Project 2",
+          type: TitleType.Primary,
+          start_date: new Date(),
+        }),
+      ],
+      descriptions: [
+        new ProjectDescriptionDTO({
+          text: "Description for project 2",
+          type: DescriptionType.Primary,
+        }),
+      ],
+      lastest_edit: new Date().toISOString(),
     },
     {
       id: "789",
@@ -38,12 +76,33 @@ describe("<DashboardListView />", () => {
       contributors: [],
       products: [],
       parties: [],
+      start_date: new Date().toISOString(),
+      organisations: [],
+      titles: [
+        new ProjectTitleDTO({
+          text: "Project 3",
+          type: TitleType.Primary,
+          start_date: new Date(),
+        }),
+      ],
+      descriptions: [
+        new ProjectDescriptionDTO({
+          text: "Description for project 3",
+          type: DescriptionType.Primary,
+        }),
+      ],
+      lastest_edit: new Date().toISOString(),
     },
   ];
 
   const mockData = mockProjects.map((p) => ({
-    project: new Project({
+    project: new ProjectDTO({
       ...p,
+      start_date: new Date(p.start_date),
+      primary_title: p.titles.find((title) => title.type === TitleType.Primary),
+      primary_description: p.descriptions.find(
+        (desc) => desc.type === DescriptionType.Primary,
+      ),
     }),
     role: "Member",
   }));
