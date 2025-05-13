@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useDebounce } from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Search, User } from "lucide-react";
@@ -139,17 +140,17 @@ export default function AddContributorModal({
     [apiClient],
   );
 
-  // Debounce search
+  // Use the debounce hook for search term
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  // Effect to search people when debounced search term changes
   useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      if (searchTerm) {
-        searchPeople(searchTerm);
-      } else {
-        setSearchResults([]);
-      }
-    }, 300);
-    return () => clearTimeout(debounceTimer);
-  }, [searchPeople, searchTerm]);
+    if (debouncedSearchTerm) {
+      searchPeople(debouncedSearchTerm);
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchPeople, debouncedSearchTerm]);
 
   // Handle person selection
   const selectPerson = (person: Person) => {
