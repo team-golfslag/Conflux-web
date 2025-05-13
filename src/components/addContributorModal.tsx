@@ -28,6 +28,7 @@ import {
   ContributorDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
+import { formatOrcidAsUrl, extractOrcidFromUrl } from "@/lib/formatters/orcidFormatter";
 
 interface ContributorFormData {
   name: string;
@@ -159,7 +160,7 @@ export default function AddContributorModal({
       ...prev,
       name: person.name,
       email: person.email ?? "",
-      orcidId: person.orcid_id ?? "",
+      orcidId: extractOrcidFromUrl(person.orcid_id) ?? "",
     }));
     setSearchResults([]);
     setSearchTerm("");
@@ -172,10 +173,11 @@ export default function AddContributorModal({
       if (selectedPerson) {
         personToUse = selectedPerson;
       } else {
+        const formattedOrcid = formData.orcidId ? formatOrcidAsUrl(formData.orcidId) : null;
         const personDTO = new PersonDTO({
           name: formData.name,
           email: formData.email,
-          or_ci_d: formData.orcidId || undefined,
+          or_ci_d: formattedOrcid || undefined,
         });
         personToUse = await apiClient.people_CreatePerson(personDTO);
         if (!personToUse?.id) {

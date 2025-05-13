@@ -29,6 +29,7 @@ import config from "@/config";
 import { useContext, useState } from "react";
 import OrcidIcon from "@/components/icons/orcidIcon";
 import { ApiClientContext } from "@/lib/ApiClientContext";
+import { formatOrcidAsUrl, extractOrcidFromUrl } from "@/lib/formatters/orcidFormatter";
 import {
   User,
   UserSession,
@@ -84,7 +85,16 @@ const ProfilePage = () => {
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">ORCID</p>
-                <p>{session.user?.orcid_id || "Not linked"}</p>
+                <p>{session.user?.orcid_id == null ?  "Not linked" : (
+                  <a
+                    href={session.user?.orcid_id ? formatOrcidAsUrl(session.user.orcid_id) ?? undefined : undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    {extractOrcidFromUrl(session.user?.orcid_id)}
+                  </a>
+                )}</p>
                 {session.user?.orcid_id ? (
                   <AlertDialog
                     open={isUnlinkDialogOpen}
