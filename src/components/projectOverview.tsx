@@ -178,9 +178,12 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
       <CardHeader>
         <div className="flex w-full rounded-lg">
           {!editTitleMode ? (
-            <div className="relative">
+            <div className="relative flex w-full">
+              <CardTitle className="w-full text-3xl/8 font-bold tracking-tight sm:text-4xl/10 md:text-5xl/14">
+                {props.title}
+              </CardTitle>
               <Button
-                className="float-end"
+                className="invisible float-end group-hover/cardHeader:visible"
                 variant="outline"
                 size="sm"
                 onClick={() => handleEditTitleClick()}
@@ -188,9 +191,6 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
                 <Edit className="mr-1 h-4 w-4" />
                 Edit
               </Button>
-              <CardTitle className="text-3xl/8 font-bold tracking-tight sm:text-4xl/10 md:text-5xl/14">
-                {props.title}
-              </CardTitle>
             </div>
           ) : (
             <div className="flex w-full flex-col">
@@ -226,7 +226,7 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="group">
         {editDescriptionMode ? (
           <div className="space-y-4">
             <h3 className="pt-1 font-semibold text-gray-700 sm:px-3">
@@ -268,7 +268,7 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
                 Primary description
               </h3>
               <Button
-                className="float-end"
+                className="invisible float-end group-hover/cardContent:visible"
                 variant="outline"
                 size="sm"
                 onClick={() => handleEditDescriptionClick()}
