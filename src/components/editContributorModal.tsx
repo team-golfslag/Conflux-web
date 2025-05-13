@@ -21,7 +21,10 @@ import {
   PersonDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
-import { formatOrcidAsUrl, extractOrcidFromUrl } from "@/lib/formatters/orcidFormatter";
+import {
+  formatOrcidAsUrl,
+  extractOrcidFromUrl,
+} from "@/lib/formatters/orcidFormatter";
 
 interface ContributorFormData {
   name: string;
@@ -115,7 +118,9 @@ export default function EditContributorModal({
       const updatedPerson = new PersonDTO({
         name: formData.name,
         email: formData.email,
-        or_ci_d: formData.orcidId ? formatOrcidAsUrl(formData.orcidId) || undefined : undefined,
+        or_ci_d: formData.orcidId
+          ? formatOrcidAsUrl(formData.orcidId) || undefined
+          : undefined,
       });
 
       const updatedContributor = new ContributorDTO({
