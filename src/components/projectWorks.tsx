@@ -4,7 +4,7 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import * as React from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductDTO } from "@team-golfslag/conflux-api-client/src/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,9 +48,13 @@ export default function ProjectWorks({
   };
 
   return (
-    <section className="space-y-4 rounded-lg bg-white p-6 shadow">
-      <h2 className="mb-4 text-xl font-semibold">Works</h2>
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+    <>
+      <CardHeader>
+        <CardTitle className="text-xl font-semibold">Works</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col gap-4">
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogTrigger asChild>
           <Button variant="outline">Edit Profile</Button>
         </DialogTrigger>
@@ -165,16 +169,18 @@ export default function ProjectWorks({
         </DialogContent>
       </Dialog>
       {products?.map((product) => (
-        <Card key={product.id} className="bg-gray-200">
-          <CardContent className="flex items-center gap-4 p-3">
-            <div>
-              <p className="font-semibold">{product.title}</p>
-              <p className="text-sm text-gray-600">Details</p>
-              <p className="text-sm text-gray-600">{product.url}</p>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </section>
+        <Card key={product.id}
+              className="flex-row items-center gap-4 border border-gray-200 p-3 shadow-sm"
+            >
+              <div>
+                <p className="font-semibold">{product.title}</p>
+                <p className="text-sm text-gray-600">Details</p>
+                <p className="text-sm text-gray-600">{product.url}</p>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </CardContent>
+    </>
   );
 }

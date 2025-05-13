@@ -21,12 +21,14 @@ import {
 import { DatePicker } from "@/components/ui/datepicker.tsx";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { useDebounce } from "@/hooks/useDebounce"; // Assuming you have or create this hook
+import { useSession } from "@/hooks/SessionContext";
 
 /** Project Search Page component <br>
  * Fetches projects from the backend using a debounced search term and selected sort order.
  * The first 15 projects matching the query are displayed.
  */
 const ProjectSearchPage = () => {
+  const { session } = useSession();
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
@@ -85,7 +87,7 @@ const ProjectSearchPage = () => {
   );
 
   return (
-    <>
+    <search>
       <div className="relative mx-auto mb-4 w-full max-w-2xl p-4">
         <Input
           className="mx-auto h-12 w-full max-w-2xl rounded-full text-lg"
@@ -155,15 +157,26 @@ const ProjectSearchPage = () => {
             {/* Display project cards - always render if projects exist */}
             {projects &&
               projects.length > 0 &&
-              projects
-                .slice(0, 15)
-                .map((project) => (
-                  <ProjectCard project={project} key={project.id} />
-                ))}
+              projects.slice(0, 15).map((project) => {
+                // Determine current user roles for search results
+                const currentUser = project.users.find(
+                  (user) => user.scim_id === session?.user?.scim_id,
+                );
+                const roles = currentUser?.roles
+                  ? currentUser.roles.map((role) => role.name)
+                  : [];
+                return (
+                  <ProjectCard
+                    project={project}
+                    roles={roles}
+                    key={project.id}
+                  />
+                );
+              })}
           </>
         )}
       </div>
-    </>
+    </search>
   );
 };
 

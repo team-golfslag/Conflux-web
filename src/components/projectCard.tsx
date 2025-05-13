@@ -12,10 +12,19 @@ import { Badge } from "@/components/ui/badge";
 
 export interface ProjectCardProps {
   project: ProjectDTO;
-  role?: string;
+  roles?: string[];
 }
 
-const ProjectCard = ({ project, role }: ProjectCardProps): JSX.Element => {
+/**
+ * Represents a component that displays information about a project in a card layout. Used on dashboard and search page
+ *
+ * @param {ProjectCardProps} props - The properties required to render the project card.
+ * @param {ProjectDTO} props.project - The project data to display.
+ * @param {string[]} props.roles - The user's roles in the project, if available.
+ *
+ * @returns {JSX.Element} A styled card element showing project details, including title, description, dates, contributors count, and user roles.
+ */
+const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
   // Format dates for display
   const startDate = project.start_date
     ? new Date(project.start_date).toLocaleDateString()
@@ -69,33 +78,41 @@ const ProjectCard = ({ project, role }: ProjectCardProps): JSX.Element => {
           </p>
 
           {/* Project Metadata */}
-          <div className="border-border/40 mt-auto flex flex-col gap-2 border-t pt-2">
-            <div className="group-hover:text-primary/70 flex items-center text-xs text-gray-500">
-              <CalendarIcon
-                size={14}
-                className="mr-2 text-gray-400 group-hover:text-blue-800"
-              />
-              <span>
-                {startDate}{" "}
-                {endDate !== "Ongoing" ? `- ${endDate}` : ": Ongoing"}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="group-hover:text-primary/70 flex items-center text-xs text-gray-500">
-                <UsersIcon
-                  size={14}
-                  className="mr-2 text-gray-400 group-hover:text-blue-800"
-                />
-                <span>
-                  {contributorCount} contributor
-                  {contributorCount !== 1 ? "s" : ""}
-                </span>
+          <div className="border-border/40 mt-auto border-t pt-2">
+            <div className="group-hover:text-primary/70 flex justify-between text-xs text-gray-500">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center">
+                  <CalendarIcon
+                    size={14}
+                    className="mr-2 text-gray-400 group-hover:text-blue-800"
+                  />
+                  <span>
+                    {startDate}{" "}
+                    {endDate !== "Ongoing" ? `- ${endDate}` : ": Ongoing"}
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <UsersIcon
+                    size={14}
+                    className="mr-2 text-gray-400 group-hover:text-blue-800"
+                  />
+                  <span>
+                    {contributorCount} contributor
+                    {contributorCount !== 1 ? "s" : ""}
+                  </span>
+                </div>
               </div>
-
-              {role && role.trim() !== "" && (
-                <div className="text-primary bg-primary/10 rounded-full px-2 py-1 text-xs font-medium">
-                  {role}
+              {roles && roles.length > 0 && (
+                <div className="flex flex-col items-end gap-1">
+                  {roles.map((r) => (
+                    <Badge
+                      key={r}
+                      variant="secondary"
+                      className="h-5 px-2 py-0 text-xs"
+                    >
+                      {r}
+                    </Badge>
+                  ))}
                 </div>
               )}
             </div>

@@ -105,11 +105,11 @@ export default function Header() {
 
   return (
     <header
-      className={`bg-primary text-primary-foreground sticky flex w-full items-center justify-center py-2 transition-all duration-400 ease-in-out ${
+      className={`bg-primary text-primary-foreground sticky flex w-full items-center justify-center transition-all duration-400 ease-in-out ${
         isScrollingUp ? "top-0" : "-top-20"
       } z-1`}
     >
-      <div className="flex w-full max-w-6xl items-center justify-between">
+      <div className="flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-8">
         <Link to="/dashboard">
           <div className="flex items-center gap-4">
             <div className="h-8 w-8 rounded-full">
@@ -126,9 +126,7 @@ export default function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-6 md:flex">
           <Link to="/projects/search">
-            <Button variant="ghost">
-              <Search className="h-6 w-6" />
-            </Button>
+            <Button variant="ghost">Search Projects</Button>
           </Link>
           <div
             className="relative"
@@ -193,7 +191,7 @@ export default function Header() {
       </div>
 
       {/* Mobile Navigation */}
-      <div className="flex gap-4 md:hidden">
+      <div className="flex gap-4 px-4 sm:px-8 md:hidden">
         <Link to="/projects/search">
           <Button variant="ghost">
             <div className="hover:text-secondary">
