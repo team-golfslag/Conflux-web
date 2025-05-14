@@ -222,6 +222,7 @@ export default function AddContributorModal({
       );
 
       if (!createdContributor?.person) {
+        console.log(createdContributor);
         throw new Error("Server returned an invalid contributor");
       }
 
@@ -330,7 +331,7 @@ export default function AddContributorModal({
           </Button>
           <Button
             onClick={addContributor}
-            disabled={!formData.name || formData.roles.length === 0}
+            disabled={!formData.name || formData.positions.length === 0}
           >
             Add Contributor
           </Button>

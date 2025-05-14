@@ -43,3 +43,14 @@ export const extractOrcidFromUrl = (
   );
   return match ? match[0] : null;
 };
+
+/**
+ * Validates the format of an ORCID identifier.
+ * @param orcidId The ORCID identifier (e.g., "0000-0000-0000-0000")
+ * @returns True if the ORCID identifier is in a valid format, false otherwise
+ */
+export const isValidOrcidFormat = (orcidId: string): boolean => {
+  // ORCID format: four groups of four digits, last group may have checksum 'X'
+  const regex = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
+  return regex.test(orcidId.trim());
+};
