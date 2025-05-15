@@ -3,19 +3,17 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-/**
- * This program has been developed by students from the bachelor Computer Science at Utrecht
- * University within the Software Project course.
- * © Copyright Utrecht University (Department of Information and Computing Sciences)
- */
 
 /// <reference types="cypress" />
 
 import { mount } from "cypress/react";
 import { BrowserRouter } from "react-router-dom";
-import ProjectCard from "./projectCard";
+import ProjectCard from "../projectCard.tsx";
 import {
+  ContributorDTO,
   DescriptionType,
+  Person,
+  ProjectDescriptionDTO,
   ProjectDTO,
   ProjectTitleDTO,
   TitleType,
@@ -31,116 +29,25 @@ const getDateRelativeToToday = (daysOffset: number): Date => {
 };
 
 // --- Test Data ---
-const mockProjectBase: ProjectDTO = {
+const mockProjectBase: ProjectDTO = new ProjectDTO({
   id: "proj-123",
-  primary_title: {
+  primary_title: new ProjectTitleDTO({
     text: "Test Project Alpha",
     type: TitleType.Primary,
     start_date: new Date("2023-01-01"),
-    init: function (this: ProjectTitleDTO, _data?: unknown) {
-      if (_data) {
-        for (const property in _data) {
-          if (Object.prototype.hasOwnProperty.call(_data, property)) {
-            if (property !== "init" && property !== "toJSON") {
-              (this as unknown as Record<string, unknown>)[property] = (
-                _data as unknown as Record<string, unknown>
-              )[property];
-            }
-          }
-        }
-      }
-    },
-    toJSON: function (this: ProjectTitleDTO): Record<string, unknown> {
-      const output: Record<string, unknown> = {};
-      for (const key in this) {
-        if (Object.prototype.hasOwnProperty.call(this, key)) {
-          if (key === "init" || key === "toJSON") {
-            continue;
-          }
-          const value = this[key as keyof ProjectTitleDTO];
-          if (value instanceof Date) {
-            output[key] = value.toISOString();
-          } else {
-            output[key] = value;
-          }
-        }
-      }
-      return output;
-    },
-  },
-  primary_description: {
+  }),
+  primary_description: new ProjectDescriptionDTO({
     text: "This is a test project description.",
     type: DescriptionType.Primary,
-    init: function (this: ProjectTitleDTO, _data?: unknown) {
-      if (_data) {
-        for (const property in _data) {
-          if (Object.prototype.hasOwnProperty.call(_data, property)) {
-            if (property !== "init" && property !== "toJSON") {
-              (this as unknown as Record<string, unknown>)[property] = (
-                _data as unknown as Record<string, unknown>
-              )[property];
-            }
-          }
-        }
-      }
-    },
-    toJSON: function (this: ProjectTitleDTO): Record<string, unknown> {
-      const output: Record<string, unknown> = {};
-      for (const key in this) {
-        if (Object.prototype.hasOwnProperty.call(this, key)) {
-          if (key === "init" || key === "toJSON") {
-            continue;
-          }
-          const value = this[key as keyof ProjectTitleDTO];
-          if (value instanceof Date) {
-            output[key] = value.toISOString();
-          } else {
-            output[key] = value;
-          }
-        }
-      }
-      return output;
-    },
-  },
+  }),
   titles: [],
   descriptions: [],
   users: [],
   contributors: [],
   products: [],
-  init: function (this: ProjectDTO, _data?: unknown) {
-    if (_data) {
-      for (const property in _data) {
-        if (Object.prototype.hasOwnProperty.call(_data, property)) {
-          // Avoid overwriting class methods if they are present in _data
-          if (property !== "init" && property !== "toJSON") {
-            (this as unknown as Record<string, unknown>)[property] = (
-              _data as unknown as Record<string, unknown>
-            )[property];
-          }
-        }
-      }
-    }
-  },
-  toJSON: function (this: ProjectDTO): Record<string, unknown> {
-    const output: Record<string, unknown> = {};
-    for (const key in this) {
-      if (Object.prototype.hasOwnProperty.call(this, key)) {
-        if (key === "init" || key === "toJSON") {
-          continue; // Skip methods
-        }
-        const value = this[key as keyof ProjectDTO];
-        if (value instanceof Date) {
-          output[key] = value.toISOString();
-        } else {
-          output[key] = value;
-        }
-      }
-    }
-    return output;
-  },
   start_date: new Date("2023-01-01"),
   organisations: [],
-};
+});
 
 const projectUpcoming: ProjectDTO = {
   ...mockProjectBase,
@@ -189,10 +96,11 @@ const projectNoDates: ProjectDTO = {
 
 // --- Test Suite ---
 describe("<ProjectCard /> Component Rendering", () => {
-  const mountCard = (project: ProjectDTO, role?: string) => {
+  // Accept an optional array of roles
+  const mountCard = (project: ProjectDTO, roles?: string[]) => {
     mount(
       <BrowserRouter>
-        <ProjectCard project={project} role={role} />
+        <ProjectCard project={project} roles={roles} />
       </BrowserRouter>,
     );
   };
@@ -257,61 +165,29 @@ describe("<ProjectCard /> Component Rendering", () => {
   });
 
   it("shows the correct contributor count", () => {
-    const projectWithContributors: ProjectDTO = {
+    const mockContributors = [
+      { id: "1", name: "Contributor 1" },
+      { id: "2", name: "Contributor 2" },
+      { id: "3", name: "Contributor 3" },
+    ];
+    const projectWithContributors: ProjectDTO = new ProjectDTO({
       ...mockProjectBase,
-      contributors: [
-        {
-          person: {
-            id: "1",
-            name: "Contributor 1",
-            init: mockProjectBase.init,
-            toJSON: mockProjectBase.toJSON,
-            schema_uri: "",
-          },
-          roles: [],
-          init: mockProjectBase.init,
-          toJSON: mockProjectBase.toJSON,
-          project_id: "",
-          positions: [],
-          leader: false,
-          contact: false,
-        },
-        {
-          person: {
-            id: "2",
-            name: "Contributor 2",
-            init: mockProjectBase.init,
-            toJSON: mockProjectBase.toJSON,
-            schema_uri: "",
-          },
-          roles: [],
-          init: mockProjectBase.init,
-          toJSON: mockProjectBase.toJSON,
-          project_id: "",
-          positions: [],
-          leader: false,
-          contact: false,
-        },
-        {
-          person: {
-            id: "3",
-            name: "Contributor 3",
-            init: mockProjectBase.init,
-            toJSON: mockProjectBase.toJSON,
-            schema_uri: "",
-          },
-          roles: [],
-          init: mockProjectBase.init,
-          toJSON: mockProjectBase.toJSON,
-          project_id: "",
-          positions: [],
-          leader: false,
-          contact: false,
-        },
-      ],
-      init: mockProjectBase.init,
-      toJSON: mockProjectBase.toJSON,
-    };
+      contributors: mockContributors.map(
+        (c) =>
+          new ContributorDTO({
+            person: new Person({
+              id: c.id,
+              name: c.name,
+              schema_uri: "",
+            }),
+            roles: [],
+            project_id: "",
+            positions: [],
+            leader: false,
+            contact: false,
+          }),
+      ),
+    });
     mountCard(projectWithContributors);
     cy.contains("3 contributors").should("be.visible");
   });
@@ -345,7 +221,7 @@ describe("<ProjectCard /> Component Rendering", () => {
   });
 
   it("shows the role when provided", () => {
-    mountCard(projectActive, "Owner");
+    mountCard(projectActive, ["Owner"]);
     cy.contains("Owner").should("be.visible");
   });
 

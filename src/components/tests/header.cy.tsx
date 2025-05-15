@@ -5,7 +5,7 @@
  */
 import { BrowserRouter } from "react-router-dom"; // Import BrowserRouter for Link component
 import { mount } from "cypress/react";
-import Header from "@/components/header";
+import Header from "@/components/header.tsx";
 
 /// <reference types="cypress" />
 
@@ -61,9 +61,9 @@ describe("<Header />", () => {
     // Simulate scrolling down
     cy.window().then((win) => {
       // Set a previous scroll position
-      win.scrollY = 0;
+      win.scrollTo(0, 0);
       // Then scroll down
-      win.scrollY = 100;
+      win.scrollTo(0, 100);
       win.dispatchEvent(new Event("scroll"));
     });
 
@@ -73,7 +73,7 @@ describe("<Header />", () => {
     // Simulate scrolling up
     cy.window().then((win) => {
       // Mock the scroll event to simulate scrolling up
-      win.scrollY = 50; // Less than previous value
+      win.scrollTo(0, 50); // Less than previous value
       win.dispatchEvent(new Event("scroll"));
     });
 
