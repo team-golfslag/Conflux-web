@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import DashboardListView from "./dashboardListView";
+import DashboardListView from "../dashboardListView.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { mount } from "cypress/react";
 import {

@@ -4,7 +4,7 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import { mount } from "cypress/react";
-import { LoadingWrapper } from "@/components/loadingWrapper";
+import { LoadingWrapper } from "@/components/loadingWrapper.tsx";
 
 describe("<LoadingWrapper />", () => {
   it("renders the loading message when isLoading is true", () => {

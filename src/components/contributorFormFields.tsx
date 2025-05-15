@@ -21,7 +21,7 @@ import {
 import { getRoleDisplay } from "@/lib/formatters/roleFormatter";
 import { getPositionDisplay } from "@/lib/formatters/positionFormatter";
 
-interface ContributorFormData {
+export interface ContributorFormData {
   name: string;
   email: string;
   orcidId: string;

@@ -13,7 +13,7 @@
 
 import { mount } from "cypress/react";
 import { BrowserRouter } from "react-router-dom";
-import ProjectCard from "./projectCard";
+import ProjectCard from "../projectCard.tsx";
 import {
   DescriptionType,
   ProjectDescriptionDTO,
