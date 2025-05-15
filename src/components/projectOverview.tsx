@@ -28,7 +28,7 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
 
   // Check if the description is long enough to need expansion
   useEffect(() => {
-    if (descriptionRef.current && props.description) {
+    if (props.description) {
       const characterCount = props.description.length ?? 0;
 
       setShouldShowExpandButton(characterCount > 880);
