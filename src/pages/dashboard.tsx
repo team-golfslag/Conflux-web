@@ -21,18 +21,17 @@ const Dashboard = () => {
     (project) => {
       // Find the current user in the project
       const currentUser = project.users.find(
-        // TODO: make this id when Id is added to the user dto
         (user) => user.scim_id === session?.user?.scim_id,
       );
 
-      // Extract roles if the user is found, otherwise use default text
-      const roleText = currentUser?.roles
-        ? currentUser.roles.map((role) => role.name).join(", ")
-        : "No role assigned";
+      // Extract roles array if the user is found, otherwise default to empty array
+      const roles = currentUser?.roles
+        ? currentUser.roles.map((role) => role.name)
+        : [];
 
       return {
-        project: project,
-        role: roleText,
+        project,
+        roles,
       };
     },
   );

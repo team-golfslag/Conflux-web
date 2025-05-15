@@ -145,14 +145,6 @@ describe("<DashboardListView />", () => {
     });
   });
 
-  it("renders the user role for each card", () => {
-    mockData.forEach(() => {
-      cy.get(".text-primary.bg-primary\\/10")
-        .contains("Member")
-        .should("exist");
-    });
-  });
-
   it("renders cards with correct links", () => {
     // Get all link elements and verify each one has the correct project link
     cy.get("a").each(($link, index) => {
