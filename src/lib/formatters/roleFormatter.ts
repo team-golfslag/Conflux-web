@@ -33,39 +33,59 @@ export const getRoleDisplay = (
   role: ContributorRoleType,
 ): { short: string; long: string } => {
   const formatted = formatRoleName(role);
+  let description: string;
 
-  // Map of roles to their descriptions
-  const descriptions: Record<ContributorRoleType, string> = {
-    [ContributorRoleType.Conceptualization]:
-      "Ideas, formulation of research goals and aims",
-    [ContributorRoleType.DataCuration]:
-      "Management of research data and metadata",
-    [ContributorRoleType.FormalAnalysis]:
-      "Application of statistical or mathematical techniques",
-    [ContributorRoleType.FundingAcquisition]:
-      "Acquisition of financial support",
-    [ContributorRoleType.Investigation]:
-      "Conducting the research and investigation process",
-    [ContributorRoleType.Methodology]: "Development or design of methodology",
-    [ContributorRoleType.ProjectAdministration]:
-      "Management and coordination responsibility",
-    [ContributorRoleType.Resources]:
-      "Provision of materials, equipment, or other resources",
-    [ContributorRoleType.Software]:
-      "Programming, software development, and implementation",
-    [ContributorRoleType.Supervision]:
-      "Oversight and leadership responsibility",
-    [ContributorRoleType.Validation]: "Verification of results and experiments",
-    [ContributorRoleType.Visualization]:
-      "Preparation of visual data presentation",
-    [ContributorRoleType.WritingOriginalDraft]: "Creation of the initial draft",
-    [ContributorRoleType.WritingReviewEditing]:
-      "Critical review and commentary",
-  };
+  // Use switch case instead of a large record
+  switch (role) {
+    case ContributorRoleType.Conceptualization:
+      description = "Ideas, formulation of research goals and aims";
+      break;
+    case ContributorRoleType.DataCuration:
+      description = "Management of research data and metadata";
+      break;
+    case ContributorRoleType.FormalAnalysis:
+      description = "Application of statistical or mathematical techniques";
+      break;
+    case ContributorRoleType.FundingAcquisition:
+      description = "Acquisition of financial support";
+      break;
+    case ContributorRoleType.Investigation:
+      description = "Conducting the research and investigation process";
+      break;
+    case ContributorRoleType.Methodology:
+      description = "Development or design of methodology";
+      break;
+    case ContributorRoleType.ProjectAdministration:
+      description = "Management and coordination responsibility";
+      break;
+    case ContributorRoleType.Resources:
+      description = "Provision of materials, equipment, or other resources";
+      break;
+    case ContributorRoleType.Software:
+      description = "Programming, software development, and implementation";
+      break;
+    case ContributorRoleType.Supervision:
+      description = "Oversight and leadership responsibility";
+      break;
+    case ContributorRoleType.Validation:
+      description = "Verification of results and experiments";
+      break;
+    case ContributorRoleType.Visualization:
+      description = "Preparation of visual data presentation";
+      break;
+    case ContributorRoleType.WritingOriginalDraft:
+      description = "Creation of the initial draft";
+      break;
+    case ContributorRoleType.WritingReviewEditing:
+      description = "Critical review and commentary";
+      break;
+    default:
+      description = formatted;
+  }
 
   return {
     short: formatted,
-    long: descriptions[role] || formatted,
+    long: description,
   };
 };
 

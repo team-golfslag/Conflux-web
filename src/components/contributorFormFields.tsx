@@ -4,7 +4,10 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { ContributorRoleType } from "@team-golfslag/conflux-api-client/src/client";
+import {
+  ContributorRoleType,
+  ContributorPositionType,
+} from "@team-golfslag/conflux-api-client/src/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -16,12 +19,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getRoleDisplay } from "@/lib/formatters/roleFormatter";
+import { getPositionDisplay } from "@/lib/formatters/positionFormatter";
 
-interface ContributorFormData {
+export interface ContributorFormData {
   name: string;
   email: string;
   orcidId: string;
   roles: ContributorRoleType[];
+  positions: ContributorPositionType[];
   leader: boolean;
   contact: boolean;
 }
@@ -30,6 +35,7 @@ interface ContributorFormFieldsProps {
   formData: ContributorFormData;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleRoleChange: (role: ContributorRoleType) => void;
+  handlePositionChange: (position: ContributorPositionType) => void;
   setFormData: React.Dispatch<React.SetStateAction<ContributorFormData>>;
   isEdit?: boolean;
 }
@@ -38,6 +44,7 @@ export default function ContributorFormFields({
   formData,
   handleInputChange,
   handleRoleChange,
+  handlePositionChange,
   setFormData,
   isEdit = false,
 }: Readonly<ContributorFormFieldsProps>) {
@@ -83,6 +90,36 @@ export default function ContributorFormFields({
           onChange={handleInputChange}
           placeholder="0000-0000-0000-0000"
         />
+      </div>
+
+      <div className="grid grid-cols-4 items-start gap-4">
+        <Label className="pt-2 text-right">Positions</Label>
+        <div className="col-span-3 flex flex-wrap gap-2">
+          {Object.values(ContributorPositionType).map((position) => {
+            const positionDisplay = getPositionDisplay(position);
+            return (
+              <TooltipProvider key={position}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      key={position}
+                      variant={
+                        formData.positions.includes(position)
+                          ? "default"
+                          : "outline"
+                      }
+                      className="cursor-pointer"
+                      onClick={() => handlePositionChange(position)}
+                    >
+                      {positionDisplay.short}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>{positionDisplay.long}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          })}
+        </div>
       </div>
 
       <div className="grid grid-cols-4 items-start gap-4">

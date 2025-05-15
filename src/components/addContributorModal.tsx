@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useDebounce } from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Search, User } from "lucide-react";
@@ -25,14 +26,21 @@ import {
   Person,
   PersonDTO,
   ContributorDTO,
+  ContributorPositionDTO,
+  ContributorPositionType,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
+import {
+  formatOrcidAsUrl,
+  extractOrcidFromUrl,
+} from "@/lib/formatters/orcidFormatter";
 
 interface ContributorFormData {
   name: string;
   email: string;
   orcidId: string;
   roles: ContributorRoleType[];
+  positions: ContributorPositionType[]; // Added positions
   leader: boolean;
   contact: boolean;
 }
@@ -56,6 +64,7 @@ export default function AddContributorModal({
     email: "",
     orcidId: "",
     roles: [],
+    positions: [], // Initialize positions
     leader: false,
     contact: false,
   });
@@ -84,6 +93,15 @@ export default function AddContributorModal({
     }));
   };
 
+  const handlePositionChange = (position: ContributorPositionType) => {
+    setFormData((prev) => ({
+      ...prev,
+      positions: prev.positions.includes(position)
+        ? prev.positions.filter((p) => p !== position)
+        : [...prev.positions, position],
+    }));
+  };
+
   // Reset form
   const resetForm = () => {
     setFormData({
@@ -91,6 +109,7 @@ export default function AddContributorModal({
       email: "",
       orcidId: "",
       roles: [],
+      positions: [], // Reset positions
       leader: false,
       contact: false,
     });
@@ -139,17 +158,17 @@ export default function AddContributorModal({
     [apiClient],
   );
 
-  // Debounce search
+  // Use the debounce hook for search term
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  // Effect to search people when debounced search term changes
   useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      if (searchTerm) {
-        searchPeople(searchTerm);
-      } else {
-        setSearchResults([]);
-      }
-    }, 300);
-    return () => clearTimeout(debounceTimer);
-  }, [searchPeople, searchTerm]);
+    if (debouncedSearchTerm) {
+      searchPeople(debouncedSearchTerm);
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchPeople, debouncedSearchTerm]);
 
   // Handle person selection
   const selectPerson = (person: Person) => {
@@ -158,7 +177,7 @@ export default function AddContributorModal({
       ...prev,
       name: person.name,
       email: person.email ?? "",
-      orcidId: person.orcid_id ?? "",
+      orcidId: extractOrcidFromUrl(person.orcid_id) ?? "",
     }));
     setSearchResults([]);
     setSearchTerm("");
@@ -171,10 +190,13 @@ export default function AddContributorModal({
       if (selectedPerson) {
         personToUse = selectedPerson;
       } else {
+        const formattedOrcid = formData.orcidId
+          ? formatOrcidAsUrl(formData.orcidId)
+          : null;
         const personDTO = new PersonDTO({
           name: formData.name,
           email: formData.email,
-          or_ci_d: formData.orcidId || undefined,
+          or_ci_d: formattedOrcid || undefined,
         });
         personToUse = await apiClient.people_CreatePerson(personDTO);
         if (!personToUse?.id) {
@@ -186,7 +208,10 @@ export default function AddContributorModal({
         person: personToUse,
         project_id: projectId,
         roles: formData.roles,
-        positions: [],
+        positions: formData.positions.map(
+          (type) =>
+            new ContributorPositionDTO({ type, start_date: new Date() }),
+        ), // Map positions to DTOs
         leader: formData.leader,
         contact: formData.contact,
       });
@@ -197,6 +222,7 @@ export default function AddContributorModal({
       );
 
       if (!createdContributor?.person) {
+        console.log(createdContributor);
         throw new Error("Server returned an invalid contributor");
       }
 
@@ -294,6 +320,7 @@ export default function AddContributorModal({
             formData={formData}
             handleInputChange={handleInputChange}
             handleRoleChange={handleRoleChange}
+            handlePositionChange={handlePositionChange} // Pass handlePositionChange
             setFormData={setFormData}
           />
         </div>
@@ -304,7 +331,7 @@ export default function AddContributorModal({
           </Button>
           <Button
             onClick={addContributor}
-            disabled={!formData.name || formData.roles.length === 0}
+            disabled={!formData.name || formData.positions.length === 0}
           >
             Add Contributor
           </Button>

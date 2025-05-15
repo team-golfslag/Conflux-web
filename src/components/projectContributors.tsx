@@ -96,8 +96,7 @@ export default function ProjectContributors({
         <CardTitle className="text-xl font-semibold">Contributors</CardTitle>
         <div
           className={
-            "absolute right-0 items-center justify-between space-x-4 px-4 group-hover:flex" +
-            (editMode ? "" : " hidden")
+            "absolute right-0 items-center justify-between space-x-4 px-4 group-hover:flex"
           }
         >
           <Button variant="outline" size="sm" onClick={toggleEditMode}>
@@ -130,19 +129,6 @@ export default function ProjectContributors({
         )}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {project.users?.map((user) => (
-            <ContributorCard
-              key={user.scim_id}
-              id={user.scim_id}
-              name={user.name}
-              email={user.email}
-              orcidId={user.or_ci_d}
-              roles={user.roles}
-              isConfluxUser
-              editMode={editMode}
-            />
-          ))}
-
           {project.contributors?.map((contributor) => (
             <div key={contributor.person.id}>
               <ContributorCard

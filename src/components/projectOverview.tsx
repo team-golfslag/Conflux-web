@@ -44,7 +44,7 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
 
   // Effect to determine whether to show expand button
   useEffect(() => {
-    if (descriptionRef.current && props.description) {
+    if (props.description) {
       const characterCount = props.description.length ?? 0;
       setShouldShowExpandButton(characterCount > descriptionTruncateLength);
     }
