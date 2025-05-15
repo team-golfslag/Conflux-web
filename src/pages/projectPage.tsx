@@ -124,7 +124,7 @@ export default function ProjectPage() {
               <ProjectContributors project={project} />
             </Card>
             <Card ref={worksRef} className="scroll-mt-12" title="Works">
-              <ProjectWorks products={project.products} />
+              <ProjectWorks project={project} />
             </Card>
           </div>
           {/* Side Panel */}

@@ -11,7 +11,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -25,7 +24,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import {
   ProductCategoryType,
   ProductDTO,
@@ -33,12 +31,13 @@ import {
   ProjectPatchDTO,
   ProjectDTO,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 
 type AddWorkModalProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  product: ProductDTO;
   project: ProjectDTO;
 };
 
@@ -52,6 +51,7 @@ function getEnumKeys<
 export default function AddProductModal({
   isOpen,
   onOpenChange,
+  product,
   project,
 }: Readonly<AddWorkModalProps>) {
   const apiClient = useContext(ApiClientContext);
@@ -65,6 +65,15 @@ export default function AddProductModal({
     ProductCategoryType | undefined
   >();
 
+  useEffect(() => {
+    if (product) {
+      setProductTitle(product.title);
+      if (product.url) setUrl(product.url);
+      setProductType(product.type);
+      setCategory(product.categories[0]);
+    }
+  }, [product]);
+
   const resetModal = () => {
     setProductTitle("");
     setUrl("");
@@ -72,17 +81,22 @@ export default function AddProductModal({
     setCategory(undefined);
   };
 
-  const addProduct = async () => {
+  const saveEditedProduct = async () => {
+    if (!product) return;
     try {
       if (productType && category) {
         const newProduct = new ProductDTO({
+          id: product.id,
           url: url,
           title: productTitle,
           type: productType,
           categories: [category],
         });
 
-        project.products.push(newProduct);
+        const index = project.products.findIndex((c) => c.id === newProduct.id);
+        if (index !== -1) {
+          project.products[index] = newProduct;
+        }
 
         const projectPatchDTO = new ProjectPatchDTO({
           products: project.products,
@@ -96,13 +110,13 @@ export default function AddProductModal({
           throw new Error("Server returned an invalid product");
         }
       }
+
       onOpenChange(false);
-      resetModal();
     } catch (error) {
-      console.log("Error adding product:", error);
+      console.error("Error updating product:", error);
       alert(
-        `Failed to add product: ${
-          error instanceof Error ? error.message : "Unkown error"
+        `Failed to update product: ${
+          error instanceof Error ? error.message : "Unknown error"
         }`,
       );
     }
@@ -110,15 +124,12 @@ export default function AddProductModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Plus className="h-4 w-4" />
-        </Button>
-      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Product</DialogTitle>
-          <DialogDescription>Add a product to your project.</DialogDescription>
+          <DialogTitle>Edit Product</DialogTitle>
+          <DialogDescription>
+            Edit the product of your project.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
@@ -204,8 +215,11 @@ export default function AddProductModal({
           >
             Cancel
           </Button>
-          <Button onClick={addProduct} disabled={!productTitle || !productType}>
-            Add Product
+          <Button
+            onClick={saveEditedProduct}
+            disabled={!productTitle || !productType}
+          >
+            Apply Changes
           </Button>
         </DialogFooter>
       </DialogContent>
