@@ -135,7 +135,7 @@ export default function EditContributorModal({
         name: formData.name,
         email: formData.email,
         or_ci_d: formData.orcidId
-          ? formatOrcidAsUrl(formData.orcidId) || undefined
+          ? (formatOrcidAsUrl(formData.orcidId) ?? undefined)
           : undefined,
       });
 

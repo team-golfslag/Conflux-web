@@ -196,7 +196,7 @@ export default function AddContributorModal({
         const personDTO = new PersonDTO({
           name: formData.name,
           email: formData.email,
-          or_ci_d: formattedOrcid || undefined,
+          or_ci_d: formattedOrcid ?? undefined,
         });
         personToUse = await apiClient.people_CreatePerson(personDTO);
         if (!personToUse?.id) {
