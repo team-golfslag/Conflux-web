@@ -115,101 +115,111 @@ export default function ProjectWorks({ project }: Readonly<ProjectWorksProps>) {
 
         {[
           ProductCategoryType.Input,
-          /*ProductCategoryType.Output,
-          ProductCategoryType.Internal,*/
+          ProductCategoryType.Output,
+          ProductCategoryType.Internal,
         ].map((catType) => (
           <>
-            <h2>{catType.toString()}</h2>
-            {project.products?.map((product) => (
-              <Card className="flex flex-col gap-1 border border-gray-200 p-3 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">{product.title}</p>
-                  {editMode && (
-                    <div>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="p-0 text-blue-500 hover:text-blue-700"
-                              onClick={() => {
-                                setIsEditModalOpen(true);
-                                setEditedProduct(product);
-                              }}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Edit Product</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <AlertDialog>
+            {project.products?.filter((p) =>
+              p.categories.some((c) => c === catType),
+            ).length > 0 ? (
+              <h2>{catType.toString()}</h2>
+            ) : (
+              ""
+            )}
+            {project.products
+              ?.filter((p) => p.categories.some((c) => c === catType))
+              .map((product) => (
+                <Card className="flex flex-col gap-1 border border-gray-200 p-3 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold">{product.title}</p>
+                    {editMode && (
+                      <div>
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-destructive hover:text-destructive/80 p-0"
-                                  onClick={() => {
-                                    setIsDeleteDialogOpen(true);
-                                    setDeletedProduct(product);
-                                  }}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="p-0 text-blue-500 hover:text-blue-700"
+                                onClick={() => {
+                                  setIsEditModalOpen(true);
+                                  setEditedProduct(product);
+                                }}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Delete contributor</TooltipContent>
+                            <TooltipContent>Edit Product</TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
-                      </AlertDialog>
-                      <AlertDialog
-                        open={
-                          isDeleteDialogOpen &&
-                          deletedProduct?.id === product.id
-                        }
-                        onOpenChange={(isOpen) => {
-                          if (!isOpen) {
-                            setIsDeleteDialogOpen(false);
-                            setDeletedProduct(null);
+                        <AlertDialog>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-destructive hover:text-destructive/80 p-0"
+                                    onClick={() => {
+                                      setIsDeleteDialogOpen(true);
+                                      setDeletedProduct(product);
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                Delete contributor
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </AlertDialog>
+                        <AlertDialog
+                          open={
+                            isDeleteDialogOpen &&
+                            deletedProduct?.id === product.id
                           }
-                        }}
-                      >
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Are you absolutely sure?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This will remove {product.title} from this
-                              project. This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              className="bg-destructive hover:text-destructive border-destructive border-1 text-white hover:bg-white/10 hover:font-bold"
-                              onClick={deleteProduct}
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
+                          onOpenChange={(isOpen) => {
+                            if (!isOpen) {
+                              setIsDeleteDialogOpen(false);
+                              setDeletedProduct(null);
+                            }
+                          }}
+                        >
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Are you absolutely sure?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will remove {product.title} from this
+                                project. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-destructive hover:text-destructive border-destructive border-1 text-white hover:bg-white/10 hover:font-bold"
+                                onClick={deleteProduct}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    )}
+                  </div>
+                  {product.url && (
+                    <p className="text-sm text-gray-600">{product.url}</p>
                   )}
-                </div>
-                {product.url && (
-                  <p className="text-sm text-gray-600">{product.url}</p>
-                )}
-                <Badge variant="secondary" className="h-5 px-2 py-0 text-xs">
-                  {product.type}
-                </Badge>
-              </Card>
-            ))}
+                  <Badge variant="secondary" className="h-5 px-2 py-0 text-xs">
+                    {product.type}
+                  </Badge>
+                </Card>
+              ))}
           </>
         ))}
       </CardContent>
