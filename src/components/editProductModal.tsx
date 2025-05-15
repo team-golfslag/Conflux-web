@@ -74,13 +74,6 @@ export default function AddProductModal({
     }
   }, [product]);
 
-  const resetModal = () => {
-    setProductTitle("");
-    setUrl("");
-    setProductType(undefined);
-    setCategory(undefined);
-  };
-
   const saveEditedProduct = async () => {
     if (!product) return;
     try {
@@ -210,7 +203,6 @@ export default function AddProductModal({
             variant="outline"
             onClick={() => {
               onOpenChange(false);
-              resetModal();
             }}
           >
             Cancel
