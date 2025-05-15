@@ -17,83 +17,35 @@ import {
 /// <reference types="cypress" />
 
 describe("<DashboardListView />", () => {
-  const mockProjects = [
-    {
-      id: "123",
-      title: "Project 1",
-      description: "Description for project 1",
-      users: [],
-      contributors: [],
-      products: [],
-      parties: [],
-      start_date: new Date().toISOString(),
-      organisations: [],
-      titles: [
-        new ProjectTitleDTO({
-          text: "Project 1",
-          type: TitleType.Primary,
-          start_date: new Date(),
-        }),
-      ],
-      descriptions: [
-        new ProjectDescriptionDTO({
-          text: "Description for project 1",
-          type: DescriptionType.Primary,
-        }),
-      ],
-      lastest_edit: new Date().toISOString(),
-    },
-    {
-      id: "456",
-      title: "Project 2",
-      description: "Description for project 2",
-      users: [],
-      contributors: [],
-      products: [],
-      parties: [],
-      start_date: new Date().toISOString(),
-      organisations: [],
-      titles: [
-        new ProjectTitleDTO({
-          text: "Project 2",
-          type: TitleType.Primary,
-          start_date: new Date(),
-        }),
-      ],
-      descriptions: [
-        new ProjectDescriptionDTO({
-          text: "Description for project 2",
-          type: DescriptionType.Primary,
-        }),
-      ],
-      lastest_edit: new Date().toISOString(),
-    },
-    {
-      id: "789",
-      title: "Project 3",
-      description: "Description for project 3",
-      users: [],
-      contributors: [],
-      products: [],
-      parties: [],
-      start_date: new Date().toISOString(),
-      organisations: [],
-      titles: [
-        new ProjectTitleDTO({
-          text: "Project 3",
-          type: TitleType.Primary,
-          start_date: new Date(),
-        }),
-      ],
-      descriptions: [
-        new ProjectDescriptionDTO({
-          text: "Description for project 3",
-          type: DescriptionType.Primary,
-        }),
-      ],
-      lastest_edit: new Date().toISOString(),
-    },
+  const mockInfo = [
+    { id: "123", title: "Project 1", description: "Description for project 1" },
+    { id: "456", title: "Project 2", description: "Description for project 2" },
+    { id: "789", title: "Project 3", description: "Description for project 3" },
   ];
+  const mockProjects: ProjectDTO[] = mockInfo.map(
+    (info) =>
+      new ProjectDTO({
+        id: info.id,
+        users: [],
+        contributors: [],
+        products: [],
+        start_date: new Date(),
+        organisations: [],
+        titles: [
+          new ProjectTitleDTO({
+            text: info.title,
+            type: TitleType.Primary,
+            start_date: new Date(),
+          }),
+        ],
+        descriptions: [
+          new ProjectDescriptionDTO({
+            text: info.description,
+            type: DescriptionType.Primary,
+          }),
+        ],
+      }),
+  );
 
   const mockData = mockProjects.map((p) => ({
     project: new ProjectDTO({
@@ -133,14 +85,14 @@ describe("<DashboardListView />", () => {
 
   it("renders all project titles", () => {
     mockProjects.forEach((project) => {
-      cy.contains("h3", project.title).should("be.visible");
+      cy.contains("h3", project.titles[0]!.text).should("be.visible");
     });
   });
 
   it("renders all project descriptions (truncated)", () => {
     mockProjects.forEach((project) => {
       // Check for the beginning of each description, since they get truncated
-      const beginningOfDesc = project.description.substring(0, 20);
+      const beginningOfDesc = project.descriptions[0].text.substring(0, 20);
       cy.contains("p", beginningOfDesc).should("exist");
     });
   });
