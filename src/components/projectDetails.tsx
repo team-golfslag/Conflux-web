@@ -26,6 +26,10 @@ const determineStatus = (
 export default function ProjectDetails({
   project,
 }: Readonly<ProjectDetailsProps>) {
+  const projectLead = project.contributors.find(
+    (contributor) => contributor.leader,
+  );
+
   return (
     <Card className="">
       <CardHeader>
@@ -41,7 +45,9 @@ export default function ProjectDetails({
         <div>
           <h3 className="font-semibold">Project Lead</h3>
           {/* TODO: make this the actual project lead*/}
-          <p className="text-gray-700">Dr. J. Doe</p>
+          <p className="text-gray-700">
+            {projectLead ? projectLead.person.name : "N/A"}
+          </p>
         </div>
         <div>
           <h3 className="font-semibold">Dates</h3>

@@ -165,6 +165,33 @@ export default function ContributorCard({
         </div>
 
         <div className="mt-auto flex flex-col gap-1 pt-1">
+          {positions && positions.length > 0 && (
+            <div className="flex flex-wrap justify-start gap-1">
+              {positions.map((positionDTO) => {
+                const displayablePosition = positionDTO.type;
+                const positionDisplay = getPositionDisplay(displayablePosition);
+                return (
+                  <TooltipProvider key={positionDisplay.short}>
+                    {" "}
+                    {/* Using positionDisplay.short as key */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge
+                          variant="outline"
+                          className="h-5 px-2 py-0 text-xs"
+                        >
+                          {positionDisplay.short}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        {positionDisplay.long}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                );
+              })}
+            </div>
+          )}
           {roles.length > 0 && (
             <div className="flex flex-wrap justify-start gap-1">
               {roles.map((role, index) => {
@@ -200,33 +227,6 @@ export default function ContributorCard({
                     </Badge>
                   );
                 }
-              })}
-            </div>
-          )}
-          {positions && positions.length > 0 && (
-            <div className="flex flex-wrap justify-start gap-1">
-              {positions.map((positionDTO) => {
-                const displayablePosition = positionDTO.type;
-                const positionDisplay = getPositionDisplay(displayablePosition);
-                return (
-                  <TooltipProvider key={positionDisplay.short}>
-                    {" "}
-                    {/* Using positionDisplay.short as key */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Badge
-                          variant="outline"
-                          className="h-5 px-2 py-0 text-xs"
-                        >
-                          {positionDisplay.short}
-                        </Badge>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        {positionDisplay.long}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                );
               })}
             </div>
           )}
