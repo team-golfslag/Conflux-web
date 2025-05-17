@@ -137,6 +137,7 @@ export default function ProjectContributors({
                 email={contributor.person.email}
                 orcidId={contributor.person.orcid_id}
                 roles={contributor.roles}
+                positions={contributor.positions}
                 isLeader={contributor.leader}
                 isContact={contributor.contact}
                 editMode={editMode}

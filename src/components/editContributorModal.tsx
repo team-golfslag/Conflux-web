@@ -202,7 +202,7 @@ export default function EditContributorModal({
           </Button>
           <Button
             onClick={saveEditedContributor}
-            disabled={!formData.name || formData.roles.length === 0}
+            disabled={!formData.name || formData.positions.length === 0}
           >
             Save Changes
           </Button>
