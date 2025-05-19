@@ -33,19 +33,25 @@ export interface ContributorFormData {
 
 interface ContributorFormFieldsProps {
   formData: ContributorFormData;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleRoleChange: (role: ContributorRoleType) => void;
-  handlePositionChange: (position: ContributorPositionType) => void;
-  setFormData: React.Dispatch<React.SetStateAction<ContributorFormData>>;
+  onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onOrcidIdChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onRoleChange: (role: ContributorRoleType) => void;
+  onPositionChange: (position: ContributorPositionType) => void;
+  onLeaderChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onContactChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isEdit?: boolean;
 }
 
 export default function ContributorFormFields({
   formData,
-  handleInputChange,
-  handleRoleChange,
-  handlePositionChange,
-  setFormData,
+  onNameChange,
+  onEmailChange,
+  onOrcidIdChange,
+  onRoleChange,
+  onPositionChange,
+  onLeaderChange,
+  onContactChange,
   isEdit = false,
 }: Readonly<ContributorFormFieldsProps>) {
   const idPrefix = isEdit ? "edit-" : "";
@@ -60,7 +66,7 @@ export default function ContributorFormFields({
           name="name"
           className="col-span-3"
           value={formData.name}
-          onChange={handleInputChange}
+          onChange={onNameChange}
         />
       </div>
 
@@ -74,7 +80,7 @@ export default function ContributorFormFields({
           type="email"
           className="col-span-3"
           value={formData.email}
-          onChange={handleInputChange}
+          onChange={onEmailChange}
         />
       </div>
 
@@ -87,7 +93,7 @@ export default function ContributorFormFields({
           name="orcidId"
           className="col-span-3"
           value={formData.orcidId}
-          onChange={handleInputChange}
+          onChange={onOrcidIdChange}
           placeholder="0000-0000-0000-0000"
         />
       </div>
@@ -109,7 +115,7 @@ export default function ContributorFormFields({
                           : "outline"
                       }
                       className="cursor-pointer"
-                      onClick={() => handlePositionChange(position)}
+                      onClick={() => onPositionChange(position)}
                     >
                       {positionDisplay.short}
                     </Badge>
@@ -137,7 +143,7 @@ export default function ContributorFormFields({
                         formData.roles.includes(role) ? "default" : "outline"
                       }
                       className="cursor-pointer"
-                      onClick={() => handleRoleChange(role)}
+                      onClick={() => onRoleChange(role)}
                     >
                       {roleDisplay.short}
                     </Badge>
@@ -158,9 +164,12 @@ export default function ContributorFormFields({
           <Switch
             id={`${idPrefix}leader`}
             checked={formData.leader}
-            onCheckedChange={(checked) =>
-              setFormData((prev) => ({ ...prev, leader: checked }))
-            }
+            onCheckedChange={(checked) => {
+              const event = {
+                target: { checked },
+              } as React.ChangeEvent<HTMLInputElement>;
+              onLeaderChange(event);
+            }}
           />
           <Label
             htmlFor={`${idPrefix}leader`}
@@ -179,9 +188,12 @@ export default function ContributorFormFields({
           <Switch
             id={`${idPrefix}contact`}
             checked={formData.contact}
-            onCheckedChange={(checked) =>
-              setFormData((prev) => ({ ...prev, contact: checked }))
-            }
+            onCheckedChange={(checked) => {
+              const event = {
+                target: { checked },
+              } as React.ChangeEvent<HTMLInputElement>;
+              onContactChange(event);
+            }}
           />
           <Label
             htmlFor={`${idPrefix}contact`}
