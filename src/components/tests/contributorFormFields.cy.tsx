@@ -37,10 +37,13 @@ describe("ContributorFormFields Component", () => {
     mount(
       <ContributorFormFields
         formData={initialValues}
-        handleInputChange={cy.stub().as("handleInputChange")}
-        handleRoleChange={cy.stub().as("handleRoleChange")}
-        handlePositionChange={cy.stub().as("handlePositionChange")}
-        setFormData={cy.stub().as("setFormData")}
+        onNameChange={cy.stub().as("handleNameChange")}
+        onEmailChange={cy.stub().as("handleEmailChange")}
+        onOrcidIdChange={cy.stub().as("handleOrcidIdChange")}
+        onRoleChange={cy.stub().as("handleRoleChange")}
+        onPositionChange={cy.stub().as("handlePositionChange")}
+        onLeaderChange={cy.stub().as("handleLeaderChange")}
+        onContactChange={cy.stub().as("handleContactChange")}
       />,
     );
 
@@ -59,17 +62,17 @@ describe("ContributorFormFields Component", () => {
     // Test name input
     cy.get('input[id="name"]').clear();
     cy.get('input[id="name"]').type("New Name");
-    cy.get("@handleInputChange").should("have.been.called");
+    cy.get("@handleNameChange").should("have.been.called");
 
     // Test email input
     cy.get('input[id="email"]').clear();
     cy.get('input[id="email"]').type("new.email@example.com");
-    cy.get("@handleInputChange").should("have.been.called");
+    cy.get("@handleEmailChange").should("have.been.called");
 
     // Test orcid input
     cy.get('input[id="orcidId"]').clear();
     cy.get('input[id="orcidId"]').type("0000-0003-4567-8901");
-    cy.get("@handleInputChange").should("have.been.called");
+    cy.get("@handleOrcidIdChange").should("have.been.called");
   });
 
   it("displays proper labels for each field", () => {
@@ -83,10 +86,13 @@ describe("ContributorFormFields Component", () => {
     mount(
       <ContributorFormFields
         formData={emptyInitialValues}
-        handleInputChange={cy.stub().as("changeHandler")}
-        handleRoleChange={cy.stub().as("changeHandler")}
-        handlePositionChange={cy.stub().as("changeHandler")}
-        setFormData={cy.stub().as("changeHandler")}
+        onNameChange={cy.stub().as("handleNameChange")}
+        onEmailChange={cy.stub().as("handleEmailChange")}
+        onOrcidIdChange={cy.stub().as("handleOrcidIdChange")}
+        onRoleChange={cy.stub().as("handleRoleChange")}
+        onPositionChange={cy.stub().as("handlePositionChange")}
+        onLeaderChange={cy.stub().as("handleLeaderChange")}
+        onContactChange={cy.stub().as("handleContactChange")}
       />,
     );
 
