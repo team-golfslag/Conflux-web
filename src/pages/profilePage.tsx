@@ -26,9 +26,9 @@ import {
 import { useSession } from "@/hooks/SessionContext";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import config from "@/config";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import OrcidIcon from "@/components/icons/orcidIcon";
-import { ApiClientContext } from "@/lib/ApiClientContext";
+import { ApiMutation } from "@/components/apiMutation";
 import {
   formatOrcidAsUrl,
   extractOrcidFromUrl,
@@ -36,34 +36,15 @@ import {
 import {
   User,
   UserSession,
+  ApiClient,
 } from "@team-golfslag/conflux-api-client/src/client";
 
 const ProfilePage = () => {
-  const apiClient = useContext(ApiClientContext);
-
   const { session, loading, logout, saveSession } = useSession();
   const [isUnlinkDialogOpen, setIsUnlinkDialogOpen] = useState(false);
 
   const handleLinkOrcid = () => {
     window.location.href = `${config.apiBaseURL}/orcid/link?redirectUri=${encodeURIComponent(window.location.href)}`;
-  };
-
-  const handleUnlinkOrcid = () => {
-    apiClient.orcid_OrcidUnlink().then(() => {
-      console.log("ORCID unlinked successfully");
-      if (session?.user) {
-        // Create a new session object with the updated user data
-        const updatedSession = new UserSession({
-          ...session,
-          user: new User({
-            ...session.user,
-            orcid_id: undefined,
-          }),
-        });
-        saveSession(updatedSession); // Pass the new object to saveSession
-      }
-      setIsUnlinkDialogOpen(false);
-    });
   };
 
   return (
@@ -127,9 +108,34 @@ const ProfilePage = () => {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleUnlinkOrcid}>
-                          Unlink
-                        </AlertDialogAction>
+                        <ApiMutation
+                          mutationFn={(apiClient: ApiClient) =>
+                            apiClient.orcid_OrcidUnlink()
+                          }
+                          data={{}}
+                          loadingMessage="Unlinking ORCID..."
+                          onSuccess={() => {
+                            console.log("ORCID unlinked successfully");
+                            if (session?.user) {
+                              // Create a new session object with the updated user data
+                              const updatedSession = new UserSession({
+                                ...session,
+                                user: new User({
+                                  ...session.user,
+                                  orcid_id: undefined,
+                                }),
+                              });
+                              saveSession(updatedSession); // Pass the new object to saveSession
+                            }
+                            setIsUnlinkDialogOpen(false);
+                          }}
+                        >
+                          {({ onSubmit }) => (
+                            <AlertDialogAction onClick={onSubmit}>
+                              Unlink
+                            </AlertDialogAction>
+                          )}
+                        </ApiMutation>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>

@@ -8,6 +8,7 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ProjectDTO,
   ContributorDTO,
+  ApiClient,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Edit, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,17 +26,21 @@ import {
 import AddContributorModal from "@/components/addContributorModal";
 import EditContributorModal from "@/components/editContributorModal";
 import ContributorCard from "@/components/contributorCard";
+import { ApiMutation } from "@/components/apiMutation";
 
 type ProjectContributorsProps = {
   project: ProjectDTO;
+  onProjectUpdate: () => void;
 };
 
 /**
- * Project Contributors component
- * @param props the people to be turned into a card
+ * Project Contributors component with proper error handling
+ * @param project the project containing contributors
+ * @param onProjectUpdate callback to trigger project data refresh
  */
-export default function ProjectContributors({
+export default function ImprovedProjectContributors({
   project,
+  onProjectUpdate,
 }: Readonly<ProjectContributorsProps>) {
   const [editMode, setEditMode] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -53,41 +58,20 @@ export default function ProjectContributors({
     setIsEditModalOpen(true);
   };
 
-  const handleContributorAdded = (newContributor: ContributorDTO) => {
-    project.contributors = [...(project.contributors ?? []), newContributor];
+  const handleContributorAdded = () => {
+    // Trigger a project refresh instead of manually updating the array
+    onProjectUpdate();
   };
 
-  const handleContributorUpdated = (updatedContributor: ContributorDTO) => {
-    if (project.contributors) {
-      const index = project.contributors.findIndex(
-        (c) => c.person.id === updatedContributor.person.id,
-      );
-      if (index !== -1) {
-        project.contributors[index] = updatedContributor;
-      }
-    }
+  const handleContributorUpdated = () => {
+    // Trigger a project refresh instead of manually updating the array
+    onProjectUpdate();
     setEditingContributor(null);
   };
 
-  const handleDeleteContributor = async () => {
-    if (!deleteContributor) return;
-
-    try {
-      // API call would go here to delete the contributor
-      // await apiClient.contributors_DeleteContributor(project.id, deleteContributor.person.id);
-
-      // Update local state
-      if (project.contributors) {
-        project.contributors = project.contributors.filter(
-          (c) => c.person.id !== deleteContributor.person.id,
-        );
-      }
-
-      setIsDeleteDialogOpen(false);
-      setDeleteContributor(null);
-    } catch (error) {
-      console.error("Error deleting contributor:", error);
-    }
+  const openDeleteDialog = (contributor: ContributorDTO) => {
+    setDeleteContributor(contributor);
+    setIsDeleteDialogOpen(true);
   };
 
   return (
@@ -142,11 +126,7 @@ export default function ProjectContributors({
                 isContact={contributor.contact}
                 editMode={editMode}
                 onEdit={() => handleEditContributor(contributor)}
-                onDelete={handleDeleteContributor}
-                openDeleteDialog={() => {
-                  setDeleteContributor(contributor);
-                  setIsDeleteDialogOpen(true);
-                }}
+                openDeleteDialog={() => openDeleteDialog(contributor)}
               />
               <AlertDialog
                 open={
@@ -172,12 +152,30 @@ export default function ProjectContributors({
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-destructive hover:text-destructive border-destructive border-1 text-white hover:bg-white/10 hover:font-bold"
-                      onClick={handleDeleteContributor}
+                    <ApiMutation
+                      mutationFn={(apiClient: ApiClient) =>
+                        apiClient.contributors_DeleteContributor(
+                          project.id,
+                          contributor.person.id,
+                        )
+                      }
+                      data={{}}
+                      loadingMessage="Deleting contributor..."
+                      onSuccess={() => {
+                        onProjectUpdate();
+                        setIsDeleteDialogOpen(false);
+                        setDeleteContributor(null);
+                      }}
                     >
-                      Delete
-                    </AlertDialogAction>
+                      {({ onSubmit }) => (
+                        <AlertDialogAction
+                          className="border-destructive bg-destructive hover:text-destructive border-1 text-white hover:bg-white/10 hover:font-bold"
+                          onClick={onSubmit}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      )}
+                    </ApiMutation>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>

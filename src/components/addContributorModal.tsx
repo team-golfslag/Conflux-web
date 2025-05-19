@@ -18,7 +18,7 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, User } from "lucide-react";
+import { Plus, Search, User, AlertCircle } from "lucide-react";
 import OrcidIcon from "@/components/icons/orcidIcon";
 import ContributorFormFields from "./contributorFormFields";
 import {
@@ -28,19 +28,21 @@ import {
   ContributorDTO,
   ContributorPositionDTO,
   ContributorPositionType,
+  ApiClient,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import {
   formatOrcidAsUrl,
   extractOrcidFromUrl,
 } from "@/lib/formatters/orcidFormatter";
+import { ApiMutation } from "@/components/apiMutation";
 
 interface ContributorFormData {
   name: string;
   email: string;
   orcidId: string;
   roles: ContributorRoleType[];
-  positions: ContributorPositionType[]; // Added positions
+  positions: ContributorPositionType[];
   leader: boolean;
   contact: boolean;
 }
@@ -64,7 +66,7 @@ export default function AddContributorModal({
     email: "",
     orcidId: "",
     roles: [],
-    positions: [], // Initialize positions
+    positions: [],
     leader: false,
     contact: false,
   });
@@ -75,6 +77,7 @@ export default function AddContributorModal({
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Person[]>([]);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const apiClient = useContext(ApiClientContext);
 
@@ -104,7 +107,7 @@ export default function AddContributorModal({
       email: "",
       orcidId: "",
       roles: [],
-      positions: [], // Reset positions
+      positions: [],
       leader: false,
       contact: false,
     });
@@ -112,24 +115,36 @@ export default function AddContributorModal({
     setOrcidSearchTerm("");
     setSearchTerm("");
     setSearchResults([]);
+    setSearchError(null);
   };
+
+  // Reset form when dialog is closed
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
 
   // ORCID search
   const searchByOrcid = async () => {
+    if (!orcidSearchTerm) return;
+
     setIsLoadingOrcidSearch(true);
+    setSearchError(null);
+
     try {
       // This would be replaced with actual API call when implemented
-      if (orcidSearchTerm) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setFormData((prev) => ({
-          ...prev,
-          name: "Jane Doe",
-          email: "jane.doe@example.com",
-          orcidId: orcidSearchTerm,
-        }));
-      }
+      // For now, we'll simulate a search
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setFormData((prev) => ({
+        ...prev,
+        name: "Jane Doe",
+        email: "jane.doe@example.com",
+        orcidId: orcidSearchTerm,
+      }));
     } catch (error) {
       console.error("Error searching ORCID:", error);
+      setSearchError("Failed to search ORCID. Please try again.");
     } finally {
       setIsLoadingOrcidSearch(false);
     }
@@ -142,11 +157,14 @@ export default function AddContributorModal({
         setSearchResults([]);
         return;
       }
+
       try {
+        setSearchError(null);
         const people = await apiClient.people_GetPersonsByQuery(query);
         setSearchResults(people);
       } catch (error) {
         console.error("Error searching for people:", error);
+        setSearchError("Failed to search for people. Please try again.");
         setSearchResults([]);
       }
     },
@@ -178,60 +196,67 @@ export default function AddContributorModal({
     setSearchTerm("");
   };
 
-  // Add contributor
-  const addContributor = async () => {
-    try {
-      let personToUse: Person;
-      if (selectedPerson) {
-        personToUse = selectedPerson;
-      } else {
-        const formattedOrcid = formData.orcidId
-          ? formatOrcidAsUrl(formData.orcidId)
-          : null;
-        const personDTO = new PersonDTO({
-          name: formData.name,
-          email: formData.email,
-          or_ci_d: formattedOrcid ?? undefined,
-        });
-        personToUse = await apiClient.people_CreatePerson(personDTO);
-        if (!personToUse?.id) {
-          throw new Error("Failed to create person");
-        }
-      }
+  // Prepare data for API mutation
+  const prepareContributorData = async (): Promise<{
+    contributorData: ContributorDTO;
+    newPerson?: PersonDTO;
+  }> => {
+    let personToUse: Person;
+    let newPerson: PersonDTO | undefined;
 
-      const newContributor = new ContributorDTO({
-        person: personToUse,
-        project_id: projectId,
-        roles: formData.roles,
-        positions: formData.positions.map(
-          (type) =>
-            new ContributorPositionDTO({ type, start_date: new Date() }),
-        ), // Map positions to DTOs
-        leader: formData.leader,
-        contact: formData.contact,
+    if (selectedPerson) {
+      personToUse = selectedPerson;
+    } else {
+      const formattedOrcid = formData.orcidId
+        ? formatOrcidAsUrl(formData.orcidId)
+        : null;
+      newPerson = new PersonDTO({
+        name: formData.name,
+        email: formData.email,
+        or_ci_d: formattedOrcid ?? undefined,
       });
 
-      const createdContributor = await apiClient.contributors_CreateContributor(
-        projectId,
-        newContributor,
-      );
+      // We'll use a temporary person object until the actual creation
+      personToUse = new Person({
+        id: "temp-id", // Will be replaced by the actual created person
+        name: formData.name,
+        email: formData.email,
+        orcid_id: formattedOrcid ?? undefined,
+        schema_uri: "",
+      });
+    }
 
-      if (!createdContributor?.person) {
-        console.log(createdContributor);
-        throw new Error("Server returned an invalid contributor");
+    const contributorData = new ContributorDTO({
+      person: personToUse,
+      project_id: projectId,
+      roles: formData.roles,
+      positions: formData.positions.map(
+        (type) => new ContributorPositionDTO({ type, start_date: new Date() }),
+      ),
+      leader: formData.leader,
+      contact: formData.contact,
+    });
+
+    return { contributorData, newPerson };
+  };
+
+  // Create or get person, then create contributor
+  const createContributor = async (apiClient: ApiClient) => {
+    const { contributorData, newPerson } = await prepareContributorData();
+
+    // If we need to create a new person first
+    if (newPerson) {
+      const createdPerson = await apiClient.people_CreatePerson(newPerson);
+      if (!createdPerson?.id) {
+        throw new Error("Failed to create person");
       }
 
-      onContributorAdded(createdContributor);
-      onOpenChange(false);
-      resetForm();
-    } catch (error) {
-      console.error("Error adding contributor:", error);
-      alert(
-        `Failed to add contributor: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
-      );
+      // Update the contributor with the created person
+      contributorData.person = createdPerson;
     }
+
+    // Now create the contributor
+    return apiClient.contributors_CreateContributor(projectId, contributorData);
   };
 
   return (
@@ -251,6 +276,13 @@ export default function AddContributorModal({
         </DialogHeader>
 
         <div className="space-y-4 py-4">
+          {searchError && (
+            <div className="bg-destructive/10 text-destructive flex items-center gap-2 rounded-md p-2 text-sm">
+              <AlertCircle className="h-4 w-4" />
+              <span>{searchError}</span>
+            </div>
+          )}
+
           <div className="flex items-end gap-2">
             <div className="flex-1">
               <Label htmlFor="orcidSearch">Search by ORCID</Label>
@@ -292,7 +324,7 @@ export default function AddContributorModal({
                   {searchResults.map((person) => (
                     <button
                       key={person.id}
-                      className="w-full cursor-pointer px-4 py-2 hover:bg-gray-100"
+                      className="w-full cursor-pointer px-4 py-2 text-left hover:bg-gray-100"
                       onClick={() => selectPerson(person)}
                     >
                       <div className="flex items-center gap-2">
@@ -337,12 +369,37 @@ export default function AddContributorModal({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={addContributor}
-            disabled={!formData.name || formData.positions.length === 0}
+
+          <ApiMutation
+            mutationFn={createContributor}
+            data={{}}
+            loadingMessage="Adding contributor..."
+            onSuccess={(createdContributor) => {
+              onContributorAdded(createdContributor);
+              onOpenChange(false);
+              resetForm();
+            }}
           >
-            Add Contributor
-          </Button>
+            {({ onSubmit, isLoading, error }) => (
+              <>
+                {error && (
+                  <div className="text-destructive text-xs">
+                    {error.message}
+                  </div>
+                )}
+                <Button
+                  onClick={onSubmit}
+                  disabled={
+                    isLoading ||
+                    !formData.name ||
+                    formData.positions.length === 0
+                  }
+                >
+                  {isLoading ? "Adding..." : "Add Contributor"}
+                </Button>
+              </>
+            )}
+          </ApiMutation>
         </DialogFooter>
       </DialogContent>
     </Dialog>

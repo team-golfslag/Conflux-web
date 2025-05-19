@@ -7,72 +7,75 @@ import { Edit, ChevronDown, ChevronUp, Check, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
-import { truncate } from "lodash";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  useEditableText,
+  useTruncatableText,
+} from "@/hooks/useEditableContent";
+import { ApiMutation } from "@/components/apiMutation";
+import { ApiClient } from "@team-golfslag/conflux-api-client/src/client";
 
 type ProjectOverviewProps = {
+  projectId: string;
   title?: string;
   description?: string;
-  onSaveTitle: (title: string) => void;
-  onSaveDescription: (description: string) => void;
+  onProjectUpdate: () => void;
 };
 
 /**
- * Project Overview component
- * @param props title and description to be displayed, and onSave callback
+ * Project Overview component with improved state management and error handling
+ * @param props projectId, title and description to be displayed, and refresh callback
  */
-export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [shouldShowExpandButton, setShouldShowExpandButton] = useState(false);
-  const descriptionTruncateLength = 800;
-  const [description, setDescription] = useState<string | undefined>(
-    truncate(props.description, {
-      length: descriptionTruncateLength,
-      separator: /,? +/,
-    }),
-  );
+export default function ProjectOverview({
+  title,
+  description,
+  onProjectUpdate,
+}: Readonly<ProjectOverviewProps>) {
+  // Title editing
   const [editTitleMode, setEditTitleMode] = useState(false);
+  const [updateTitleSubmit, setUpdateTitleSubmit] = useState<
+    (() => void) | null
+  >(null);
+
+  const {
+    editedText: editTitle,
+    handleTextChange: handleTitleChange,
+    handleCancel: handleTitleCancel,
+    handleKeyDown: handleTitleKeyDown,
+  } = useEditableText(title ?? "", title ?? "", editTitleMode, () => {
+    // This will be called when saving via the hook's handlers
+    if (updateTitleSubmit) updateTitleSubmit();
+  });
+
+  // Description editing
   const [editDescriptionMode, setEditDescriptionMode] = useState(false);
-  const [editTitle, setEditTitle] = useState(props.title ?? "");
-  const [editDescription, setEditDescription] = useState(
-    props.description ?? "",
+  const [updateDescriptionSubmit, setUpdateDescriptionSubmit] = useState<
+    (() => void) | null
+  >(null);
+
+  const {
+    editedText: editDescription,
+    handleTextChange: handleDescriptionChange,
+    handleCancel: handleDescriptionCancel,
+    handleKeyDown: handleDescriptionKeyDown,
+  } = useEditableText(
+    description ?? "",
+    description ?? "",
+    editDescriptionMode,
+    () => {
+      // This will be called when saving via the hook's handlers
+      if (updateDescriptionSubmit) updateDescriptionSubmit();
+    },
   );
 
-  const descriptionRef = useRef<HTMLParagraphElement>(null);
+  // Description truncation
+  const descriptionTruncateLength = 800;
+  const { isExpanded, shouldShowExpandButton, toggleExpand } =
+    useTruncatableText(description ?? "", descriptionTruncateLength);
+
+  // Refs for textarea auto-resize
   const titleTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const descriptionTextAreaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Effect to determine whether to show expand button
-  useEffect(() => {
-    if (props.description) {
-      const characterCount = props.description.length ?? 0;
-      setShouldShowExpandButton(characterCount > descriptionTruncateLength);
-    }
-  }, [props.description]);
-
-  // Effect to set edit title
-  useEffect(() => {
-    if (!editTitleMode) {
-      setEditTitle(props.title ?? "");
-    }
-  }, [props.title, editTitleMode]);
-
-  // Effect to set edit description and to set the displayed description
-  useEffect(() => {
-    if (!editDescriptionMode) {
-      setEditDescription(props.description ?? "");
-
-      // Reset displayed description based on current props and expansion state
-      setDescription(
-        isExpanded
-          ? (props.description ?? "")
-          : truncate(props.description, {
-              length: descriptionTruncateLength,
-              separator: /,? +/,
-            }),
-      );
-    }
-  }, [props.description, editDescriptionMode, isExpanded]);
 
   // Effect to adjust title textarea height
   useEffect(() => {
@@ -92,85 +95,16 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
     }
   }, [editDescription, editDescriptionMode]);
 
-  const toggleExpand = () => {
-    const newExpandedState = !isExpanded;
-    let newDescription: string;
-
-    if (newExpandedState) {
-      newDescription = editDescriptionMode
-        ? editDescription
-        : (props.description ?? "");
-    } else
-      newDescription = truncate(
-        editDescriptionMode ? editDescription : (props.description ?? ""),
-        {
-          length: descriptionTruncateLength,
-          separator: /,? +/,
-        },
-      );
-
-    setDescription(newDescription);
-    setIsExpanded(newExpandedState);
+  // API mutation handlers for title
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const updateProjectTitle = async (_apiClient: ApiClient) => {
+    // TODO: update project title
   };
 
-  const handleEditTitleClick = () => {
-    setEditTitleMode(true);
-    setEditTitle(props.title ?? "");
-  };
-
-  const handleEditDescriptionClick = () => {
-    setEditDescriptionMode(true);
-    setEditDescription(props.description ?? "");
-  };
-
-  const handleSaveTitle = () => {
-    props.onSaveTitle(editTitle);
-    setEditTitleMode(false);
-  };
-
-  const handleSaveDescription = () => {
-    props.onSaveDescription(editDescription);
-    setEditDescriptionMode(false);
-  };
-
-  const handleCancelTitle = () => {
-    setEditTitleMode(false);
-  };
-
-  const handleCancelDescription = () => {
-    setEditDescriptionMode(false);
-    // Reset displayed description to what it was before entering edit mode (based on props)
-    setEditDescription(props.description ?? "");
-    setDescription(
-      isExpanded
-        ? (props.description ?? "")
-        : truncate(props.description, {
-            length: descriptionTruncateLength,
-            separator: /,? +/,
-          }),
-    );
-  };
-
-  const handleEditTitleKeyDown = (
-    e: React.KeyboardEvent<HTMLTextAreaElement>,
-  ) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSaveTitle();
-    }
-    if (e.key === "Escape") {
-      e.preventDefault();
-      handleCancelTitle();
-    }
-  };
-
-  const handleEditDescriptionKeyDown = (
-    e: React.KeyboardEvent<HTMLTextAreaElement>,
-  ) => {
-    if (e.key === "Escape") {
-      e.preventDefault();
-      handleCancelDescription();
-    }
+  // API mutation handlers for description
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const updateProjectDescription = async (_apiClient: ApiClient) => {
+    // TODO: update project description
   };
 
   return (
@@ -180,13 +114,13 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
           {!editTitleMode ? (
             <div className="relative flex w-full">
               <CardTitle className="w-full text-3xl/8 font-bold tracking-tight sm:text-4xl/10 md:text-5xl/14">
-                {props.title}
+                {title}
               </CardTitle>
               <Button
                 className="invisible float-end group-hover/cardHeader:visible"
                 variant="outline"
                 size="sm"
-                onClick={() => handleEditTitleClick()}
+                onClick={() => setEditTitleMode(true)}
               >
                 <Edit className="mr-1 h-4 w-4" />
                 Edit
@@ -199,25 +133,46 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
                 rows={1}
                 value={editTitle}
                 autoFocus
-                onChange={(e) => setEditTitle(e.target.value)}
+                onChange={handleTitleChange}
                 className="w-full resize-none overflow-hidden bg-white font-bold tracking-tight sm:text-4xl/10 md:text-5xl/14"
                 placeholder="Enter project title"
-                onKeyDown={handleEditTitleKeyDown}
+                onKeyDown={handleTitleKeyDown}
               />
               <div className="flex justify-end gap-2 pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-1"
-                  onClick={handleSaveTitle}
+                <ApiMutation
+                  mutationFn={updateProjectTitle}
+                  data={{}}
+                  loadingMessage="Saving title..."
+                  onInitialize={(submitFn) => {
+                    setUpdateTitleSubmit(() => submitFn);
+                  }}
+                  onSuccess={() => {
+                    setEditTitleMode(false);
+                    onProjectUpdate();
+                  }}
                 >
-                  <Check size={16} /> Save
-                </Button>
+                  {({ onSubmit, isLoading }) => {
+                    return (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-1"
+                        onClick={onSubmit}
+                        disabled={isLoading}
+                      >
+                        <Check size={16} /> Save
+                      </Button>
+                    );
+                  }}
+                </ApiMutation>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="flex items-center gap-1"
-                  onClick={handleCancelTitle}
+                  onClick={() => {
+                    handleTitleCancel();
+                    setEditTitleMode(false);
+                  }}
                 >
                   <X size={16} /> Cancel
                 </Button>
@@ -236,26 +191,47 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
               ref={descriptionTextAreaRef}
               value={editDescription}
               autoFocus
-              onChange={(e) => setEditDescription(e.target.value)}
+              onChange={handleDescriptionChange}
               className="min-h-[200px] w-full resize-none overflow-hidden text-sm/6 text-gray-700 md:text-base/7"
               placeholder="Enter project description"
               rows={10}
-              onKeyDown={handleEditDescriptionKeyDown}
+              onKeyDown={handleDescriptionKeyDown}
             />
             <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1"
-                onClick={handleSaveDescription}
+              <ApiMutation
+                mutationFn={updateProjectDescription}
+                data={{}}
+                loadingMessage="Saving description..."
+                onInitialize={(submitFn) => {
+                  setUpdateDescriptionSubmit(() => submitFn);
+                }}
+                onSuccess={() => {
+                  setEditDescriptionMode(false);
+                  onProjectUpdate();
+                }}
               >
-                <Check size={16} /> Save
-              </Button>
+                {({ onSubmit, isLoading }) => {
+                  return (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-1"
+                      onClick={onSubmit}
+                      disabled={isLoading}
+                    >
+                      <Check size={16} /> Save
+                    </Button>
+                  );
+                }}
+              </ApiMutation>
               <Button
                 variant="ghost"
                 size="sm"
                 className="flex items-center gap-1"
-                onClick={handleCancelDescription}
+                onClick={() => {
+                  handleDescriptionCancel();
+                  setEditDescriptionMode(false);
+                }}
               >
                 <X size={16} /> Cancel
               </Button>
@@ -268,20 +244,21 @@ export default function ProjectOverview(props: Readonly<ProjectOverviewProps>) {
                 Primary description
               </h3>
               <Button
-                className="invisible float-end group-hover/cardContent:visible"
+                className="invisible float-end group-hover:visible"
                 variant="outline"
                 size="sm"
-                onClick={() => handleEditDescriptionClick()}
+                onClick={() => setEditDescriptionMode(true)}
               >
                 <Edit className="mr-1 h-4 w-4" />
                 Edit
               </Button>
             </div>
-            <p
-              ref={descriptionRef}
-              className="text-start text-sm/6 text-gray-700 sm:px-3 sm:text-base/7"
-            >
-              {description}
+            <p className="text-start text-sm/6 text-gray-700 sm:px-3 sm:text-base/7">
+              {isExpanded
+                ? description
+                : description && description.length > descriptionTruncateLength
+                  ? description.substring(0, descriptionTruncateLength) + "..."
+                  : description}
             </p>
             {shouldShowExpandButton && !isExpanded && (
               <Button

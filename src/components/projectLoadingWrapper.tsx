@@ -8,24 +8,30 @@ import { AlertCircle, Loader2, RefreshCcw } from "lucide-react";
 import { SwaggerException } from "@team-golfslag/conflux-api-client/src/client";
 import { Button } from "./ui/button";
 
-interface LoadingWrapperProps {
+interface ProjectLoadingWrapperProps {
   isLoading: boolean;
+  isInitialLoad: boolean;
   children: React.ReactNode;
   loadingMessage?: React.ReactNode;
   error?: SwaggerException | null;
   onRetry?: () => void;
 }
 
-export function LoadingWrapper({
+/**
+ * A specialized loading wrapper for project pages that prevents flickering
+ * on updates after initial load
+ */
+export function ProjectLoadingWrapper({
   isLoading,
+  isInitialLoad,
   children,
   loadingMessage = "Loading...",
   error = null,
   onRetry,
-}: LoadingWrapperProps) {
-  if (isLoading) {
+}: ProjectLoadingWrapperProps) {
+  // Only show loading UI on initial load to prevent flickering
+  if (isLoading && isInitialLoad) {
     return (
-      // Adjust min-height to account for the header (assuming 3rem height)
       <div className="flex min-h-[calc(100vh-3rem)] items-center justify-center p-8">
         <div className="flex flex-col items-center justify-center space-y-4 rounded-lg bg-white p-6 text-xl font-semibold shadow-md">
           <Loader2 className="text-primary h-8 w-8 animate-spin" />
@@ -56,5 +62,7 @@ export function LoadingWrapper({
     );
   }
 
+  // If there's a background refresh, just show the current content
+  // to avoid flickering
   return <>{children}</>;
 }

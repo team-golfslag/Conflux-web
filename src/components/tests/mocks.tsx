@@ -9,6 +9,7 @@ import {
   ContributorPositionType,
   ContributorRoleType,
   Person,
+  ApiClient,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 
 const mockContributor: ContributorDTO = new ContributorDTO({
@@ -31,5 +32,24 @@ const mockContributor: ContributorDTO = new ContributorDTO({
   leader: true,
   contact: true,
 });
+
+/**
+ * Creates a mock API client for testing
+ * @returns A mock API client with all methods stubbed
+ */
+export function createApiClientMock() {
+  return {
+    projects_GetProjectById: cy.stub(),
+    projects_GetProjects: cy.stub(),
+    projects_GetProject: cy.stub(),
+    projects_UpdateProject: cy.stub(),
+    projects_PatchProject: cy.stub(),
+    contributors_CreateContributor: cy.stub(),
+    contributors_UpdateContributor: cy.stub(),
+    contributors_DeleteContributor: cy.stub(),
+    people_GetPersonsByQuery: cy.stub(),
+    people_CreatePerson: cy.stub(),
+  } as unknown as ApiClient;
+}
 
 export { mockContributor };

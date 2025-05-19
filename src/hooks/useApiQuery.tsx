@@ -6,7 +6,10 @@
 import { useState, useEffect } from "react";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { useContext } from "react";
-import { ApiClient } from "@team-golfslag/conflux-api-client/src/client";
+import {
+  ApiClient,
+  SwaggerException,
+} from "@team-golfslag/conflux-api-client/src/client";
 
 export function useApiQuery<T>(
   queryFn: (apiClient: ApiClient) => Promise<T>,
@@ -15,7 +18,7 @@ export function useApiQuery<T>(
   const apiClient = useContext(ApiClientContext);
   const [data, setData] = useState<T | undefined>();
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<SwaggerException | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -30,7 +33,17 @@ export function useApiQuery<T>(
         }
       } catch (err) {
         if (isMounted) {
-          setError(err instanceof Error ? err : new Error(String(err)));
+          setError(
+            err instanceof SwaggerException
+              ? err
+              : new SwaggerException(
+                  "An error occurred",
+                  0,
+                  JSON.stringify(err),
+                  {},
+                  err,
+                ),
+          );
           console.error("Error fetching data:", err);
         }
       } finally {
