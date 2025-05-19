@@ -163,14 +163,14 @@ This project uses `.env` files to manage environment-specific configurations. Vi
 
 **`.env` (for development/default):**
 
-```dotenv
+```env
 VITE_API_URL=http://localhost:8000
 VITE_WEBUI_URL=http://localhost:5173
 ```
 
 **Example `.env.production` (for production builds):**
 
-```dotenv
+```env
 VITE_API_URL=https://api.conflux.example.com
 VITE_WEBUI_URL=https://conflux.example.com
 ```
