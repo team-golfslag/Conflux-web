@@ -143,6 +143,7 @@ export default function ProjectOverview({
                   mutationFn={updateProjectTitle}
                   data={{}}
                   loadingMessage="Saving title..."
+                  mode="component"
                   onInitialize={(submitFn) => {
                     setUpdateTitleSubmit(() => submitFn);
                   }}
@@ -202,6 +203,7 @@ export default function ProjectOverview({
                 mutationFn={updateProjectDescription}
                 data={{}}
                 loadingMessage="Saving description..."
+                mode="component"
                 onInitialize={(submitFn) => {
                   setUpdateDescriptionSubmit(() => submitFn);
                 }}

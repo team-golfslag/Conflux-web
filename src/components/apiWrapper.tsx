@@ -13,6 +13,7 @@ interface ApiWrapperProps<T> {
   dependencies?: readonly unknown[];
   loadingMessage?: React.ReactNode;
   children: (data: T) => React.ReactNode;
+  mode?: "page" | "component";
 }
 
 export function ApiWrapper<T>({
@@ -20,6 +21,7 @@ export function ApiWrapper<T>({
   dependencies = [],
   loadingMessage = "Loading...",
   children,
+  mode = "page",
 }: ApiWrapperProps<T>) {
   const [retryCount, setRetryCount] = useState(0);
 
@@ -38,6 +40,7 @@ export function ApiWrapper<T>({
       loadingMessage={loadingMessage}
       error={error}
       onRetry={handleRetry}
+      mode={mode}
     >
       {data !== undefined && children(data)}
     </LoadingWrapper>

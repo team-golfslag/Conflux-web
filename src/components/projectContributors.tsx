@@ -114,7 +114,7 @@ export default function ImprovedProjectContributors({
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {project.contributors?.map((contributor) => (
-            <div key={contributor.person.id}>
+            <div key={contributor.person.id} className="flex h-full flex-col">
               <ContributorCard
                 id={contributor.person.id}
                 name={contributor.person.name}
@@ -126,6 +126,7 @@ export default function ImprovedProjectContributors({
                 isContact={contributor.contact}
                 editMode={editMode}
                 onEdit={() => handleEditContributor(contributor)}
+                onDelete={() => openDeleteDialog(contributor)}
                 openDeleteDialog={() => openDeleteDialog(contributor)}
               />
               <AlertDialog
@@ -161,6 +162,7 @@ export default function ImprovedProjectContributors({
                       }
                       data={{}}
                       loadingMessage="Deleting contributor..."
+                      mode="component"
                       onSuccess={() => {
                         onProjectUpdate();
                         setIsDeleteDialogOpen(false);

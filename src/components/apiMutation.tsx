@@ -53,6 +53,13 @@ interface ApiMutationProps<T, R> {
    * during rendering
    */
   onInitialize?: (submitFn: () => void) => void;
+
+  /**
+   * Display mode for loading and error states
+   * - 'page': full-page loading/error state
+   * - 'component': overlay on top of the component with a blurred background
+   */
+  mode?: "page" | "component";
 }
 
 /**
@@ -67,6 +74,7 @@ export function ApiMutation<T, R>({
   onSuccess,
   onError,
   onInitialize,
+  mode = "page",
 }: ApiMutationProps<T, R>) {
   const apiClient = useContext(ApiClientContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -115,8 +123,30 @@ export function ApiMutation<T, R>({
     }
   }, [onInitialize, handleSubmit]);
 
-  // During the actual mutation, show a full-page loading state
+  // During the actual mutation, show a loading state based on mode
   if (isLoading) {
+    if (mode === "component") {
+      const childContent = children({
+        isLoading: true,
+        error: null,
+        onSubmit: handleSubmit,
+        result: undefined,
+      });
+
+      return (
+        <div className="relative h-full w-full">
+          <div className="absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
+            <div className="flex flex-col items-center justify-center space-y-2 rounded-lg bg-white/80 p-4 shadow-md">
+              <Loader2 className="text-primary h-6 w-6 animate-spin" />
+              <span className="text-sm font-medium">{loadingMessage}</span>
+            </div>
+          </div>
+          {/* Show a disabled version of children */}
+          <div className="pointer-events-none opacity-60">{childContent}</div>
+        </div>
+      );
+    }
+
     return (
       <div className="flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-2 rounded-lg bg-white p-4 shadow-md">
@@ -129,6 +159,29 @@ export function ApiMutation<T, R>({
 
   // If there's an error during submission that we want to highlight (not inline)
   if (error && !children) {
+    if (mode === "component") {
+      return (
+        <div className="relative">
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
+            <div className="flex flex-col items-center justify-center space-y-2 rounded-lg bg-white/80 p-4 shadow-md">
+              <AlertCircle className="text-destructive h-6 w-6" />
+              <span className="text-sm font-medium">
+                Error: {error.message}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleSubmit()}
+                className="mt-1"
+              >
+                Retry
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="flex flex-col items-center justify-center gap-4 p-4">
         <div className="flex flex-col items-center gap-2 rounded-lg bg-white p-4 shadow-md">
@@ -148,5 +201,34 @@ export function ApiMutation<T, R>({
   }
 
   // Render the children with the necessary props
+  if (error && mode === "component") {
+    const childContent = children({
+      isLoading,
+      error,
+      onSubmit: handleSubmit,
+      result,
+    });
+
+    return (
+      <div className="relative h-full w-full">
+        <div className="absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
+          <div className="flex flex-col items-center justify-center space-y-2 rounded-lg bg-white/80 p-4 shadow-md">
+            <AlertCircle className="text-destructive h-6 w-6" />
+            <span className="text-sm font-medium">Error: {error.message}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleSubmit()}
+              className="mt-1"
+            >
+              Retry
+            </Button>
+          </div>
+        </div>
+        <div className="pointer-events-none opacity-60">{childContent}</div>
+      </div>
+    );
+  }
+
   return <>{children({ isLoading, error, onSubmit: handleSubmit, result })}</>;
 }

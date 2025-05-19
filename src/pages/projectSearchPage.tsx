@@ -153,6 +153,7 @@ const ProjectSearchPage = () => {
         }
         dependencies={[debouncedSearchTerm, refreshKey]}
         loadingMessage="Searching projects..."
+        mode="page"
       >
         {(projects) => (
           <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">

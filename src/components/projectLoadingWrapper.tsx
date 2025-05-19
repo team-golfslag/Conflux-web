@@ -15,6 +15,7 @@ interface ProjectLoadingWrapperProps {
   loadingMessage?: React.ReactNode;
   error?: SwaggerException | null;
   onRetry?: () => void;
+  mode?: "page" | "component";
 }
 
 /**
@@ -28,9 +29,24 @@ export function ProjectLoadingWrapper({
   loadingMessage = "Loading...",
   error = null,
   onRetry,
+  mode = "page",
 }: ProjectLoadingWrapperProps) {
   // Only show loading UI on initial load to prevent flickering
   if (isLoading && isInitialLoad) {
+    if (mode === "component") {
+      return (
+        <div className="relative">
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
+            <div className="flex flex-col items-center justify-center space-y-2 rounded-lg bg-white/80 p-4 shadow-md">
+              <Loader2 className="text-primary h-6 w-6 animate-spin" />
+              <span className="text-sm font-medium">{loadingMessage}</span>
+            </div>
+          </div>
+          <div className="pointer-events-none opacity-60">{children}</div>
+        </div>
+      );
+    }
+
     return (
       <div className="flex min-h-[calc(100vh-3rem)] items-center justify-center p-8">
         <div className="flex flex-col items-center justify-center space-y-4 rounded-lg bg-white p-6 text-xl font-semibold shadow-md">

@@ -69,8 +69,8 @@ export default function ContributorCard({
   };
 
   return (
-    <Card className="flex flex-col border border-gray-200 p-3 shadow-sm">
-      <div className="flex flex-col justify-between">
+    <Card className="flex h-full flex-col border border-gray-200 p-3 shadow-sm">
+      <div className="flex h-full flex-col justify-between">
         <div className="w-full">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -164,7 +164,7 @@ export default function ContributorCard({
           {email && <p className="text-muted-foreground text-xs">{email}</p>}
         </div>
 
-        <div className="mt-auto flex flex-col gap-1 pt-1">
+        <div className="mt-auto flex flex-col gap-1 pt-3">
           {positions && positions.length > 0 && (
             <div className="flex flex-wrap justify-start gap-1">
               {positions.map((positionDTO) => {

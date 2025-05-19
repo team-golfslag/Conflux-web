@@ -374,6 +374,7 @@ export default function AddContributorModal({
             mutationFn={createContributor}
             data={{}}
             loadingMessage="Adding contributor..."
+            mode="component"
             onSuccess={(createdContributor) => {
               onContributorAdded(createdContributor);
               onOpenChange(false);

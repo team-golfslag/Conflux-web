@@ -18,11 +18,11 @@ Components follow these patterns:
 
 1. **ApiWrapper Pattern**: Used to fetch data with loading and error states handled
 
-   - `<ApiWrapper queryFn={...} dependencies={...} loadingMessage="...">`
+   - `<ApiWrapper queryFn={...} dependencies={...} loadingMessage="..." mode="page|component">`
 
 2. **ApiMutation Pattern**: Used for data mutations with loading and error handling
 
-   - `<ApiMutation mutationFn={...} data={...} onSuccess={...} loadingMessage="...">`
+   - `<ApiMutation mutationFn={...} data={...} onSuccess={...} loadingMessage="..." mode="page|component">`
 
 3. **Edit Mode Pattern**: Components that need edit functionality implement:
 

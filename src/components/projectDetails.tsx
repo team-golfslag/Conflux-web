@@ -141,157 +141,196 @@ export default function ProjectDetails({
       </CardHeader>
       <CardContent>
         {editMode ? (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="start-date">Start Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
+          <ApiMutation
+            mutationFn={updateProject}
+            data={{}}
+            loadingMessage="Updating project details..."
+            mode="component"
+            onSuccess={() => {
+              setEditMode(false);
+              onProjectUpdate();
+            }}
+          >
+            {({ onSubmit, isLoading: outerLoading }) => (
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="status" className="font-semibold">
+                    Status
+                  </Label>
+                  <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                    {determineStatus(project.start_date, project.end_date)}
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="project-lead" className="font-semibold">
+                    Project Lead
+                  </Label>
+                  <Select
+                    value={selectedLeaderId}
+                    onValueChange={setSelectedLeaderId}
                   >
-                    {selectedStartDate
-                      ? format(selectedStartDate, "PPP")
-                      : "Select date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={selectedStartDate}
-                    onSelect={setSelectedStartDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+                    <SelectTrigger className="mt-1 w-full">
+                      <SelectValue
+                        placeholder="Select project lead"
+                        className="text-left whitespace-normal"
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {project.contributors.map((contributor) => (
+                        <SelectItem
+                          key={contributor.person.id}
+                          value={contributor.person.id}
+                          className="text-left whitespace-normal"
+                        >
+                          {contributor.person.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div>
-              <Label htmlFor="end-date">End Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
+                <div>
+                  <Label htmlFor="start-date" className="font-semibold">
+                    Start Date
+                  </Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="mt-1 w-full justify-start text-left font-normal"
+                      >
+                        {selectedStartDate
+                          ? format(selectedStartDate, "d MMMM yyyy")
+                          : "Select date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={selectedStartDate}
+                        onSelect={setSelectedStartDate}
+                        defaultMonth={selectedStartDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div>
+                  <Label htmlFor="end-date" className="font-semibold">
+                    End Date
+                  </Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="mt-1 w-full justify-start text-left font-normal"
+                      >
+                        {selectedEndDate
+                          ? format(selectedEndDate, "d MMMM yyyy")
+                          : "Select date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={selectedEndDate}
+                        onSelect={setSelectedEndDate}
+                        defaultMonth={selectedEndDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div>
+                  <Label htmlFor="lead-organization" className="font-semibold">
+                    Lead Organisation
+                  </Label>
+                  <Select
+                    value={selectedOrganizationId}
+                    onValueChange={setSelectedOrganizationId}
                   >
-                    {selectedEndDate
-                      ? format(selectedEndDate, "PPP")
-                      : "Select date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={selectedEndDate}
-                    onSelect={setSelectedEndDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+                    <SelectTrigger className="mt-1 w-full">
+                      <SelectValue placeholder="Select lead organization" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {project.organisations.map((org) => (
+                        <SelectItem key={org.id} value={org.id || ""}>
+                          {org.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div>
-              <Label htmlFor="project-lead">Project Lead</Label>
-              <Select
-                value={selectedLeaderId}
-                onValueChange={setSelectedLeaderId}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select project lead" />
-                </SelectTrigger>
-                <SelectContent>
-                  {project.contributors.map((contributor) => (
-                    <SelectItem
-                      key={contributor.person.id}
-                      value={contributor.person.id}
-                    >
-                      {contributor.person.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="lead-organization">Lead Organization</Label>
-              <Select
-                value={selectedOrganizationId}
-                onValueChange={setSelectedOrganizationId}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select lead organization" />
-                </SelectTrigger>
-                <SelectContent>
-                  {project.organisations.map((org) => (
-                    <SelectItem key={org.id} value={org.id || ""}>
-                      {org.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex justify-end gap-2 pt-4">
-              <ApiMutation
-                mutationFn={updateProject}
-                data={{}}
-                loadingMessage="Updating project details..."
-                onSuccess={() => {
-                  setEditMode(false);
-                  onProjectUpdate();
-                }}
-              >
-                {({ onSubmit, isLoading }) => (
+                <div className="flex justify-end gap-2 pt-4">
                   <Button
                     variant="default"
                     className="flex items-center gap-1"
                     onClick={onSubmit}
-                    disabled={isLoading}
+                    disabled={outerLoading}
                   >
                     <Check size={16} /> Save Changes
                   </Button>
-                )}
-              </ApiMutation>
-            </div>
-          </div>
+                </div>
+              </div>
+            )}
+          </ApiMutation>
         ) : (
-          <>
+          <div className="space-y-4">
             <div>
-              <h3 className="font-semibold">Status</h3>
-              <p className="text-gray-700">
+              <Label htmlFor="status" className="font-semibold">
+                Status
+              </Label>
+              <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm break-words whitespace-normal text-gray-700">
                 {determineStatus(project.start_date, project.end_date)}
               </p>
             </div>
-            <div className="mt-4">
-              <h3 className="font-semibold">Project Lead</h3>
-              <p className="text-gray-700">
+
+            <div>
+              <Label htmlFor="project-lead" className="font-semibold">
+                Project Lead
+              </Label>
+              <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm break-words whitespace-normal text-gray-700">
                 {projectLead ? projectLead.person.name : "N/A"}
               </p>
             </div>
-            <div className="mt-4">
-              <h3 className="font-semibold">Dates</h3>
-              <div className="flex text-gray-700">
-                <div className="w-12 font-medium">Start:</div>
+
+            <div>
+              <Label htmlFor="start-date" className="font-semibold">
+                Start Date
+              </Label>
+              <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm break-words whitespace-normal text-gray-700">
                 {project.start_date
                   ? format(project.start_date, "d MMMM yyyy")
                   : "N/A"}
-              </div>
-              <p className="flex text-gray-700">
-                <span className="w-12 font-medium">End:</span>
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="end-date" className="font-semibold">
+                End Date
+              </Label>
+              <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm break-words whitespace-normal text-gray-700">
                 {project.end_date
                   ? format(project.end_date, "d MMMM yyyy")
                   : "N/A"}
               </p>
             </div>
-            <div className="mt-4">
-              <h3 className="font-semibold">Lead Organisation</h3>
-              <p className="text-gray-700">
+
+            <div>
+              <Label htmlFor="lead-organization" className="font-semibold">
+                Lead Organisation
+              </Label>
+              <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm break-words whitespace-normal text-gray-700">
                 {project.organisations.length > 0
                   ? project.organisations[0].name
                   : "N/A"}
               </p>
             </div>
-          </>
+          </div>
         )}
       </CardContent>
     </Card>

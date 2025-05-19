@@ -114,6 +114,7 @@ const ProfilePage = () => {
                           }
                           data={{}}
                           loadingMessage="Unlinking ORCID..."
+                          mode="component"
                           onSuccess={() => {
                             console.log("ORCID unlinked successfully");
                             if (session?.user) {

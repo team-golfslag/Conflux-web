@@ -19,6 +19,7 @@ The `ApiWrapper` component provides a simple way to make API queries with loadin
   queryFn={(apiClient) => apiClient.someQuery(params)}
   dependencies={[dependency1, dependency2]} // Variables that should trigger a refresh when changed
   loadingMessage="Loading data..."
+  mode="page" // 'page' (full-screen) or 'component' (overlay with blur)
 >
   {(data) => (
     // Render your UI with the returned data
@@ -42,6 +43,7 @@ The `ApiMutation` component is designed for handling operations that modify data
   mutationFn={(apiClient, data) => apiClient.someUpdateFunction(data)}
   data={formData}
   loadingMessage="Saving changes..."
+  mode="component" // 'page' (full-screen) or 'component' (overlay with blur)
   onSuccess={(result) => {
     // Handle successful mutation
     toast.success("Changes saved successfully!");

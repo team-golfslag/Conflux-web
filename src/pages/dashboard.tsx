@@ -36,6 +36,7 @@ const Dashboard = () => {
     <ApiWrapper
       queryFn={(apiClient) => apiClient.projects_GetAllProjects()}
       loadingMessage="Loading your projects..."
+      mode="page"
     >
       {(projects) => {
         const projectCards = transformProjects(projects);
