@@ -58,43 +58,16 @@ describe("<Header />", () => {
     // Initial state
     cy.get("header").should("have.class", "top-0");
 
-    // First, set the initial state with a proper scroll event
-    cy.window().invoke("scrollTo", 0, 0);
-
-    // Manually manipulate the component state via a custom command
-    cy.window().then((win) => {
-      // Simulate scrolling down with a significant distance
-      win.scrollTo(0, 300);
-
-      // Create a proper scroll event with all properties a native scroll would have
-      const scrollEvent = new Event("scroll", { bubbles: true });
-      win.dispatchEvent(scrollEvent);
-
-      return cy.wrap(win);
-    });
-
-    // Using a longer wait to ensure state updates complete (including any transition times)
-    cy.wait(200);
+    // Simulate scrolling down
+    cy.scrollTo(0, 0);
+    // Then scroll down
+    cy.scrollTo(0, 100);
 
     // Header should now be hidden
-    // Using should with a retry/timeout strategy
     cy.get("header").should("have.class", "-top-20");
 
-    // Simulate scrolling up - properly chain this after the previous assertion
-    cy.window().then((win) => {
-      // Mock the scroll event to simulate scrolling up
-      // Scroll up with deliberate action that ensures detection
-      win.scrollTo(0, 10); // Scroll almost to top to clearly trigger "up" direction
-
-      // Create a proper scroll event with all properties a native scroll would have
-      const scrollEvent = new Event("scroll", { bubbles: true });
-      win.dispatchEvent(scrollEvent);
-
-      return cy.wrap(win);
-    });
-
-    // Using a longer wait to ensure state updates complete (including any transition times)
-    cy.wait(200);
+    // Simulate scrolling up
+    cy.scrollTo(0, 50);
 
     // Header should now be visible again
     cy.get("header").should("have.class", "top-0");
