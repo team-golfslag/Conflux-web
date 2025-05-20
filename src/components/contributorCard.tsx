@@ -131,6 +131,7 @@ export default function ContributorCard({
                         size="sm"
                         className="p-0 text-blue-500 hover:text-blue-700"
                         onClick={onEdit}
+                        aria-label="Edit contributor"
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -149,6 +150,7 @@ export default function ContributorCard({
                             size="sm"
                             className="text-destructive hover:text-destructive/80 p-0"
                             onClick={openDeleteDialog}
+                            aria-label="Delete contributor"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

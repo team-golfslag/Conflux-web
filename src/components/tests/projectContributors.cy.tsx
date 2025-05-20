@@ -55,10 +55,14 @@ describe("ProjectContributors Component", () => {
     organisations: [],
   });
 
-  const onProjectUpdate = cy.stub().as("updateFn");
+  // Define onProjectUpdate as a function type
+  let onProjectUpdate: () => void;
   const mockApiClient = createApiClientMock();
 
   beforeEach(() => {
+    // Create a fresh stub for each test
+    onProjectUpdate = cy.stub().as("updateFn");
+
     cy.stub(mockApiClient, "contributors_DeleteContributor").resolves();
     cy.stub(mockApiClient, "contributors_UpdateContributor").resolves({});
     cy.stub(mockApiClient, "contributors_CreateContributor").resolves(

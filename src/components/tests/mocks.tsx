@@ -35,20 +35,20 @@ const mockContributor: ContributorDTO = new ContributorDTO({
 
 /**
  * Creates a mock API client for testing
- * @returns A mock API client with all methods stubbed
+ * @returns A mock API client with methods that can be stubbed later
  */
 export function createApiClientMock() {
   return {
-    projects_GetProjectById: cy.stub(),
-    projects_GetProjects: cy.stub(),
-    projects_GetProject: cy.stub(),
-    projects_UpdateProject: cy.stub(),
-    projects_PatchProject: cy.stub(),
-    contributors_CreateContributor: cy.stub(),
-    contributors_UpdateContributor: cy.stub(),
-    contributors_DeleteContributor: cy.stub(),
-    people_GetPersonsByQuery: cy.stub(),
-    people_CreatePerson: cy.stub(),
+    projects_GetProjectById: () => {},
+    projects_GetProjects: () => {},
+    projects_GetProject: () => {},
+    projects_UpdateProject: () => {},
+    projects_PatchProject: () => {},
+    contributors_CreateContributor: () => {},
+    contributors_UpdateContributor: () => {},
+    contributors_DeleteContributor: () => {},
+    people_GetPersonsByQuery: () => {},
+    people_CreatePerson: () => {},
   } as unknown as ApiClient;
 }
 
