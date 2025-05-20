@@ -63,4 +63,24 @@ describe("<LoadingWrapper />", () => {
     ).should("not.exist");
     cy.contains("Content").should("be.visible");
   });
+
+  it("doesn't render loading when isLoading is true but isInitialLoad is false", () => {
+    mount(
+      <LoadingWrapper isLoading={true} isInitialLoad={false}>
+        <div>Content While Loading</div>
+      </LoadingWrapper>,
+    );
+    cy.contains("Content While Loading").should("be.visible");
+    cy.contains("Loading...").should("not.exist");
+  });
+
+  it("renders loading when isInitialLoad is true and isLoading is true", () => {
+    mount(
+      <LoadingWrapper isLoading={true} isInitialLoad={true}>
+        <div>Content</div>
+      </LoadingWrapper>,
+    );
+    cy.contains("Loading...").should("be.visible");
+    cy.contains("Content").should("not.exist");
+  });
 });

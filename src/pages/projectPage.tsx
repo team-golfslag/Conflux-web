@@ -15,7 +15,7 @@ import ProjectDetails from "@/components/projectDetails.tsx";
 import ProjectTimeline from "@/components/projectTimeline.tsx";
 import PageLinks from "@/components/pageLinks";
 import { ApiClientContext } from "@/lib/ApiClientContext";
-import { ProjectLoadingWrapper } from "@/components/projectLoadingWrapper";
+import { LoadingWrapper } from "@/components/loadingWrapper";
 import {
   ProjectDTO,
   SwaggerException,
@@ -141,7 +141,7 @@ export default function ProjectPage() {
   }
 
   return (
-    <ProjectLoadingWrapper
+    <LoadingWrapper
       isLoading={isLoading}
       isInitialLoad={isInitialLoad}
       loadingMessage="Loading project..."
@@ -193,6 +193,6 @@ export default function ProjectPage() {
           </main>
         </>
       )}
-    </ProjectLoadingWrapper>
+    </LoadingWrapper>
   );
 }
