@@ -32,8 +32,8 @@ type ProjectDetailsProps = {
 };
 
 const determineStatus = (
-  startDate: Date | undefined,
-  endDate: Date | undefined,
+  startDate: Date | undefined | null,
+  endDate: Date | undefined | null,
 ) => {
   const now = new Date();
   if (!startDate || startDate > now) {
@@ -50,12 +50,12 @@ export default function ProjectDetails({
   onProjectUpdate,
 }: Readonly<ProjectDetailsProps>) {
   const [editMode, setEditMode] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(
-    project.start_date,
-  );
-  const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(
-    project.end_date,
-  );
+  const [selectedStartDate, setSelectedStartDate] = useState<
+    Date | null | undefined
+  >(project.start_date);
+  const [selectedEndDate, setSelectedEndDate] = useState<
+    Date | null | undefined
+  >(project.end_date);
   const [selectedLeaderId, setSelectedLeaderId] = useState<string | undefined>(
     project.contributors.find((c) => c.leader)?.person.id,
   );
@@ -112,9 +112,8 @@ export default function ProjectDetails({
     return apiClient.projects_PatchProject(
       project.id,
       new ProjectPatchDTO({
-        start_date: selectedStartDate,
-        end_date: selectedEndDate,
-        // We'd include organization updates here if the API supports it
+        start_date: selectedStartDate === null ? undefined : selectedStartDate,
+        end_date: selectedEndDate === null ? undefined : selectedEndDate,
       }),
     );
   };
@@ -194,54 +193,76 @@ export default function ProjectDetails({
                   <Label htmlFor="start-date" className="font-semibold">
                     Start Date
                   </Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="mt-1 w-full justify-start text-left font-normal"
-                      >
-                        {selectedStartDate
-                          ? format(selectedStartDate, "d MMMM yyyy")
-                          : "Select date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={selectedStartDate}
-                        onSelect={setSelectedStartDate}
-                        defaultMonth={selectedStartDate}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <div className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full max-w-[calc(100%-44px)] justify-start overflow-hidden text-left font-normal text-ellipsis"
+                        >
+                          {selectedStartDate
+                            ? format(selectedStartDate, "d MMMM yyyy")
+                            : "Select date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={selectedStartDate || undefined}
+                          onSelect={setSelectedStartDate}
+                          defaultMonth={selectedStartDate || undefined}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setSelectedStartDate(null)}
+                      title="Clear date"
+                      className="h-9 w-10 min-w-10 flex-shrink-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 <div>
                   <Label htmlFor="end-date" className="font-semibold">
                     End Date
                   </Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="mt-1 w-full justify-start text-left font-normal"
-                      >
-                        {selectedEndDate
-                          ? format(selectedEndDate, "d MMMM yyyy")
-                          : "Select date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={selectedEndDate}
-                        onSelect={setSelectedEndDate}
-                        defaultMonth={selectedEndDate}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <div className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full max-w-[calc(100%-44px)] justify-start overflow-hidden text-left font-normal text-ellipsis"
+                        >
+                          {selectedEndDate
+                            ? format(selectedEndDate, "d MMMM yyyy")
+                            : "Select date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={selectedEndDate || undefined}
+                          onSelect={setSelectedEndDate}
+                          defaultMonth={selectedEndDate || undefined}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setSelectedEndDate(null)}
+                      title="Clear date"
+                      className="h-9 w-10 min-w-10 flex-shrink-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 <div>

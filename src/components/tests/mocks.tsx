@@ -39,16 +39,16 @@ const mockContributor: ContributorDTO = new ContributorDTO({
  */
 export function createApiClientMock() {
   return {
-    projects_GetProjectById: () => {},
-    projects_GetProjects: () => {},
-    projects_GetProject: () => {},
-    projects_UpdateProject: () => {},
-    projects_PatchProject: () => {},
-    contributors_CreateContributor: () => {},
-    contributors_UpdateContributor: () => {},
-    contributors_DeleteContributor: () => {},
-    people_GetPersonsByQuery: () => {},
-    people_CreatePerson: () => {},
+    projects_GetProjectById: () => ({}),
+    projects_GetProjects: () => [],
+    projects_GetProject: () => ({}),
+    projects_UpdateProject: () => ({}),
+    projects_PatchProject: () => ({}),
+    contributors_CreateContributor: () => ({}),
+    contributors_UpdateContributor: () => ({}),
+    contributors_DeleteContributor: () => ({}),
+    people_GetPersonsByQuery: () => [],
+    people_CreatePerson: () => ({}),
   } as unknown as ApiClient;
 }
 

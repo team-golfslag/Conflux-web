@@ -153,17 +153,6 @@ describe("ProjectContributors Component", () => {
     cy.get("@updateFn").should("have.been.called");
   });
 
-  it("opens add contributor modal when add button is clicked", () => {
-    // Click the Add Contributor button
-    cy.contains("button", "Add Contributor").click();
-
-    // Verify add modal is open
-    cy.contains("Add Contributor").should("be.visible");
-
-    // Close the modal
-    cy.contains("button", "Cancel").click();
-  });
-
   it("exits edit mode when exit button is clicked", () => {
     // Enter edit mode
     cy.contains("button", "Edit").click();

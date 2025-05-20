@@ -27,8 +27,6 @@ type ProjectOverviewProps = {
  * @param props projectId, title and description to be displayed, and refresh callback
  */
 export default function ProjectOverview({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  projectId,
   title,
   description,
   onProjectUpdate,

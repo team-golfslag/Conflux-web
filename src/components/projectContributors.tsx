@@ -95,14 +95,6 @@ export default function ImprovedProjectContributors({
             )}
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsAddModalOpen(true)}
-          >
-            Add Contributor
-          </Button>
-
           <AddContributorModal
             isOpen={isAddModalOpen}
             onOpenChange={setIsAddModalOpen}
