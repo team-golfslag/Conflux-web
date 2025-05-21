@@ -69,8 +69,8 @@ export default function ContributorCard({
   };
 
   return (
-    <Card className="flex flex-col border border-gray-200 p-3 shadow-sm">
-      <div className="flex flex-col justify-between">
+    <Card className="flex h-full flex-col border border-gray-200 p-3 shadow-sm">
+      <div className="flex h-full flex-col justify-between">
         <div className="w-full">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -131,6 +131,7 @@ export default function ContributorCard({
                         size="sm"
                         className="p-0 text-blue-500 hover:text-blue-700"
                         onClick={onEdit}
+                        aria-label="Edit contributor"
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -149,6 +150,7 @@ export default function ContributorCard({
                             size="sm"
                             className="text-destructive hover:text-destructive/80 p-0"
                             onClick={openDeleteDialog}
+                            aria-label="Delete contributor"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -164,7 +166,7 @@ export default function ContributorCard({
           {email && <p className="text-muted-foreground text-xs">{email}</p>}
         </div>
 
-        <div className="mt-auto flex flex-col gap-1 pt-1">
+        <div className="mt-auto flex flex-col gap-1 pt-3">
           {positions && positions.length > 0 && (
             <div className="flex flex-wrap justify-start gap-1">
               {positions.map((positionDTO) => {
@@ -223,7 +225,7 @@ export default function ContributorCard({
                       variant="secondary"
                       className="h-5 px-2 py-0 text-xs"
                     >
-                      {role.name}
+                      {role.type}
                     </Badge>
                   );
                 }

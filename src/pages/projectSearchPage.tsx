@@ -6,7 +6,13 @@
 import ProjectCard from "@/components/projectCard";
 import { Input } from "@/components/ui/input.tsx";
 import { useState } from "react";
-import { OrderByType } from "@team-golfslag/conflux-api-client/src/client";
+import {
+  OrderByType,
+  ApiClient,
+  ProjectDTO,
+  UserDTO,
+  UserRoleDTO,
+} from "@team-golfslag/conflux-api-client/src/client";
 import { Separator } from "@/components/ui/separator.tsx";
 import { Search } from "lucide-react";
 import {
@@ -19,9 +25,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/datepicker.tsx";
-import { useApiQuery } from "@/hooks/useApiQuery";
 import { useDebounce } from "@/hooks/useDebounce"; // Assuming you have or create this hook
 import { useSession } from "@/hooks/SessionContext";
+import { ApiWrapper } from "@/components/apiWrapper";
 
 /** Project Search Page component <br>
  * Fetches projects from the backend using a debounced search term and selected sort order.
@@ -33,6 +39,7 @@ const ProjectSearchPage = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [sort, setSort] = useState(""); // Default to relevance
+  const [refreshKey, setRefreshKey] = useState(0); // Used to force refresh the query
 
   // Debounce the search term to avoid excessive API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 200); // 300ms delay
@@ -63,28 +70,19 @@ const ProjectSearchPage = () => {
   const handleStartDateChange = (date: Date | undefined) => {
     console.log("Start Date selected:", date);
     setStartDate(date);
+    // Force refresh the query when the date changes
+    setRefreshKey((prev) => prev + 1);
   };
 
   const handleEndDateChange = (date: Date | undefined) => {
     console.log("End Date selected:", date);
     setEndDate(date);
+    // Force refresh the query when the date changes
+    setRefreshKey((prev) => prev + 1);
   };
 
-  // Use useApiQuery to fetch data based on debounced search term and sort order
-  const {
-    data: projects,
-    isLoading,
-    error,
-  } = useApiQuery(
-    (apiClient) =>
-      apiClient.projects_GetProjectByQuery(
-        debouncedSearchTerm,
-        startDate,
-        endDate,
-        parseOrderBy(sort),
-      ),
-    [debouncedSearchTerm, startDate, endDate, sort], // Dependencies for the query
-  );
+  // Define a state variable to track when the API returns no results
+  // const [hasNoResults, setHasNoResults] = useState(false);
 
   return (
     <search>
@@ -113,7 +111,14 @@ const ProjectSearchPage = () => {
             <DatePicker onDateChange={handleEndDateChange} />
           </div>
         </div>
-        <Select value={sort} onValueChange={setSort}>
+        <Select
+          value={sort}
+          onValueChange={(value) => {
+            setSort(value);
+            // Force refresh the query when the sort order changes
+            setRefreshKey((prev) => prev + 1);
+          }}
+        >
           <SelectTrigger className="w-50 sm:ml-auto">
             <SelectValue placeholder="Sort by.." />
           </SelectTrigger>
@@ -136,46 +141,49 @@ const ProjectSearchPage = () => {
         </Select>
       </div>
       <Separator className="col-span-full my-4" />
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
-        {/* Show loading only on initial load or if projects array is empty */}
-        {isLoading && (!projects || projects.length === 0) ? (
-          <p className="text-muted-foreground col-span-full text-center">
-            Searching projects...
-          </p>
-        ) : (
-          <>
-            {error && (
-              <h3 className="col-span-full text-center text-red-500">
-                Error: {error.message}
-              </h3>
-            )}
-            {!isLoading && projects && !error && projects.length === 0 && (
+
+      <ApiWrapper<ProjectDTO[]>
+        queryFn={(apiClient: ApiClient) =>
+          apiClient.projects_GetProjectByQuery(
+            debouncedSearchTerm,
+            startDate,
+            endDate,
+            parseOrderBy(sort),
+          )
+        }
+        dependencies={[debouncedSearchTerm, refreshKey]}
+        loadingMessage="Searching projects..."
+        mode="page"
+      >
+        {(projects) => (
+          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
+            {projects.length === 0 ? (
               <h3 className="col-span-full text-center text-gray-500">
                 No results found
               </h3>
+            ) : (
+              <>
+                {projects.slice(0, 15).map((project) => {
+                  // Determine current user roles for search results
+                  const currentUser = project.users.find(
+                    (user: UserDTO) => user.scim_id === session?.user?.scim_id,
+                  );
+                  const roles = currentUser?.roles
+                    ? currentUser.roles.map((role: UserRoleDTO) => role.type)
+                    : [];
+                  return (
+                    <ProjectCard
+                      project={project}
+                      roles={roles}
+                      key={project.id}
+                    />
+                  );
+                })}
+              </>
             )}
-            {/* Display project cards - always render if projects exist */}
-            {projects &&
-              projects.length > 0 &&
-              projects.slice(0, 15).map((project) => {
-                // Determine current user roles for search results
-                const currentUser = project.users.find(
-                  (user) => user.scim_id === session?.user?.scim_id,
-                );
-                const roles = currentUser?.roles
-                  ? currentUser.roles.map((role) => role.name)
-                  : [];
-                return (
-                  <ProjectCard
-                    project={project}
-                    roles={roles}
-                    key={project.id}
-                  />
-                );
-              })}
-          </>
+          </div>
         )}
-      </div>
+      </ApiWrapper>
     </search>
   );
 };
