@@ -4,7 +4,10 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { ContributorRoleType } from "@team-golfslag/conflux-api-client/src/client";
+import {
+  ContributorRoleType,
+  ContributorPositionType,
+} from "@team-golfslag/conflux-api-client/src/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -16,29 +19,39 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getRoleDisplay } from "@/lib/formatters/roleFormatter";
+import { getPositionDisplay } from "@/lib/formatters/positionFormatter";
 
-interface ContributorFormData {
+export interface ContributorFormData {
   name: string;
   email: string;
   orcidId: string;
   roles: ContributorRoleType[];
+  positions: ContributorPositionType[];
   leader: boolean;
   contact: boolean;
 }
 
 interface ContributorFormFieldsProps {
   formData: ContributorFormData;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleRoleChange: (role: ContributorRoleType) => void;
-  setFormData: React.Dispatch<React.SetStateAction<ContributorFormData>>;
+  onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onOrcidIdChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onRoleChange: (role: ContributorRoleType) => void;
+  onPositionChange: (position: ContributorPositionType) => void;
+  onLeaderChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onContactChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   isEdit?: boolean;
 }
 
 export default function ContributorFormFields({
   formData,
-  handleInputChange,
-  handleRoleChange,
-  setFormData,
+  onNameChange,
+  onEmailChange,
+  onOrcidIdChange,
+  onRoleChange,
+  onPositionChange,
+  onLeaderChange,
+  onContactChange,
   isEdit = false,
 }: Readonly<ContributorFormFieldsProps>) {
   const idPrefix = isEdit ? "edit-" : "";
@@ -53,7 +66,7 @@ export default function ContributorFormFields({
           name="name"
           className="col-span-3"
           value={formData.name}
-          onChange={handleInputChange}
+          onChange={onNameChange}
         />
       </div>
 
@@ -67,7 +80,7 @@ export default function ContributorFormFields({
           type="email"
           className="col-span-3"
           value={formData.email}
-          onChange={handleInputChange}
+          onChange={onEmailChange}
         />
       </div>
 
@@ -80,9 +93,39 @@ export default function ContributorFormFields({
           name="orcidId"
           className="col-span-3"
           value={formData.orcidId}
-          onChange={handleInputChange}
+          onChange={onOrcidIdChange}
           placeholder="0000-0000-0000-0000"
         />
+      </div>
+
+      <div className="grid grid-cols-4 items-start gap-4">
+        <Label className="pt-2 text-right">Positions</Label>
+        <div className="col-span-3 flex flex-wrap gap-2">
+          {Object.values(ContributorPositionType).map((position) => {
+            const positionDisplay = getPositionDisplay(position);
+            return (
+              <TooltipProvider key={position}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      key={position}
+                      variant={
+                        formData.positions.includes(position)
+                          ? "default"
+                          : "outline"
+                      }
+                      className="cursor-pointer"
+                      onClick={() => onPositionChange(position)}
+                    >
+                      {positionDisplay.short}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>{positionDisplay.long}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          })}
+        </div>
       </div>
 
       <div className="grid grid-cols-4 items-start gap-4">
@@ -100,7 +143,7 @@ export default function ContributorFormFields({
                         formData.roles.includes(role) ? "default" : "outline"
                       }
                       className="cursor-pointer"
-                      onClick={() => handleRoleChange(role)}
+                      onClick={() => onRoleChange(role)}
                     >
                       {roleDisplay.short}
                     </Badge>
@@ -121,9 +164,12 @@ export default function ContributorFormFields({
           <Switch
             id={`${idPrefix}leader`}
             checked={formData.leader}
-            onCheckedChange={(checked) =>
-              setFormData((prev) => ({ ...prev, leader: checked }))
-            }
+            onCheckedChange={(checked) => {
+              const event = {
+                target: { checked },
+              } as React.ChangeEvent<HTMLInputElement>;
+              onLeaderChange(event);
+            }}
           />
           <Label
             htmlFor={`${idPrefix}leader`}
@@ -142,9 +188,12 @@ export default function ContributorFormFields({
           <Switch
             id={`${idPrefix}contact`}
             checked={formData.contact}
-            onCheckedChange={(checked) =>
-              setFormData((prev) => ({ ...prev, contact: checked }))
-            }
+            onCheckedChange={(checked) => {
+              const event = {
+                target: { checked },
+              } as React.ChangeEvent<HTMLInputElement>;
+              onContactChange(event);
+            }}
           />
           <Label
             htmlFor={`${idPrefix}contact`}

@@ -158,13 +158,13 @@ export default function ProjectPage() {
             </Card>
           </div>
           {/* Side Panel */}
-          <aside className="space-y-8">
+          <div className="space-y-8">
             <ProjectDetails
               onSave={handleEditDetails}
               project={project}
             ></ProjectDetails>
             <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
-          </aside>
+          </div>
         </main>
       </>
     );

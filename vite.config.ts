@@ -10,35 +10,6 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (id.includes("react-dom/client")) {
-              return "react-dom-client";
-            }
-            if (id.includes("react-dom")) {
-              return "react-dom";
-            }
-            if (id.includes("react-router-dom")) {
-              return "react-router-dom";
-            }
-            if (id.includes("react")) {
-              return "react";
-            }
-            if (id.includes("tailwindcss")) {
-              return "tailwindcss";
-            }
-            if (id.includes("golfslag")) {
-              return "golfslag";
-            }
-            return "vendor";
-          }
-        },
-      },
-    },
-  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

@@ -57,6 +57,10 @@ export default function ProjectDetails({
     ? format(project.end_date, "d MMMM yyyy")
     : "N/A";
 
+  const projectLead = project.contributors.find(
+    (contributor) => contributor.leader,
+  );
+
   return (
     <Card className="">
       <CardHeader className="flex items-center justify-between">
@@ -82,8 +86,9 @@ export default function ProjectDetails({
         </div>
         <div>
           <h3 className="font-semibold">Project Lead</h3>
-          {/* TODO: make this the actual project lead*/}
-          <p className="text-gray-700">Dr. J. Doe</p>
+          <p className="text-gray-700">
+            {projectLead ? projectLead.person.name : "N/A"}
+          </p>
         </div>
         <div>
           <h3 className="font-semibold">Dates</h3>

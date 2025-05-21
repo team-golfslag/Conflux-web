@@ -5,7 +5,7 @@
  */
 import { BrowserRouter } from "react-router-dom"; // Import BrowserRouter for Link component
 import { mount } from "cypress/react";
-import Header from "@/components/header";
+import Header from "@/components/header.tsx";
 
 /// <reference types="cypress" />
 
@@ -59,23 +59,15 @@ describe("<Header />", () => {
     cy.get("header").should("have.class", "top-0");
 
     // Simulate scrolling down
-    cy.window().then((win) => {
-      // Set a previous scroll position
-      win.scrollY = 0;
-      // Then scroll down
-      win.scrollY = 100;
-      win.dispatchEvent(new Event("scroll"));
-    });
+    cy.scrollTo(0, 0);
+    // Then scroll down
+    cy.scrollTo(0, 100);
 
     // Header should now be hidden
     cy.get("header").should("have.class", "-top-20");
 
     // Simulate scrolling up
-    cy.window().then((win) => {
-      // Mock the scroll event to simulate scrolling up
-      win.scrollY = 50; // Less than previous value
-      win.dispatchEvent(new Event("scroll"));
-    });
+    cy.scrollTo(0, 50);
 
     // Header should now be visible again
     cy.get("header").should("have.class", "top-0");
