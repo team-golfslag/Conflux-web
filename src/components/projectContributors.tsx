@@ -129,19 +129,6 @@ export default function ProjectContributors({
         )}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {project.users?.map((user) => (
-            <ContributorCard
-              key={user.scim_id}
-              id={user.scim_id}
-              name={user.name}
-              email={user.email}
-              orcidId={user.or_ci_d}
-              roles={user.roles}
-              isConfluxUser
-              editMode={editMode}
-            />
-          ))}
-
           {project.contributors?.map((contributor) => (
             <div key={contributor.person.id}>
               <ContributorCard
@@ -150,6 +137,7 @@ export default function ProjectContributors({
                 email={contributor.person.email}
                 orcidId={contributor.person.orcid_id}
                 roles={contributor.roles}
+                positions={contributor.positions}
                 isLeader={contributor.leader}
                 isContact={contributor.contact}
                 editMode={editMode}

@@ -79,11 +79,6 @@ export default function AddContributorModal({
   const apiClient = useContext(ApiClientContext);
 
   // Form handlers
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleRoleChange = (role: ContributorRoleType) => {
     setFormData((prev) => ({
       ...prev,
@@ -196,7 +191,7 @@ export default function AddContributorModal({
         const personDTO = new PersonDTO({
           name: formData.name,
           email: formData.email,
-          or_ci_d: formattedOrcid || undefined,
+          or_ci_d: formattedOrcid ?? undefined,
         });
         personToUse = await apiClient.people_CreatePerson(personDTO);
         if (!personToUse?.id) {
@@ -222,6 +217,7 @@ export default function AddContributorModal({
       );
 
       if (!createdContributor?.person) {
+        console.log(createdContributor);
         throw new Error("Server returned an invalid contributor");
       }
 
@@ -317,10 +313,23 @@ export default function AddContributorModal({
 
           <ContributorFormFields
             formData={formData}
-            handleInputChange={handleInputChange}
-            handleRoleChange={handleRoleChange}
-            handlePositionChange={handlePositionChange} // Pass handlePositionChange
-            setFormData={setFormData}
+            onNameChange={(e) =>
+              setFormData((prev) => ({ ...prev, name: e.target.value }))
+            }
+            onEmailChange={(e) =>
+              setFormData((prev) => ({ ...prev, email: e.target.value }))
+            }
+            onOrcidIdChange={(e) =>
+              setFormData((prev) => ({ ...prev, orcidId: e.target.value }))
+            }
+            onRoleChange={handleRoleChange}
+            onPositionChange={handlePositionChange}
+            onLeaderChange={(e) =>
+              setFormData((prev) => ({ ...prev, leader: e.target.checked }))
+            }
+            onContactChange={(e) =>
+              setFormData((prev) => ({ ...prev, contact: e.target.checked }))
+            }
           />
         </div>
 
@@ -330,7 +339,7 @@ export default function AddContributorModal({
           </Button>
           <Button
             onClick={addContributor}
-            disabled={!formData.name || formData.roles.length === 0}
+            disabled={!formData.name || formData.positions.length === 0}
           >
             Add Contributor
           </Button>

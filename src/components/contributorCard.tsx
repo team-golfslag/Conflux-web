@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/tooltip";
 import { getRoleDisplay } from "@/lib/formatters/roleFormatter";
 import { getPositionDisplay } from "@/lib/formatters/positionFormatter"; // Added import
-import Logo from "./icons/logo";
 import { AlertDialog, AlertDialogTrigger } from "./ui/alert-dialog";
 import { useState } from "react";
 
@@ -32,7 +31,7 @@ type ContributorCardProps = {
   email?: string | null;
   orcidId?: string | null;
   roles: ContributorRoleType[] | UserRoleDTO[];
-  positions?: ContributorPositionDTO[] | null; // Updated type
+  positions?: ContributorPositionDTO[] | null;
   isLeader?: boolean;
   isContact?: boolean;
   isConfluxUser?: boolean;
@@ -48,10 +47,9 @@ export default function ContributorCard({
   email,
   orcidId,
   roles,
-  positions, // Added positions
+  positions,
   isLeader,
   isContact,
-  isConfluxUser,
   editMode,
   onEdit,
   onDelete,
@@ -77,16 +75,6 @@ export default function ContributorCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <p className="font-semibold">{name}</p>
-              {isConfluxUser && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Logo size="16" />
-                    </TooltipTrigger>
-                    <TooltipContent>Conflux User</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
               {isLeader && (
                 <TooltipProvider>
                   <Tooltip>
@@ -133,54 +121,77 @@ export default function ContributorCard({
               </TooltipProvider>
             )}
 
-            {editMode &&
-              !isConfluxUser &&
-              onEdit &&
-              onDelete &&
-              openDeleteDialog && (
-                <div className="flex space-x-1">
+            {editMode && onEdit && onDelete && openDeleteDialog && (
+              <div className="flex space-x-1">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="p-0 text-blue-500 hover:text-blue-700"
+                        onClick={onEdit}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Edit contributor</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <AlertDialog>
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="p-0 text-blue-500 hover:text-blue-700"
-                          onClick={onEdit}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive/80 p-0"
+                            onClick={openDeleteDialog}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
                       </TooltipTrigger>
-                      <TooltipContent>Edit contributor</TooltipContent>
+                      <TooltipContent>Delete contributor</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-
-                  <AlertDialog>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-destructive hover:text-destructive/80 p-0"
-                              onClick={openDeleteDialog}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                        </TooltipTrigger>
-                        <TooltipContent>Delete contributor</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </AlertDialog>
-                </div>
-              )}
+                </AlertDialog>
+              </div>
+            )}
           </div>
           {email && <p className="text-muted-foreground text-xs">{email}</p>}
         </div>
 
         <div className="mt-auto flex flex-col gap-1 pt-1">
+          {positions && positions.length > 0 && (
+            <div className="flex flex-wrap justify-start gap-1">
+              {positions.map((positionDTO) => {
+                const displayablePosition = positionDTO.type;
+                const positionDisplay = getPositionDisplay(displayablePosition);
+                return (
+                  <TooltipProvider key={positionDisplay.short}>
+                    {" "}
+                    {/* Using positionDisplay.short as key */}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge
+                          variant="outline"
+                          className="h-5 px-2 py-0 text-xs"
+                        >
+                          {positionDisplay.short}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        {positionDisplay.long}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                );
+              })}
+            </div>
+          )}
           {roles.length > 0 && (
             <div className="flex flex-wrap justify-start gap-1">
               {roles.map((role, index) => {
@@ -216,33 +227,6 @@ export default function ContributorCard({
                     </Badge>
                   );
                 }
-              })}
-            </div>
-          )}
-          {positions && positions.length > 0 && (
-            <div className="flex flex-wrap justify-start gap-1">
-              {positions.map((positionDTO) => {
-                const displayablePosition = positionDTO.type;
-                const positionDisplay = getPositionDisplay(displayablePosition);
-                return (
-                  <TooltipProvider key={positionDisplay.short}>
-                    {" "}
-                    {/* Using positionDisplay.short as key */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Badge
-                          variant="outline"
-                          className="h-5 px-2 py-0 text-xs"
-                        >
-                          {positionDisplay.short}
-                        </Badge>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        {positionDisplay.long}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                );
               })}
             </div>
           )}
