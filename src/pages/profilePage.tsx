@@ -80,11 +80,11 @@ const ProfilePage = () => {
             <CardContent className="space-y-4">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">Name</p>
-                <p>{session.name || "N/A"}</p>
+                <p>{session.name ?? "N/A"}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">Email</p>
-                <p>{session.email || "N/A"}</p>
+                <p>{session.email ?? "N/A"}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">ORCID</p>

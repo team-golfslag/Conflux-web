@@ -54,7 +54,7 @@ export default function ProjectContributors({
   };
 
   const handleContributorAdded = (newContributor: ContributorDTO) => {
-    project.contributors = [...(project.contributors || []), newContributor];
+    project.contributors = [...(project.contributors ?? []), newContributor];
   };
 
   const handleContributorUpdated = (updatedContributor: ContributorDTO) => {

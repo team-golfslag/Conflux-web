@@ -12,8 +12,12 @@ import { TimeLineImportance, TimelineItem } from "@/components/timeline";
 import { useParams } from "react-router";
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 import {
+  DescriptionType,
+  ProjectDescriptionDTO,
   ProjectDTO,
   ProjectPatchDTO,
+  ProjectTitleDTO,
+  TitleType,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { LoadingWrapper } from "@/components/loadingWrapper";
@@ -83,22 +87,54 @@ export default function ProjectPage() {
   }, [apiClient, id]);
 
   /**
-   * Handles the editing of project details by updating the project's start date and end date.
-   * Sends a patch request to update the project information in the backend.
+   * Handles the editing of a project's title
    *
-   * @function handleEditDetails
-   * @param {Date} [startDate] - The new start date for the project, if provided.
-   * @param {Date} [endDate] - The new end date for the project, if provided.
-   * @throws Will set an error state if the API request fails.
+   * @param {string} [title] - The new title for the project's overview. Defaults to an empty string if not provided.
    */
-  const handleEditDetails = (startDate?: Date, endDate?: Date) => {
+  const handleEditTitle = (title?: string) => {
+    const titleDto: ProjectTitleDTO[] = [
+      new ProjectTitleDTO({
+        text: title ?? "",
+        type: TitleType.Primary,
+        start_date: new Date(),
+      }),
+    ];
+
     if (id) {
       apiClient
         .projects_PatchProject(
           id,
           new ProjectPatchDTO({
-            start_date: startDate,
-            end_date: endDate,
+            titles: titleDto,
+          }),
+        )
+        .then((p) => {
+          setProject(p);
+          setError(undefined);
+        })
+        .catch((e) => setError(e));
+    }
+  };
+
+  /**
+   * Handles the editing of a project's description
+   *
+   * @param {string} [description] - The new description for the project's overview. Defaults to an empty string if not provided.
+   */
+  const handleEditDescription = (description?: string) => {
+    const descriptionDto: ProjectDescriptionDTO[] = [
+      new ProjectDescriptionDTO({
+        text: description ?? "",
+        type: DescriptionType.Primary,
+      }),
+    ];
+
+    if (id) {
+      apiClient
+        .projects_PatchProject(
+          id,
+          new ProjectPatchDTO({
+            descriptions: descriptionDto,
           }),
         )
         .then((p) => {
@@ -144,6 +180,8 @@ export default function ProjectPage() {
               <ProjectOverview
                 title={project.primary_title?.text ?? "No title available"}
                 description={project.primary_description?.text}
+                onSaveTitle={handleEditTitle}
+                onSaveDescription={handleEditDescription}
               />
             </Card>
             <Card
