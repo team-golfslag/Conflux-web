@@ -4,6 +4,7 @@
     "target": "ES2022",
     "lib": ["ES2023"],
     "module": "ESNext",
+    "composite": true,
     "skipLibCheck": true,
 
     /* Bundler mode */
@@ -12,6 +13,7 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "allowSyntheticDefaultImports": true,
 
     /* Linting */
     "strict": true,
@@ -20,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "cypress.config.ts"]
 }

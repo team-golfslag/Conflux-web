@@ -13,6 +13,7 @@ import {
   SessionContext,
   SessionContextType,
 } from "@/hooks/SessionContext";
+import config from "@/config";
 
 // Session expiration time in milliseconds (30 minutes)
 const SESSION_EXPIRATION_TIME = 30 * 60 * 1000;
@@ -110,13 +111,31 @@ export function SessionProvider({ children }: SessionProviderProps) {
     fetchSession();
   }, [apiClient, navigate, location.pathname]);
 
+  const saveSession = (userData: UserSession) => {
+    const sessionWithTimestamp: StoredSession = {
+      userData,
+      timestamp: new Date().getTime(),
+    };
+    localStorage.setItem(
+      SESSION_STORAGE_KEY,
+      JSON.stringify(sessionWithTimestamp),
+    );
+    setSession(userData);
+  };
+
   const logout = () => {
     setSession(null);
     localStorage.removeItem(SESSION_STORAGE_KEY);
-    navigate("/");
+    window.location.href = `${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(config.webUIUrl) + "/dashboard"}`;
   };
 
-  const contextValue: SessionContextType = { session, loading, error, logout };
+  const contextValue: SessionContextType = {
+    session,
+    loading,
+    error,
+    logout,
+    saveSession,
+  };
   return (
     <SessionContext.Provider value={contextValue}>
       {children}

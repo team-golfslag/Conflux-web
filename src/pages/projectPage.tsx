@@ -4,23 +4,64 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { Edit } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
 import ProjectOverview from "@/components/projectOverview.tsx";
 import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
-import Timeline, { TimelineItem } from "@/components/timeline";
-import { Link, useParams } from "react-router";
-import { useContext, useEffect, useState } from "react";
-import { Project } from "@team-golfslag/conflux-api-client/src/client";
+import { TimeLineImportance, TimelineItem } from "@/components/timeline";
+import { useParams } from "react-router";
+import { ReactNode, useContext, useEffect, useRef, useState } from "react";
+import {
+  DescriptionType,
+  ProjectDescriptionDTO,
+  ProjectDTO,
+  ProjectPatchDTO,
+  ProjectTitleDTO,
+  TitleType,
+} from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
+import { LoadingWrapper } from "@/components/loadingWrapper";
+import ProjectDetails from "@/components/projectDetails.tsx";
+import ProjectTimeline from "@/components/projectTimeline.tsx";
+import PageLinks from "@/components/pageLinks";
 
 /** List of timeline data as dummy data */
 const timelineData: TimelineItem[] = [
-  { date: "01-01-2023", name: "Event One" },
-  { date: "15-03-2023", name: "Event Two" },
-  { date: "10-06-2023", name: "Event Three" },
-  { date: "22-09-2023", name: "Event Four" },
+  {
+    date: "01-01-2023",
+    name: "Project Start",
+    importance: TimeLineImportance.High,
+  },
+  {
+    date: "05-02-2023",
+    name: "Log Item",
+    importance: TimeLineImportance.Medium,
+  },
+  {
+    date: "15-03-2023",
+    name: "Event One",
+    importance: TimeLineImportance.High,
+  },
+  {
+    date: "10-06-2023",
+    name: "Event Two",
+    importance: TimeLineImportance.High,
+  },
+  {
+    date: "08-07-2023",
+    name: "Log Item 1",
+    importance: TimeLineImportance.Medium,
+  },
+  {
+    date: "02-08-2023",
+    name: "Log Item 2",
+    importance: TimeLineImportance.Medium,
+  },
+  {
+    date: "22-09-2023",
+    name: "Project End",
+    importance: TimeLineImportance.High,
+  },
 ];
 
 /** Project page component <br>
@@ -29,9 +70,8 @@ const timelineData: TimelineItem[] = [
 export default function ProjectPage() {
   const { id } = useParams();
 
-  const [project, setProject] = useState<Project>();
+  const [project, setProject] = useState<ProjectDTO>();
   const [error, setError] = useState<Error>();
-
   const apiClient = useContext(ApiClientContext);
 
   useEffect(() => {
@@ -46,8 +86,73 @@ export default function ProjectPage() {
     }
   }, [apiClient, id]);
 
-  if (error)
-    return (
+  /**
+   * Handles the editing of a project's title
+   *
+   * @param {string} [title] - The new title for the project's overview. Defaults to an empty string if not provided.
+   */
+  const handleEditTitle = (title?: string) => {
+    const titleDto: ProjectTitleDTO[] = [
+      new ProjectTitleDTO({
+        text: title ?? "",
+        type: TitleType.Primary,
+        start_date: new Date(),
+      }),
+    ];
+
+    if (id) {
+      apiClient
+        .projects_PatchProject(
+          id,
+          new ProjectPatchDTO({
+            titles: titleDto,
+          }),
+        )
+        .then((p) => {
+          setProject(p);
+          setError(undefined);
+        })
+        .catch((e) => setError(e));
+    }
+  };
+
+  /**
+   * Handles the editing of a project's description
+   *
+   * @param {string} [description] - The new description for the project's overview. Defaults to an empty string if not provided.
+   */
+  const handleEditDescription = (description?: string) => {
+    const descriptionDto: ProjectDescriptionDTO[] = [
+      new ProjectDescriptionDTO({
+        text: description ?? "",
+        type: DescriptionType.Primary,
+      }),
+    ];
+
+    if (id) {
+      apiClient
+        .projects_PatchProject(
+          id,
+          new ProjectPatchDTO({
+            descriptions: descriptionDto,
+          }),
+        )
+        .then((p) => {
+          setProject(p);
+          setError(undefined);
+        })
+        .catch((e) => setError(e));
+    }
+  };
+
+  const overviewRef = useRef<HTMLDivElement>(null);
+  const contributorsRef = useRef<HTMLDivElement>(null);
+  const worksRef = useRef<HTMLDivElement>(null);
+
+  let content: ReactNode = null;
+
+  if (error) {
+    content = (
       <>
         <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
           <span>{error.name}</span>
@@ -58,64 +163,54 @@ export default function ProjectPage() {
         </div>
       </>
     );
-
-  if (!project)
-    return (
-      <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
-        <span>Loading...</span>
-      </div>
+  } else if (project) {
+    content = (
+      <>
+        <PageLinks
+          className="mt-6 mr-auto"
+          links={[
+            { label: "Overview", ref: overviewRef },
+            { label: "Contributors", ref: contributorsRef },
+            { label: "Works", ref: worksRef },
+          ]}
+        />
+        <main className="my-6 grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div className="flex flex-col gap-8 md:col-span-2">
+            <Card ref={overviewRef} className="scroll-mt-12" title="Overview">
+              <ProjectOverview
+                title={project.primary_title?.text ?? "No title available"}
+                description={project.primary_description?.text}
+                onSaveTitle={handleEditTitle}
+                onSaveDescription={handleEditDescription}
+              />
+            </Card>
+            <Card
+              ref={contributorsRef}
+              className="scroll-mt-12"
+              title="Contributors"
+            >
+              <ProjectContributors project={project} />
+            </Card>
+            <Card ref={worksRef} className="scroll-mt-12" title="Works">
+              <ProjectWorks products={project.products} />
+            </Card>
+          </div>
+          {/* Side Panel */}
+          <div className="space-y-8">
+            <ProjectDetails project={project}></ProjectDetails>
+            <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
+          </div>
+        </main>
+      </>
     );
+  }
 
   return (
-    <>
-      {/* Title */}
-      <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
-        <span>{project.title}</span>
-        <Link
-          to="edit"
-          className="bg-primary text-primary-foreground m-2 flex items-center justify-center rounded-lg p-2 transition-colors duration-300"
-        >
-          <Edit size={24} />
-        </Link>
-      </div>
-
-      <main className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="md:col-span-2">
-          <Tabs defaultValue="overview" className="h-fullw-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="contributors">Contributors</TabsTrigger>
-              <TabsTrigger value="works">Works</TabsTrigger>
-            </TabsList>
-            <TabsContent value="overview">
-              <ProjectOverview description={project.description} />
-            </TabsContent>
-            <TabsContent value="contributors">
-              <ProjectContributors contributors={project.contributors} />
-            </TabsContent>
-            <TabsContent value="works">
-              <ProjectWorks products={project.products} />
-            </TabsContent>
-          </Tabs>
-        </div>
-        {/* Side Panel */}
-        <aside className="space-y-6">
-          <div className="rounded-lg bg-white p-4 shadow">
-            <h3 className="text-lg font-semibold">Start Date</h3>
-            <p>{project.start_date?.toDateString()}</p>
-            <h3 className="mt-4 text-lg font-semibold">End Date</h3>
-            <p>{project.end_date?.toDateString()}</p>
-          </div>
-
-          {/* Contributors Section */}
-          <div className="rounded-lg bg-white p-4 shadow">
-            <h3 className="text-lg font-semibold">Timeline</h3>
-            <div className="mt-4 ml-3 space-y-4">
-              <Timeline items={timelineData} />
-            </div>
-          </div>
-        </aside>
-      </main>
-    </>
+    <LoadingWrapper
+      isLoading={!project && !error}
+      loadingMessage="Loading project..."
+    >
+      {content}
+    </LoadingWrapper>
   );
 }

@@ -3,8 +3,6 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-
-import { DashboardCardProps } from "@/components/dashboardCard";
 import { JSX, useState } from "react";
 import {
   Accordion,
@@ -22,12 +20,23 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination.tsx";
+import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
+import ProjectCard from "@/components/projectCard.tsx";
+import { CalendarIcon, UsersIcon } from "lucide-react";
 
+export interface DashboardCardProps {
+  project: ProjectDTO;
+  role: string;
+}
 interface DashboardListViewProps {
   data?: DashboardCardProps[];
+  listView: boolean;
 }
 
-const DashboardListView = ({ data }: DashboardListViewProps): JSX.Element => {
+const DashboardListView = ({
+  data,
+  listView,
+}: DashboardListViewProps): JSX.Element => {
   const [count, setCount] = useState(0);
   if (data) {
     const maxCards = 20;
@@ -44,39 +53,65 @@ const DashboardListView = ({ data }: DashboardListViewProps): JSX.Element => {
     };
     return (
       <div className="items-center">
-        <Accordion type="single" collapsible className="w-full">
-          {data
-            ?.slice(count * maxCards, count * maxCards + maxCards)
-            .map((rowProps) => (
-              <AccordionItem value={rowProps.project.id}>
-                <AccordionTrigger>{rowProps.project.title}</AccordionTrigger>
-                <AccordionContent className="w-full text-right flex flex-row">
-                  <div className="flex flex-col w-full">
-                    <div className="ml-3 flex h-5 items-center space-x-10 text-sm">
-                      <h3 className="font-semibold">Roles</h3>
-                      <p>{rowProps.role}</p>
+        {listView ? (
+          <Accordion type="single" collapsible className="w-full">
+            {data
+              ?.slice(count * maxCards, count * maxCards + maxCards)
+              .map((rowProps) => (
+                <AccordionItem value={rowProps.project.id}>
+                  <AccordionTrigger>
+                    {rowProps.project.primary_title.text}
+                  </AccordionTrigger>
+                  <AccordionContent className="flex w-full flex-row text-right">
+                    <div className="flex w-full flex-col">
+                      <div className="ml-3 flex h-5 items-center space-x-10 text-sm">
+                        <UsersIcon
+                          size={14}
+                          className="mr-2 text-gray-400 group-hover:text-blue-800"
+                        />
+                        <span className={"text-gray-400"}>
+                          {rowProps.project.contributors.length} contributor
+                          {rowProps.project.contributors.length !== 1
+                            ? "s"
+                            : ""}
+                        </span>
+                      </div>
+                      <div className="mt-2 ml-3 flex h-5 items-center space-x-4 text-sm">
+                        <CalendarIcon
+                          size={14}
+                          className="mr-2 text-gray-400 group-hover:text-blue-800"
+                        />
+                        <span className={"text-gray-400"}>
+                          {rowProps.project.start_date.toLocaleDateString()}{" "}
+                          {rowProps.project.end_date.toLocaleDateString() !==
+                          "Ongoing"
+                            ? `- ${rowProps.project.end_date.toLocaleDateString()}`
+                            : ": Ongoing"}
+                        </span>
+                      </div>
                     </div>
-                    <div className="mt-2 ml-3 flex h-5 items-center space-x-4 text-sm">
-                      <h3 className="font-semibold">Start Date</h3>
-                      <p>{rowProps.project.start_date?.toDateString()}</p>
-                      <h3 className="font-semibold">End Date</h3>
-                      <p>{rowProps.project.end_date?.toDateString()}</p>
+                    <div className="mt-3 text-right">
+                      <Link
+                        to={`/projects/${rowProps.project.id}`}
+                        className="mr-4"
+                      >
+                        <Button className="bg-primary right-0 font-semibold">
+                          See more
+                        </Button>
+                      </Link>
                     </div>
-                  </div>
-                  <div className="text-right mt-3">
-                    <Link
-                      to={`/projects/${rowProps.project.id}`}
-                      className="mr-4"
-                    >
-                      <Button className="bg-primary right-0 font-semibold">
-                        See more
-                      </Button>
-                    </Link>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+          </Accordion>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {data?.map((cardProps, index) => (
+              <ProjectCard key={cardProps.project.id || index} {...cardProps} />
             ))}
-        </Accordion>
+          </div>
+        )}
+
         <Pagination className="mt-2">
           <PaginationContent>
             <PaginationItem>

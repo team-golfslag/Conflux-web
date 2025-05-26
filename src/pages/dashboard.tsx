@@ -7,9 +7,13 @@ import DashboardListView from "@/components/dashboardListView";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import { useSession } from "@/hooks/SessionContext";
 import { useApiQuery } from "@/hooks/useApiQuery";
-import { DashboardCardProps } from "@/components/dashboardCard";
+import { ProjectCardProps } from "@/components/projectCard";
+import { ListIcon, GalleryVerticalIcon } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button.tsx";
 
 const Dashboard = () => {
+  const [isListView, setIsListView] = useState(false);
   const { session } = useSession();
   const { data: projects, isLoading } = useApiQuery(
     (apiClient) => apiClient.projects_GetAllProjects(),
@@ -17,21 +21,21 @@ const Dashboard = () => {
   );
 
   // Transform the API response to match DashboardCardProps format
-  const projectCards: DashboardCardProps[] | undefined = projects?.map(
+  const projectCards: ProjectCardProps[] | undefined = projects?.map(
     (project) => {
       // Find the current user in the project
       const currentUser = project.users.find(
-        (user) => user.id === session?.user?.id,
+        (user) => user.scim_id === session?.user?.scim_id,
       );
 
-      // Extract roles if the user is found, otherwise use default text
-      const roleText = currentUser?.roles
-        ? currentUser.roles.map((role) => role.name).join(", ")
-        : "No role assigned";
+      // Extract roles array if the user is found, otherwise default to empty array
+      const roles = currentUser?.roles
+        ? currentUser.roles.map((role) => role.name)
+        : [];
 
       return {
-        project: project,
-        role: roleText,
+        project,
+        roles,
       };
     },
   );
@@ -41,19 +45,36 @@ const Dashboard = () => {
       isLoading={isLoading}
       loadingMessage="Loading your projects..."
     >
-      <div className="h-full space-y-6 p-6">
-        {/* Welcome Banner */}
-        <div className="rounded-m bg-primary rounded-lg p-4 text-white shadow-md">
-          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-            Welcome, {session?.name}!
-          </h3>
-          <p className="leading-7 [&:not(:first-child)]:mt-6">
-            Here's an overview of your current projects:
-          </p>
-        </div>
+      <div className="min-h-screen pb-12">
+        <div className="mx-auto max-w-7xl space-y-8 p-6">
+          {/* Welcome Banner with Action Button */}
+          <div className="from-primary/90 to-primary flex items-center justify-between rounded-lg bg-gradient-to-r p-6 shadow-md">
+            <div className="text-primary-foreground">
+              <h1 className="text-3xl font-bold">
+                {session?.user?.name || session?.name}
+              </h1>
+              <p className="mt-2 opacity-90">
+                Manage and track your research projects in one place
+              </p>
+            </div>
+          </div>
 
-        {/* User's Projects Section */}
-        <DashboardListView data={projectCards} />
+          {/* Projects Section with Header */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-foreground text-2xl font-semibold">
+                Your Projects
+              </h2>
+              <Button onClick={() => setIsListView(!isListView)}>
+                {isListView ? <ListIcon /> : <GalleryVerticalIcon />}
+              </Button>
+              <div className="flex gap-2">
+                {/* Additional controls could go here */}
+              </div>
+            </div>
+            <DashboardListView data={projectCards} listView={isListView} />
+          </div>
+        </div>
       </div>
     </LoadingWrapper>
   );
