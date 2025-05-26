@@ -66,7 +66,7 @@ export function LoadingWrapper({
 
     return (
       // Adjust min-height to account for the header (assuming 3rem height)
-      <div className="flex min-h-[calc(100vh-3rem)] items-center justify-center p-8">
+      <div className="flex items-center justify-center p-8 pt-16">
         <div className="flex flex-col items-center justify-center space-y-4 rounded-lg bg-white p-6 text-xl font-semibold shadow-md">
           <Loader2 className="text-primary h-8 w-8 animate-spin" />
           <span>{loadingMessage}</span>
@@ -104,7 +104,7 @@ export function LoadingWrapper({
     }
 
     return (
-      <div className="flex min-h-[calc(100vh-3rem)] items-center justify-center p-8">
+      <div className="flex items-center justify-center p-8 pt-16">
         <div className="flex max-w-2xl flex-col items-center justify-center space-y-4 rounded-lg bg-white p-6 text-xl shadow-md">
           <AlertCircle className="text-destructive h-12 w-12" />
           <h2 className="text-center text-xl font-semibold">Error</h2>
