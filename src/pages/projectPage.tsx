@@ -10,20 +10,16 @@ import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
 import { TimeLineImportance, TimelineItem } from "@/components/timeline";
 import { useParams } from "react-router";
-import { ReactNode, useContext, useEffect, useRef, useState } from "react";
-import {
-  DescriptionType,
-  ProjectDescriptionDTO,
-  ProjectDTO,
-  ProjectPatchDTO,
-  ProjectTitleDTO,
-  TitleType,
-} from "@team-golfslag/conflux-api-client/src/client";
-import { ApiClientContext } from "@/lib/ApiClientContext.ts";
-import { LoadingWrapper } from "@/components/loadingWrapper";
+import { useContext, useEffect, useRef, useState } from "react";
 import ProjectDetails from "@/components/projectDetails.tsx";
 import ProjectTimeline from "@/components/projectTimeline.tsx";
 import PageLinks from "@/components/pageLinks";
+import { ApiClientContext } from "@/lib/ApiClientContext";
+import { LoadingWrapper } from "@/components/loadingWrapper";
+import {
+  ProjectDTO,
+  SwaggerException,
+} from "@team-golfslag/conflux-api-client/src/client";
 
 /** List of timeline data as dummy data */
 const timelineData: TimelineItem[] = [
@@ -69,148 +65,134 @@ const timelineData: TimelineItem[] = [
  */
 export default function ProjectPage() {
   const { id } = useParams();
-
-  const [project, setProject] = useState<ProjectDTO>();
-  const [error, setError] = useState<Error>();
   const apiClient = useContext(ApiClientContext);
-
-  useEffect(() => {
-    if (id) {
-      apiClient
-        .projects_GetProjectById(id)
-        .then((p) => {
-          setProject(p);
-          setError(undefined);
-        })
-        .catch((e) => setError(e));
-    }
-  }, [apiClient, id]);
-
-  /**
-   * Handles the editing of a project's title
-   *
-   * @param {string} [title] - The new title for the project's overview. Defaults to an empty string if not provided.
-   */
-  const handleEditTitle = (title?: string) => {
-    const titleDto: ProjectTitleDTO[] = [
-      new ProjectTitleDTO({
-        text: title ?? "",
-        type: TitleType.Primary,
-        start_date: new Date(),
-      }),
-    ];
-
-    if (id) {
-      apiClient
-        .projects_PatchProject(
-          id,
-          new ProjectPatchDTO({
-            titles: titleDto,
-          }),
-        )
-        .then((p) => {
-          setProject(p);
-          setError(undefined);
-        })
-        .catch((e) => setError(e));
-    }
-  };
-
-  /**
-   * Handles the editing of a project's description
-   *
-   * @param {string} [description] - The new description for the project's overview. Defaults to an empty string if not provided.
-   */
-  const handleEditDescription = (description?: string) => {
-    const descriptionDto: ProjectDescriptionDTO[] = [
-      new ProjectDescriptionDTO({
-        text: description ?? "",
-        type: DescriptionType.Primary,
-      }),
-    ];
-
-    if (id) {
-      apiClient
-        .projects_PatchProject(
-          id,
-          new ProjectPatchDTO({
-            descriptions: descriptionDto,
-          }),
-        )
-        .then((p) => {
-          setProject(p);
-          setError(undefined);
-        })
-        .catch((e) => setError(e));
-    }
-  };
+  const [project, setProject] = useState<ProjectDTO | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [error, setError] = useState<SwaggerException | null>(null);
 
   const overviewRef = useRef<HTMLDivElement>(null);
   const contributorsRef = useRef<HTMLDivElement>(null);
   const worksRef = useRef<HTMLDivElement>(null);
 
-  let content: ReactNode = null;
+  // Function to fetch the project data
+  const fetchProject = async () => {
+    if (!id) return;
 
-  if (error) {
-    content = (
-      <>
-        <div className="flex items-center justify-between rounded-lg bg-white p-3 text-2xl font-semibold">
-          <span>{error.name}</span>
-        </div>
-        <div className="p-10" />
-        <div className="text-l flex items-center justify-between rounded-lg bg-white p-3">
-          <span>{error.message}</span>
-        </div>
-      </>
-    );
-  } else if (project) {
-    content = (
-      <>
-        <PageLinks
-          className="mt-6 mr-auto"
-          links={[
-            { label: "Overview", ref: overviewRef },
-            { label: "Contributors", ref: contributorsRef },
-            { label: "Works", ref: worksRef },
-          ]}
-        />
-        <main className="my-6 grid grid-cols-1 gap-8 md:grid-cols-3">
-          <div className="flex flex-col gap-8 md:col-span-2">
-            <Card ref={overviewRef} className="scroll-mt-12" title="Overview">
-              <ProjectOverview
-                title={project.primary_title?.text ?? "No title available"}
-                description={project.primary_description?.text}
-                onSaveTitle={handleEditTitle}
-                onSaveDescription={handleEditDescription}
-              />
-            </Card>
-            <Card
-              ref={contributorsRef}
-              className="scroll-mt-12"
-              title="Contributors"
-            >
-              <ProjectContributors project={project} />
-            </Card>
-            <Card ref={worksRef} className="scroll-mt-12" title="Works">
-              <ProjectWorks products={project.products} />
-            </Card>
-          </div>
-          {/* Side Panel */}
-          <div className="space-y-8">
-            <ProjectDetails project={project}></ProjectDetails>
-            <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
-          </div>
-        </main>
-      </>
-    );
+    setIsLoading(true);
+    try {
+      const data = await apiClient.projects_GetProjectById(id);
+      setProject(data);
+      setError(null);
+    } catch (err) {
+      const swaggerError =
+        err instanceof SwaggerException
+          ? err
+          : new SwaggerException(
+              "An error occurred",
+              0,
+              JSON.stringify(err),
+              {},
+              err,
+            );
+      setError(swaggerError);
+      console.error("Error fetching project:", err);
+    } finally {
+      setIsLoading(false);
+      setIsInitialLoad(false);
+    }
+  };
+
+  // Function to update specific project fields without a full reload
+  const handleProjectUpdate = () => {
+    // Only update the project data without showing loading indicators
+    const fetchWithoutIndicators = async () => {
+      if (!id) return;
+
+      try {
+        // Fetch the updated project data silently in the background
+        const data = await apiClient.projects_GetProjectById(id);
+
+        // Update state without triggering loading indicators
+        setProject((prevProject) => {
+          // Only update if we actually have new data and it's different
+          if (data && JSON.stringify(data) !== JSON.stringify(prevProject)) {
+            return data;
+          }
+          return prevProject;
+        });
+      } catch (err) {
+        // Log error but don't update error state to avoid UI disruption
+        console.error("Error updating project:", err);
+      }
+    };
+
+    fetchWithoutIndicators();
+  };
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchProject();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  if (!id) {
+    return <div className="p-8 text-center">Project ID is required</div>;
   }
 
   return (
     <LoadingWrapper
-      isLoading={!project && !error}
+      isLoading={isLoading}
+      isInitialLoad={isInitialLoad}
       loadingMessage="Loading project..."
+      error={error}
+      onRetry={fetchProject}
     >
-      {content}
+      {project && (
+        <>
+          <PageLinks
+            className="mt-6 mr-auto"
+            links={[
+              { label: "Overview", ref: overviewRef },
+              { label: "Contributors", ref: contributorsRef },
+              { label: "Works", ref: worksRef },
+            ]}
+          />
+          <main className="my-6 grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div className="flex flex-col gap-8 md:col-span-2">
+              <Card ref={overviewRef} className="scroll-mt-12" title="Overview">
+                <ProjectOverview
+                  projectId={id}
+                  title={project.primary_title?.text ?? "No title available"}
+                  description={project.primary_description?.text}
+                  onProjectUpdate={handleProjectUpdate}
+                />
+              </Card>
+              <Card
+                ref={contributorsRef}
+                className="scroll-mt-12"
+                title="Contributors"
+              >
+                <ProjectContributors
+                  project={project}
+                  onProjectUpdate={handleProjectUpdate}
+                />
+              </Card>
+              <Card ref={worksRef} className="scroll-mt-12" title="Works">
+                <ProjectWorks products={project.products} />
+              </Card>
+            </div>
+            {/* Side Panel */}
+            <div className="space-y-8">
+              <ProjectDetails
+                project={project}
+                onProjectUpdate={handleProjectUpdate}
+              />
+              <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
+            </div>
+          </main>
+        </>
+      )}
     </LoadingWrapper>
   );
 }
