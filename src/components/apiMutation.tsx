@@ -115,13 +115,22 @@ export function ApiMutation<T, R>({
     }
   }, [apiClient, data, mutationFn, onSuccess, onError]);
 
+  // Use useRef to track if we've already initialized to prevent infinite loops
+  const initializeRef = React.useRef(false);
+  
   // Use useEffect to safely provide the submit function to the parent component
   // This runs after render and avoids setState-during-render issues
   React.useEffect(() => {
-    if (onInitialize) {
+    if (onInitialize && !initializeRef.current) {
       onInitialize(handleSubmit);
+      initializeRef.current = true;
     }
   }, [onInitialize, handleSubmit]);
+
+  // Reset the ref when onInitialize changes (component remounts or prop changes)
+  React.useEffect(() => {
+    initializeRef.current = false;
+  }, [onInitialize]);
 
   // During the actual mutation, show a loading state based on mode
   if (isLoading) {

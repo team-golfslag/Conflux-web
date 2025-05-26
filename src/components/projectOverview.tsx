@@ -4,7 +4,7 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import { Edit, ChevronDown, ChevronUp, Check, X } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
 import { Textarea } from "@/components/ui/textarea";
@@ -52,6 +52,15 @@ export default function ProjectOverview({
   const [updateDescriptionSubmit, setUpdateDescriptionSubmit] = useState<
     (() => void) | null
   >(null);
+
+  // Stable callback functions to prevent infinite re-renders
+  const handleTitleInitialize = useCallback((submitFn: () => void) => {
+    setUpdateTitleSubmit(() => submitFn);
+  }, []);
+
+  const handleDescriptionInitialize = useCallback((submitFn: () => void) => {
+    setUpdateDescriptionSubmit(() => submitFn);
+  }, []);
 
   const {
     editedText: editDescription,
@@ -144,9 +153,7 @@ export default function ProjectOverview({
                   data={{}}
                   loadingMessage="Saving title..."
                   mode="component"
-                  onInitialize={(submitFn) => {
-                    setUpdateTitleSubmit(() => submitFn);
-                  }}
+                  onInitialize={handleTitleInitialize}
                   onSuccess={() => {
                     setEditTitleMode(false);
                     onProjectUpdate();
@@ -204,9 +211,7 @@ export default function ProjectOverview({
                 data={{}}
                 loadingMessage="Saving description..."
                 mode="component"
-                onInitialize={(submitFn) => {
-                  setUpdateDescriptionSubmit(() => submitFn);
-                }}
+                onInitialize={handleDescriptionInitialize}
                 onSuccess={() => {
                   setEditDescriptionMode(false);
                   onProjectUpdate();

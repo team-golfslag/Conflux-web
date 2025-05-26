@@ -22,8 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Calendar } from "./ui/calendar";
 import { Label } from "./ui/label";
 import { DatePicker } from "./ui/datepicker";
 
@@ -207,11 +205,11 @@ export default function ProjectDetails({
                     End Date
                   </Label>
                   <DatePicker
-                      className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1"
-                      buttonClassName="w-full max-w-[calc(100%-44px)]"
-                      initialDate={project.end_date}
-                      onDateChange={setSelectedEndDate}
-                    />
+                    className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1"
+                    buttonClassName="w-full max-w-[calc(100%-44px)]"
+                    initialDate={project.end_date}
+                    onDateChange={setSelectedEndDate}
+                  />
                 </div>
 
                 <div>
@@ -272,7 +270,7 @@ export default function ProjectDetails({
               <Label htmlFor="start-date" className="font-semibold">
                 Start Date
               </Label>
-              <p className=" text-gray-700">
+              <p className="text-gray-700">
                 {project.start_date
                   ? format(project.start_date, "d MMMM yyyy")
                   : "N/A"}
@@ -283,7 +281,7 @@ export default function ProjectDetails({
               <Label htmlFor="end-date" className="font-semibold">
                 End Date
               </Label>
-              <p className=" text-gray-700">
+              <p className="text-gray-700">
                 {project.end_date
                   ? format(project.end_date, "d MMMM yyyy")
                   : "N/A"}
