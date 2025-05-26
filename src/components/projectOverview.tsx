@@ -19,6 +19,7 @@ type ProjectOverviewProps = {
   projectId: string;
   title?: string;
   description?: string;
+  isAdmin: boolean;
   onProjectUpdate: () => void;
 };
 
@@ -29,6 +30,7 @@ type ProjectOverviewProps = {
 export default function ProjectOverview({
   title,
   description,
+  isAdmin,
   onProjectUpdate,
 }: Readonly<ProjectOverviewProps>) {
   // Title editing
@@ -120,20 +122,22 @@ export default function ProjectOverview({
     <>
       <CardHeader>
         <div className="flex w-full rounded-lg">
-          {!editTitleMode ? (
+          {!editTitleMode || !isAdmin ? (
             <div className="relative flex w-full">
               <CardTitle className="w-full text-3xl/8 font-bold tracking-tight sm:text-4xl/10 md:text-5xl/14">
                 {title}
               </CardTitle>
-              <Button
-                className="invisible float-end group-hover/cardHeader:visible"
-                variant="outline"
-                size="sm"
-                onClick={() => setEditTitleMode(true)}
-              >
-                <Edit className="mr-1 h-4 w-4" />
-                Edit
-              </Button>
+              {isAdmin && (
+                <Button
+                  className="invisible float-end group-hover/cardHeader:visible"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditTitleMode(true)}
+                >
+                  <Edit className="mr-1 h-4 w-4" />
+                  Edit
+                </Button>
+              )}
             </div>
           ) : (
             <div className="flex w-full flex-col">
@@ -190,7 +194,7 @@ export default function ProjectOverview({
         </div>
       </CardHeader>
       <CardContent className="group">
-        {editDescriptionMode ? (
+        {editDescriptionMode && isAdmin ? (
           <div className="space-y-4">
             <h3 className="pt-1 font-semibold text-gray-700 sm:px-3">
               Primary description
@@ -250,15 +254,17 @@ export default function ProjectOverview({
               <h3 className="font-semibold text-gray-700 sm:px-3">
                 Primary description
               </h3>
-              <Button
-                className="invisible float-end group-hover:visible"
-                variant="outline"
-                size="sm"
-                onClick={() => setEditDescriptionMode(true)}
-              >
-                <Edit className="mr-1 h-4 w-4" />
-                Edit
-              </Button>
+              {isAdmin && (
+                <Button
+                  className="invisible float-end group-hover:visible"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditDescriptionMode(true)}
+                >
+                  <Edit className="mr-1 h-4 w-4" />
+                  Edit
+                </Button>
+              )}
             </div>
             <p className="text-start text-sm/6 text-gray-700 sm:px-3 sm:text-base/7">
               {isExpanded

@@ -30,6 +30,7 @@ import { ApiMutation } from "@/components/apiMutation";
 
 type ProjectContributorsProps = {
   project: ProjectDTO;
+  isAdmin: boolean;
   onProjectUpdate: () => void;
 };
 
@@ -40,6 +41,7 @@ type ProjectContributorsProps = {
  */
 export default function ProjectContributors({
   project,
+  isAdmin,
   onProjectUpdate,
 }: Readonly<ProjectContributorsProps>) {
   const [editMode, setEditMode] = useState(false);
@@ -83,24 +85,30 @@ export default function ProjectContributors({
             "absolute right-0 items-center justify-between space-x-4 px-4 group-hover:flex"
           }
         >
-          <Button variant="outline" size="sm" onClick={toggleEditMode}>
-            {editMode ? (
-              <>
-                <X className="mr-2 h-4 w-4" /> Exit Edit Mode
-              </>
-            ) : (
-              <>
-                <Edit className="mr-2 h-4 w-4" /> Edit
-              </>
-            )}
-          </Button>
+          {isAdmin && (
+            <div className="invisible group-hover/card:visible">
+              <Button variant="outline" size="sm" onClick={toggleEditMode}>
+                {editMode ? (
+                  <>
+                    <X className="mr-2 h-4 w-4" /> Exit Edit Mode
+                  </>
+                ) : (
+                  <>
+                    <Edit className="mr-2 h-4 w-4" /> Edit
+                  </>
+                )}
+              </Button>
 
-          <AddContributorModal
-            isOpen={isAddModalOpen}
-            onOpenChange={setIsAddModalOpen}
-            projectId={project.id}
-            onContributorAdded={handleContributorAdded}
-          />
+              <AddContributorModal
+                isOpen={isAddModalOpen}
+                onOpenChange={setIsAddModalOpen}
+                projectId={project.id}
+                onContributorAdded={handleContributorAdded}
+              />
+            </div>
+          )}
+
+          {/* Only show edit button if there are contributors and user is admin */}
         </div>
       </CardHeader>
 

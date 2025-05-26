@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   ProjectDTO,
   ApiClient,
@@ -13,7 +13,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { format } from "date-fns";
-import { Edit, Check, X } from "lucide-react";
+import { Edit, Check, X, RefreshCw, CheckCircle, XCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 import { ApiMutation } from "./apiMutation";
 import {
   Select,
@@ -24,9 +30,11 @@ import {
 } from "./ui/select";
 import { Label } from "./ui/label";
 import { DatePicker } from "./ui/datepicker";
+import { ApiClientContext } from "@/lib/ApiClientContext";
 
 type ProjectDetailsProps = {
   project: ProjectDTO;
+  isAdmin: boolean;
   onProjectUpdate: () => void;
 };
 
@@ -46,8 +54,10 @@ const determineStatus = (
 
 export default function ProjectDetails({
   project,
+  isAdmin,
   onProjectUpdate,
 }: Readonly<ProjectDetailsProps>) {
+  const apiClient = useContext(ApiClientContext);
   const [editMode, setEditMode] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState<
     Date | null | undefined
@@ -73,6 +83,36 @@ export default function ProjectDetails({
       setSelectedOrganizationId(project.organisations[0]?.id);
     }
     setEditMode(!editMode);
+  };
+
+  // States to track sync progress
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
+  const [syncFailed, setSyncFailed] = useState(false);
+
+  // Method to sync project data with SRAM
+  const syncWithSram = async () => {
+    try {
+      setIsSyncing(true);
+      setSyncSuccess(false);
+      setSyncFailed(false);
+      await apiClient.projects_SyncProject(project.id);
+      onProjectUpdate();
+      setSyncSuccess(true);
+      // Reset success state after 2 seconds
+      setTimeout(() => {
+        setSyncSuccess(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error syncing with SRAM:", error);
+      setSyncFailed(true);
+      // Reset failure state after 2 seconds
+      setTimeout(() => {
+        setSyncFailed(false);
+      }, 2000);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const updateProject = async (apiClient: ApiClient) => {
@@ -125,17 +165,56 @@ export default function ProjectDetails({
     <Card className="">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Project Details</CardTitle>
-        <Button variant="outline" size="sm" onClick={toggleEditMode}>
-          {editMode ? (
-            <>
-              <X className="mr-2 h-4 w-4" /> Cancel
-            </>
-          ) : (
-            <>
-              <Edit className="mr-2 h-4 w-4" /> Edit
-            </>
+
+        <div className="flex items-center gap-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="relative group-hover:inline-flex"
+                  onClick={syncWithSram}
+                  disabled={isSyncing}
+                >
+                  {syncSuccess ? (
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  ) : syncFailed ? (
+                    <XCircle className="h-4 w-4 text-red-500" />
+                  ) : (
+                    <RefreshCw
+                      className={`h-4 w-4 transition-transform duration-300 ${isSyncing ? "animate-spin" : "hover:rotate-90"}`}
+                    />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {isSyncing
+                    ? "Syncing..."
+                    : syncSuccess
+                      ? "Sync complete!"
+                      : syncFailed
+                        ? "Sync failed!"
+                        : "Sync this project with SRAM"}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          {isAdmin && (
+            <Button variant="outline" size="sm" onClick={toggleEditMode}>
+              {editMode ? (
+                <>
+                  <X className="mr-2 h-4 w-4" /> Cancel
+                </>
+              ) : (
+                <>
+                  <Edit className="mr-2 h-4 w-4" /> Edit
+                </>
+              )}
+            </Button>
           )}
-        </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {editMode ? (

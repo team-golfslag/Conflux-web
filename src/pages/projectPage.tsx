@@ -19,7 +19,9 @@ import { LoadingWrapper } from "@/components/loadingWrapper";
 import {
   ProjectDTO,
   SwaggerException,
+  UserRoleType,
 } from "@team-golfslag/conflux-api-client/src/client";
+import { useSession } from "@/hooks/SessionContext";
 
 /** List of timeline data as dummy data */
 const timelineData: TimelineItem[] = [
@@ -65,11 +67,13 @@ const timelineData: TimelineItem[] = [
  */
 export default function ProjectPage() {
   const { id } = useParams();
+  const session = useSession();
   const apiClient = useContext(ApiClientContext);
   const [project, setProject] = useState<ProjectDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError] = useState<SwaggerException | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const overviewRef = useRef<HTMLDivElement>(null);
   const contributorsRef = useRef<HTMLDivElement>(null);
@@ -83,6 +87,12 @@ export default function ProjectPage() {
     try {
       const data = await apiClient.projects_GetProjectById(id);
       setProject(data);
+      const admin = data.users
+        .find((user) => user.scim_id === session?.session?.user?.scim_id)
+        ?.roles.map((role) => role.type)
+        .includes(UserRoleType.Admin);
+      setIsAdmin(admin || false);
+
       setError(null);
     } catch (err) {
       const swaggerError =
@@ -121,6 +131,13 @@ export default function ProjectPage() {
           }
           return prevProject;
         });
+
+        // Check if the current user is an admin
+        const admin = data.users
+          .find((user) => user.scim_id === session?.session?.user?.scim_id)
+          ?.roles.map((role) => role.type)
+          .includes(UserRoleType.Admin);
+        setIsAdmin(admin || false);
       } catch (err) {
         // Log error but don't update error state to avoid UI disruption
         console.error("Error updating project:", err);
@@ -166,6 +183,7 @@ export default function ProjectPage() {
                   title={project.primary_title?.text ?? "No title available"}
                   description={project.primary_description?.text}
                   onProjectUpdate={handleProjectUpdate}
+                  isAdmin={isAdmin}
                 />
               </Card>
               <Card
@@ -176,6 +194,7 @@ export default function ProjectPage() {
                 <ProjectContributors
                   project={project}
                   onProjectUpdate={handleProjectUpdate}
+                  isAdmin={isAdmin}
                 />
               </Card>
               <Card ref={worksRef} className="scroll-mt-12" title="Works">
@@ -187,6 +206,7 @@ export default function ProjectPage() {
               <ProjectDetails
                 project={project}
                 onProjectUpdate={handleProjectUpdate}
+                isAdmin={isAdmin}
               />
               <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
             </div>

@@ -9,7 +9,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "format": "eslint . --fix && npx prettier --write .",
+    "format": "npx prettier --write .",
     "preview": "vite preview",
     "build:prod": "NODE_ENV=production tsc -b && vite build",
     "purge-vite": "rimraf node_modules/.vite",

@@ -4,7 +4,10 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import { Card, CardContent, CardHeader } from "@/components/ui/card.tsx";
-import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
+import {
+  ProjectDTO,
+  UserRoleType,
+} from "@team-golfslag/conflux-api-client/src/client";
 import { Link } from "react-router-dom";
 import { JSX } from "react";
 import { CalendarIcon, UsersIcon } from "lucide-react";
@@ -104,15 +107,17 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
               </div>
               {roles && roles.length > 0 && (
                 <div className="flex flex-col items-end gap-1">
-                  {roles.map((r) => (
-                    <Badge
-                      key={r}
-                      variant="secondary"
-                      className="h-5 px-2 py-0 text-xs"
-                    >
-                      {r}
-                    </Badge>
-                  ))}
+                  {roles
+                    .filter((r) => r !== UserRoleType.User)
+                    .map((r) => (
+                      <Badge
+                        key={r}
+                        variant="secondary"
+                        className="h-5 px-2 py-0 text-xs"
+                      >
+                        {r}
+                      </Badge>
+                    ))}
                 </div>
               )}
             </div>
