@@ -7,26 +7,25 @@ import * as React from "react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AddProductModal from "@/components/addProductModal.tsx";
 import EditProductModal from "@/components/editProductModal.tsx";
-import { useContext } from "react";
 import {
   ProductCategoryType,
   ProductDTO,
-  ProjectPatchDTO,
   ProjectDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Button } from "@/components/ui/button";
-import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { Edit, X } from "lucide-react";
 import ProductCard from "@/components/productCard.tsx";
 
-type ProjectWorksProps = { project: ProjectDTO };
+type ProjectWorksProps = { project: ProjectDTO; onProjectUpdate: () => void };
 
 /**
  * Project Works component
  * @param props the products to be turned into a card
  */
-export default function ProjectWorks({ project }: Readonly<ProjectWorksProps>) {
-  const apiClient = useContext(ApiClientContext);
+export default function ProjectWorks({
+  project,
+  onProjectUpdate,
+}: Readonly<ProjectWorksProps>) {
   const [editMode, setEditMode] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
@@ -38,33 +37,6 @@ export default function ProjectWorks({ project }: Readonly<ProjectWorksProps>) {
     null,
   );
   const toggleEditMode = () => setEditMode(!editMode);
-
-  const deleteProduct = async () => {
-    if (!deletedProduct) return;
-
-    try {
-      if (project.products) {
-        project.products = project.products.filter(
-          (c) => c.id !== deletedProduct.id,
-        );
-      }
-      const projectPatchDTO = new ProjectPatchDTO({
-        products: project.products,
-      });
-      const updatedProject = await apiClient.projects_PatchProject(
-        project.id,
-        projectPatchDTO,
-      );
-
-      if (!updatedProject) {
-        throw new Error("Server returned an invalid product");
-      }
-
-      setDeletedProduct(null);
-    } catch (error) {
-      console.log("Error deleting product:", error);
-    }
-  };
 
   return (
     <>
@@ -121,7 +93,8 @@ export default function ProjectWorks({ project }: Readonly<ProjectWorksProps>) {
                   setIsDeleteDialogOpen={setIsDeleteDialogOpen}
                   deletedProduct={deletedProduct!}
                   setDeletedProduct={setDeletedProduct}
-                  deleteProduct={deleteProduct}
+                  project={project}
+                  onProjectUpdate={onProjectUpdate}
                 />
               ))}
           </>

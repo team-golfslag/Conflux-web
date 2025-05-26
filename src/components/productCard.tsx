@@ -24,7 +24,15 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
 import { Card } from "@/components/ui/card.tsx";
-import { ProductDTO } from "@team-golfslag/conflux-api-client/src/client";
+import {
+  ProductDTO,
+  ProjectDTO,
+} from "@team-golfslag/conflux-api-client/src/client";
+import {
+  ApiClient,
+  ProjectPatchDTO,
+} from "@team-golfslag/conflux-api-client/src/client.ts";
+import { ApiMutation } from "@/components/apiMutation.tsx";
 
 type productCardProps = {
   product: ProductDTO;
@@ -35,7 +43,8 @@ type productCardProps = {
   setIsDeleteDialogOpen: (isOpen: boolean) => void;
   deletedProduct: ProductDTO;
   setDeletedProduct: (product: ProductDTO) => void;
-  deleteProduct: (product: ProductDTO) => void;
+  project: ProjectDTO;
+  onProjectUpdate: () => void;
 };
 
 export default function ProductCard({
@@ -47,7 +56,8 @@ export default function ProductCard({
   setIsDeleteDialogOpen,
   deletedProduct,
   setDeletedProduct,
-  deleteProduct,
+  project,
+  onProjectUpdate,
 }: Readonly<productCardProps>) {
   return (
     <Card className="flex flex-col gap-1 border border-gray-200 p-3 shadow-sm">
@@ -114,12 +124,35 @@ export default function ProductCard({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-destructive hover:text-destructive border-destructive border-1 text-white hover:bg-white/10 hover:font-bold"
-                    onClick={() => deleteProduct}
+                  <ApiMutation
+                    mutationFn={(apiClient: ApiClient) =>
+                      apiClient.projects_PatchProject(
+                        project.id,
+                        new ProjectPatchDTO({
+                          products: project.products.filter(
+                            (c) => c.id !== deletedProduct.id,
+                          ),
+                        }),
+                      )
+                    }
+                    data={{}}
+                    loadingMessage="Deleting product..."
+                    mode="component"
+                    onSuccess={() => {
+                      onProjectUpdate();
+                      setIsDeleteDialogOpen(false);
+                      setDeletedProduct(null!);
+                    }}
                   >
-                    Delete
-                  </AlertDialogAction>
+                    {({ onSubmit }) => (
+                      <AlertDialogAction
+                        className="border-destructive bg-destructive hover:text-destructive border-1 text-white hover:bg-white/10 hover:font-bold"
+                        onClick={onSubmit}
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    )}
+                  </ApiMutation>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
