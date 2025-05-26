@@ -38,7 +38,7 @@ type ProjectContributorsProps = {
  * @param project the project containing contributors
  * @param onProjectUpdate callback to trigger project data refresh
  */
-export default function ImprovedProjectContributors({
+export default function ProjectContributors({
   project,
   onProjectUpdate,
 }: Readonly<ProjectContributorsProps>) {

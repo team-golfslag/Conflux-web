@@ -23,7 +23,7 @@ type ProjectOverviewProps = {
 };
 
 /**
- * Project Overview component with improved state management and error handling
+ * Project Overview component
  * @param props projectId, title and description to be displayed, and refresh callback
  */
 export default function ProjectOverview({
