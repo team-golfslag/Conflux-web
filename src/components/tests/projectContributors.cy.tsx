@@ -75,6 +75,7 @@ describe("ProjectContributors Component", () => {
         <ProjectContributors
           project={mockProject}
           onProjectUpdate={onProjectUpdate}
+          isAdmin={true}
         />
       </ApiClientContext.Provider>,
     );

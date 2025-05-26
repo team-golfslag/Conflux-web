@@ -19,7 +19,7 @@ type ProjectOverviewProps = {
   projectId: string;
   title?: string;
   description?: string;
-  isAdmin: boolean;
+  isAdmin?: boolean;
   onProjectUpdate: () => void;
 };
 
@@ -30,7 +30,7 @@ type ProjectOverviewProps = {
 export default function ProjectOverview({
   title,
   description,
-  isAdmin,
+  isAdmin = false,
   onProjectUpdate,
 }: Readonly<ProjectOverviewProps>) {
   // Title editing

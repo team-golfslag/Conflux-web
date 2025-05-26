@@ -30,7 +30,7 @@ import { ApiMutation } from "@/components/apiMutation";
 
 type ProjectContributorsProps = {
   project: ProjectDTO;
-  isAdmin: boolean;
+  isAdmin?: boolean;
   onProjectUpdate: () => void;
 };
 
@@ -41,7 +41,7 @@ type ProjectContributorsProps = {
  */
 export default function ProjectContributors({
   project,
-  isAdmin,
+  isAdmin = false,
   onProjectUpdate,
 }: Readonly<ProjectContributorsProps>) {
   const [editMode, setEditMode] = useState(false);

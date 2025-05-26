@@ -34,6 +34,7 @@ describe("ProjectOverview Component", () => {
           title={title}
           description={description}
           onProjectUpdate={onProjectUpdate}
+          isAdmin={true}
         />
       </ApiClientContext.Provider>,
     );
@@ -52,6 +53,7 @@ describe("ProjectOverview Component", () => {
           title={title}
           description={longDescription}
           onProjectUpdate={onProjectUpdate}
+          isAdmin={true}
         />
       </ApiClientContext.Provider>,
     );
@@ -66,6 +68,7 @@ describe("ProjectOverview Component", () => {
           title={title}
           description={longDescription}
           onProjectUpdate={onProjectUpdate}
+          isAdmin={true}
         />
       </ApiClientContext.Provider>,
     );
@@ -130,6 +133,18 @@ describe("ProjectOverview Component", () => {
   // });
 
   it("has a responsive layout that adapts to different screen sizes", () => {
+    mount(
+      <ApiClientContext.Provider value={mockApiClient}>
+        <ProjectOverview
+          projectId={projectId}
+          title={title}
+          description={description}
+          onProjectUpdate={onProjectUpdate}
+          isAdmin={true}
+        />
+      </ApiClientContext.Provider>,
+    );
+
     // Test mobile view
     cy.viewport("iphone-6");
     cy.get(".flex-col").should("exist");
