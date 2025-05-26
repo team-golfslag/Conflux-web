@@ -25,6 +25,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Calendar } from "./ui/calendar";
 import { Label } from "./ui/label";
+import { DatePicker } from "./ui/datepicker";
 
 type ProjectDetailsProps = {
   project: ProjectDTO;
@@ -156,7 +157,7 @@ export default function ProjectDetails({
                   <Label htmlFor="status" className="font-semibold">
                     Status
                   </Label>
-                  <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                  <p className="text-gray-700">
                     {determineStatus(project.start_date, project.end_date)}
                   </p>
                 </div>
@@ -193,76 +194,24 @@ export default function ProjectDetails({
                   <Label htmlFor="start-date" className="font-semibold">
                     Start Date
                   </Label>
-                  <div className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full max-w-[calc(100%-44px)] justify-start overflow-hidden text-left font-normal text-ellipsis"
-                        >
-                          {selectedStartDate
-                            ? format(selectedStartDate, "d MMMM yyyy")
-                            : "Select date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={selectedStartDate || undefined}
-                          onSelect={setSelectedStartDate}
-                          defaultMonth={selectedStartDate || undefined}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setSelectedStartDate(null)}
-                      title="Clear date"
-                      className="h-9 w-10 min-w-10 flex-shrink-0"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <DatePicker
+                    className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1"
+                    buttonClassName="w-full max-w-[calc(100%-44px)]"
+                    initialDate={project.start_date}
+                    onDateChange={setSelectedStartDate}
+                  />
                 </div>
 
                 <div>
                   <Label htmlFor="end-date" className="font-semibold">
                     End Date
                   </Label>
-                  <div className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full max-w-[calc(100%-44px)] justify-start overflow-hidden text-left font-normal text-ellipsis"
-                        >
-                          {selectedEndDate
-                            ? format(selectedEndDate, "d MMMM yyyy")
-                            : "Select date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={selectedEndDate || undefined}
-                          onSelect={setSelectedEndDate}
-                          defaultMonth={selectedEndDate || undefined}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setSelectedEndDate(null)}
-                      title="Clear date"
-                      className="h-9 w-10 min-w-10 flex-shrink-0"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <DatePicker
+                      className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1"
+                      buttonClassName="w-full max-w-[calc(100%-44px)]"
+                      initialDate={project.end_date}
+                      onDateChange={setSelectedEndDate}
+                    />
                 </div>
 
                 <div>
@@ -305,7 +254,7 @@ export default function ProjectDetails({
               <Label htmlFor="status" className="font-semibold">
                 Status
               </Label>
-              <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm break-words whitespace-normal text-gray-700">
+              <p className="text-gray-700">
                 {determineStatus(project.start_date, project.end_date)}
               </p>
             </div>
@@ -314,7 +263,7 @@ export default function ProjectDetails({
               <Label htmlFor="project-lead" className="font-semibold">
                 Project Lead
               </Label>
-              <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm break-words whitespace-normal text-gray-700">
+              <p className="text-gray-700">
                 {projectLead ? projectLead.person.name : "N/A"}
               </p>
             </div>
@@ -323,7 +272,7 @@ export default function ProjectDetails({
               <Label htmlFor="start-date" className="font-semibold">
                 Start Date
               </Label>
-              <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm break-words whitespace-normal text-gray-700">
+              <p className=" text-gray-700">
                 {project.start_date
                   ? format(project.start_date, "d MMMM yyyy")
                   : "N/A"}
@@ -334,7 +283,7 @@ export default function ProjectDetails({
               <Label htmlFor="end-date" className="font-semibold">
                 End Date
               </Label>
-              <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm break-words whitespace-normal text-gray-700">
+              <p className=" text-gray-700">
                 {project.end_date
                   ? format(project.end_date, "d MMMM yyyy")
                   : "N/A"}
@@ -345,7 +294,7 @@ export default function ProjectDetails({
               <Label htmlFor="lead-organization" className="font-semibold">
                 Lead Organisation
               </Label>
-              <p className="mt-1 rounded-md border bg-gray-50 px-3 py-2 text-sm break-words whitespace-normal text-gray-700">
+              <p className="text-gray-700">
                 {project.organisations.length > 0
                   ? project.organisations[0].name
                   : "N/A"}
