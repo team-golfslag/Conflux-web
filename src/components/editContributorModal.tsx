@@ -73,7 +73,7 @@ export default function EditContributorModal({
         email: contributor.person.email ?? "",
         orcidId: extractOrcidFromUrl(contributor.person.orcid_id) ?? "",
         roles: contributor.roles,
-        positions: contributor.positions?.map((p) => p.type) || [],
+        positions: contributor.positions?.map((p) => p.type) ?? [],
         leader: contributor.leader,
         contact: contributor.contact,
       });
@@ -106,7 +106,7 @@ export default function EditContributorModal({
         email: contributor.person.email ?? "",
         orcidId: extractOrcidFromUrl(contributor.person.orcid_id) ?? "",
         roles: contributor.roles,
-        positions: contributor.positions?.map((p) => p.type) || [],
+        positions: contributor.positions?.map((p) => p.type) ?? [],
         leader: contributor.leader,
         contact: contributor.contact,
       });

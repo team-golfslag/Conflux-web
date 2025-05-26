@@ -7,7 +7,7 @@
 
 import * as React from "react";
 import { format, getMonth, getYear, setMonth, setYear } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -29,6 +29,8 @@ export interface DatePickerProps {
   endYear?: number;
   onDateChange?: (date: Date | undefined) => void;
   initialDate?: Date;
+  className?: string;
+  buttonClassName?: string;
 }
 
 /**
@@ -43,6 +45,8 @@ export function DatePicker({
   endYear = getYear(new Date()) + 20,
   onDateChange,
   initialDate,
+  className = "",
+  buttonClassName = "",
 }: Readonly<DatePickerProps>) {
   const [date, setDate] = React.useState<Date | undefined>(initialDate);
   const [currentMonthView, setCurrentMonthView] = React.useState<Date>(
@@ -97,81 +101,77 @@ export function DatePicker({
   }, [initialDate]);
 
   return (
-    <Popover>
-      <PopoverTrigger asChild className="cursor-pointer">
-        <Button
-          variant={"outline"}
-          className={cn(
-            "w-[210px] justify-start text-left font-normal",
-            !date && "text-muted-foreground",
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
-        <div className="flex justify-between p-2">
-          <Select
-            onValueChange={handleMonthChange}
-            value={months[getMonth(currentMonthView)]}
+    <div className={cn(className)}>
+      <Popover>
+        <PopoverTrigger asChild className="cursor-pointer">
+          <Button
+            variant={"outline"}
+            className={cn(
+              "w-[210px] justify-start text-left font-normal",
+              !date && "text-muted-foreground",
+              buttonClassName,
+            )}
           >
-            <SelectTrigger className="w-[110px] cursor-pointer transition-colors duration-200 hover:bg-slate-100">
-              <SelectValue placeholder="Month" />
-            </SelectTrigger>
-            <SelectContent>
-              {months.map((month) => (
-                <SelectItem key={month} value={month}>
-                  {month}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            onValueChange={handleYearChange}
-            value={getYear(currentMonthView).toString()}
-          >
-            <SelectTrigger className="w-[110px] cursor-pointer transition-colors duration-200 hover:bg-slate-100">
-              <SelectValue placeholder="Year" />
-            </SelectTrigger>
-            <SelectContent>
-              {years.map((year) => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date ? format(date, "PPP") : <span>Pick a date</span>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0">
+          <div className="flex justify-between p-2">
+            <Select
+              onValueChange={handleMonthChange}
+              value={months[getMonth(currentMonthView)]}
+            >
+              <SelectTrigger className="w-[110px] cursor-pointer transition-colors duration-200 hover:bg-slate-100">
+                <SelectValue placeholder="Month" />
+              </SelectTrigger>
+              <SelectContent>
+                {months.map((month) => (
+                  <SelectItem key={month} value={month}>
+                    {month}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              onValueChange={handleYearChange}
+              value={getYear(currentMonthView).toString()}
+            >
+              <SelectTrigger className="w-[110px] cursor-pointer transition-colors duration-200 hover:bg-slate-100">
+                <SelectValue placeholder="Year" />
+              </SelectTrigger>
+              <SelectContent>
+                {years.map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={handleSelect}
-          month={currentMonthView}
-          onMonthChange={handleMonthNavigate}
-        />
-      </PopoverContent>
-      {date && (
-        <Button
-          variant="ghost"
-          className="text-muted-foreground mx-2 cursor-pointer"
-          size="sm"
-          onClick={() => {
-            setDate(undefined);
-            onDateChange?.(undefined);
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="size-4"
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={handleSelect}
+            month={currentMonthView}
+            onMonthChange={handleMonthNavigate}
+          />
+        </PopoverContent>
+        {date && (
+          <Button
+            variant="ghost"
+            className="text-muted-foreground mx-2 cursor-pointer"
+            size="sm"
+            onClick={() => {
+              setDate(undefined);
+              onDateChange?.(undefined);
+            }}
           >
-            <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-          </svg>
-        </Button>
-      )}
-    </Popover>
+            <X className="h-4 w-4" />
+          </Button>
+        )}
+      </Popover>
+    </div>
   );
 }
