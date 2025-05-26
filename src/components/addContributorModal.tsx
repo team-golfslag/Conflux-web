@@ -4,7 +4,7 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { useState, useContext, useEffect, useCallback } from "react";
+import { useState, useContext, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -36,6 +36,7 @@ import {
   extractOrcidFromUrl,
 } from "@/lib/formatters/orcidFormatter";
 import { ApiMutation } from "@/components/apiMutation";
+import { getLevenshteinDistance } from "@/lib/utils";
 
 interface ContributorFormData {
   name: string;
@@ -74,10 +75,15 @@ export default function AddContributorModal({
   // Search state
   const [orcidSearchTerm, setOrcidSearchTerm] = useState("");
   const [isLoadingOrcidSearch, setIsLoadingOrcidSearch] = useState(false);
+  const [orcidSearchResults, setOrcidSearchResults] = useState<Person[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Person[]>([]);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [autoFillError, setAutoFillError] = useState<string | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
+
+  // Ref for click-outside detection
+  const orcidSearchContainerRef = useRef<HTMLDivElement>(null);
 
   const apiClient = useContext(ApiClientContext);
 
@@ -89,6 +95,7 @@ export default function AddContributorModal({
         ? prev.roles.filter((r) => r !== role)
         : [...prev.roles, role],
     }));
+    setSelectedPerson(null);
   };
 
   const handlePositionChange = (position: ContributorPositionType) => {
@@ -98,6 +105,7 @@ export default function AddContributorModal({
         ? prev.positions.filter((p) => p !== position)
         : [...prev.positions, position],
     }));
+    setSelectedPerson(null);
   };
 
   // Reset form
@@ -115,7 +123,9 @@ export default function AddContributorModal({
     setOrcidSearchTerm("");
     setSearchTerm("");
     setSearchResults([]);
+    setOrcidSearchResults([]);
     setSearchError(null);
+    setAutoFillError(null);
   };
 
   // Reset form when dialog is closed
@@ -126,25 +136,59 @@ export default function AddContributorModal({
   }, [isOpen]);
 
   // ORCID search
-  const searchByOrcid = async () => {
-    if (!orcidSearchTerm) return;
+  const searchInOrcid = async () => {
+    if (!orcidSearchTerm || orcidSearchTerm.length < 3) {
+      setOrcidSearchResults([]);
+      return;
+    }
 
     setIsLoadingOrcidSearch(true);
     setSearchError(null);
 
     try {
-      // This would be replaced with actual API call when implemented
-      // For now, we'll simulate a search
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setFormData((prev) => ({
-        ...prev,
-        name: "Jane Doe",
-        email: "jane.doe@example.com",
-        orcidId: orcidSearchTerm,
-      }));
+      const results = await apiClient.orcid_GetPersonByQuery(orcidSearchTerm);
+      // sort results by getLevenshteinDistance
+      results.sort((a, b) => {
+        const distanceA = getLevenshteinDistance(a.name, orcidSearchTerm);
+        const distanceB = getLevenshteinDistance(b.name, orcidSearchTerm);
+        return distanceA - distanceB;
+      });
+
+      setOrcidSearchResults(results);
+    } catch (error) {
+      console.error("Error searching ORCID database:", error);
+      setSearchError("Failed to search ORCID database. Please try again.");
+      setOrcidSearchResults([]);
+    } finally {
+      setIsLoadingOrcidSearch(false);
+    }
+  };
+
+  // ORCID autofill from the form field
+  const handleOrcidAutoFill = async () => {
+    if (!formData.orcidId) return false;
+
+    setAutoFillError(null);
+
+    try {
+      const person = await apiClient.orcid_GetPersonFromOrcid(formData.orcidId);
+      if (person) {
+        setSelectedPerson(person);
+        setFormData((prev) => ({
+          ...prev,
+          name: person.name,
+          email: person.email ?? "",
+          orcidId: extractOrcidFromUrl(person.orcid_id) ?? "",
+        }));
+        return true;
+      } else {
+        setAutoFillError("No person found with this ORCID.");
+        return false;
+      }
     } catch (error) {
       console.error("Error searching ORCID:", error);
-      setSearchError("Failed to search ORCID. Please try again.");
+      setAutoFillError("Failed to search ORCID. Please try again.");
+      return false;
     } finally {
       setIsLoadingOrcidSearch(false);
     }
@@ -182,6 +226,26 @@ export default function AddContributorModal({
       setSearchResults([]);
     }
   }, [searchPeople, debouncedSearchTerm]);
+
+  // Click outside handler to dismiss search results
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      // Close ORCID search results if clicked outside
+      if (
+        orcidSearchContainerRef.current &&
+        !orcidSearchContainerRef.current.contains(event.target as Node)
+      ) {
+        setOrcidSearchResults([]);
+      }
+    }
+
+    // Add event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Handle person selection
   const selectPerson = (person: Person) => {
@@ -297,27 +361,59 @@ export default function AddContributorModal({
                   </div>
                 )}
 
-                <div className="flex items-end gap-2">
-                  <div className="flex-1">
-                    <Label htmlFor="orcidSearch">Search by ORCID</Label>
-                    <div className="relative mt-2">
-                      <Input
-                        id="orcidSearch"
-                        value={orcidSearchTerm}
-                        onChange={(e) => setOrcidSearchTerm(e.target.value)}
-                        className="pl-8"
-                        placeholder="0000-0000-0000-0000"
-                      />
-                      <OrcidIcon className="absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-end gap-2">
+                    <div className="flex-1">
+                      <Label htmlFor="orcidSearch">Search in ORCID</Label>
+                      <div className="relative mt-2">
+                        <Input
+                          id="orcidSearch"
+                          value={orcidSearchTerm}
+                          onChange={(e) => setOrcidSearchTerm(e.target.value)}
+                          className="pl-8"
+                          placeholder="Name or keyword"
+                        />
+                        <OrcidIcon className="absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
+                      </div>
                     </div>
+                    <Button
+                      type="button"
+                      onClick={searchInOrcid}
+                      disabled={isLoadingOrcidSearch}
+                    >
+                      {isLoadingOrcidSearch ? "Searching..." : "Search"}
+                    </Button>
                   </div>
-                  <Button
-                    type="button"
-                    onClick={searchByOrcid}
-                    disabled={isLoadingOrcidSearch}
-                  >
-                    {isLoadingOrcidSearch ? "Searching..." : "Search"}
-                  </Button>
+
+                  {orcidSearchResults && orcidSearchResults.length > 0 && (
+                    <div
+                      ref={orcidSearchContainerRef}
+                      className="mt-1 max-h-40 w-full overflow-y-auto rounded-md border bg-white shadow-md"
+                    >
+                      {orcidSearchResults.map((person) => (
+                        <button
+                          key={person.id}
+                          className="w-full cursor-pointer px-4 py-2 text-left hover:bg-gray-100"
+                          onClick={() => selectPerson(person)}
+                        >
+                          <div className="flex items-center gap-2">
+                            <OrcidIcon className="h-4 w-4" />
+                            <span>{person.name}</span>
+                          </div>
+                          {person.email && (
+                            <p className="text-muted-foreground text-xs">
+                              {person.email}
+                            </p>
+                          )}
+                          {person.orcid_id && (
+                            <p className="text-muted-foreground text-xs">
+                              ORCID: {extractOrcidFromUrl(person.orcid_id)}
+                            </p>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-end gap-2">
@@ -345,11 +441,17 @@ export default function AddContributorModal({
                           >
                             <div className="flex items-center gap-2">
                               <User className="text-muted-foreground h-4 w-4" />
+
                               <span>{person.name}</span>
                             </div>
                             {person.email && (
                               <p className="text-muted-foreground text-xs">
                                 {person.email}
+                              </p>
+                            )}
+                            {person.orcid_id && (
+                              <p className="text-muted-foreground text-xs">
+                                ORCID: {extractOrcidFromUrl(person.orcid_id)}
                               </p>
                             )}
                           </button>
@@ -361,32 +463,41 @@ export default function AddContributorModal({
 
                 <ContributorFormFields
                   formData={formData}
-                  onNameChange={(e) =>
-                    setFormData((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                  onEmailChange={(e) =>
-                    setFormData((prev) => ({ ...prev, email: e.target.value }))
-                  }
-                  onOrcidIdChange={(e) =>
+                  onNameChange={(e) => {
+                    setFormData((prev) => ({ ...prev, name: e.target.value }));
+                    setSelectedPerson(null);
+                  }}
+                  onEmailChange={(e) => {
+                    setFormData((prev) => ({ ...prev, email: e.target.value }));
+                    setSelectedPerson(null);
+                  }}
+                  onOrcidIdChange={(e) => {
                     setFormData((prev) => ({
                       ...prev,
                       orcidId: e.target.value,
-                    }))
-                  }
+                    }));
+                    // Clear error when input changes
+                    if (autoFillError) setAutoFillError(null);
+                    setSelectedPerson(null);
+                  }}
                   onRoleChange={handleRoleChange}
                   onPositionChange={handlePositionChange}
-                  onLeaderChange={(e) =>
+                  orcidError={autoFillError}
+                  onLeaderChange={(e) => {
                     setFormData((prev) => ({
                       ...prev,
                       leader: e.target.checked,
-                    }))
-                  }
-                  onContactChange={(e) =>
+                    }));
+                    setSelectedPerson(null);
+                  }}
+                  onContactChange={(e) => {
                     setFormData((prev) => ({
                       ...prev,
                       contact: e.target.checked,
-                    }))
-                  }
+                    }));
+                    setSelectedPerson(null);
+                  }}
+                  onOrcidAutoFill={handleOrcidAutoFill}
                 />
               </div>
 

@@ -62,6 +62,8 @@ export default function EditContributorModal({
     leader: false,
     contact: false,
   });
+  const [orcidError, setOrcidError] = useState<string | null>(null);
+  const [, setIsLoadingOrcidSearch] = useState(false);
 
   const apiClient = useContext(ApiClientContext);
 
@@ -99,7 +101,39 @@ export default function EditContributorModal({
     }));
   };
 
+  // ORCID autofill from the form field
+  const handleOrcidAutoFill = async () => {
+    if (!formData.orcidId) return false;
+
+    setIsLoadingOrcidSearch(true);
+    setOrcidError(null);
+
+    try {
+      const person = await apiClient.orcid_GetPersonFromOrcid(formData.orcidId);
+      if (person) {
+        setFormData((prev) => ({
+          ...prev,
+          name: person.name,
+          email: person.email ?? "",
+          orcidId: extractOrcidFromUrl(person.orcid_id) ?? "",
+        }));
+        return true;
+      } else {
+        setOrcidError("No person found with this ORCID.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error searching ORCID:", error);
+      setOrcidError("Failed to search ORCID. Please try again.");
+      return false;
+    } finally {
+      setIsLoadingOrcidSearch(false);
+    }
+  };
+
   const resetForm = () => {
+    setOrcidError(null);
+
     if (contributor) {
       setFormData({
         name: contributor.person.name,
@@ -184,9 +218,11 @@ export default function EditContributorModal({
           onEmailChange={(e) =>
             setFormData((prev) => ({ ...prev, email: e.target.value }))
           }
-          onOrcidIdChange={(e) =>
-            setFormData((prev) => ({ ...prev, orcidId: e.target.value }))
-          }
+          onOrcidIdChange={(e) => {
+            setFormData((prev) => ({ ...prev, orcidId: e.target.value }));
+            // Clear error when input changes
+            if (orcidError) setOrcidError(null);
+          }}
           onRoleChange={handleRoleChange}
           onPositionChange={handlePositionChange}
           onLeaderChange={(e) =>
@@ -195,6 +231,8 @@ export default function EditContributorModal({
           onContactChange={(e) =>
             setFormData((prev) => ({ ...prev, contact: e.target.checked }))
           }
+          onOrcidAutoFill={handleOrcidAutoFill}
+          orcidError={orcidError}
           isEdit={true}
         />
 

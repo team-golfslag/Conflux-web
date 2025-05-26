@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/tooltip";
 import { getRoleDisplay } from "@/lib/formatters/roleFormatter";
 import { getPositionDisplay } from "@/lib/formatters/positionFormatter";
+import { ArrowRight } from "lucide-react";
+import { Button } from "./ui/button";
 
 export interface ContributorFormData {
   name: string;
@@ -40,6 +42,8 @@ interface ContributorFormFieldsProps {
   onPositionChange: (position: ContributorPositionType) => void;
   onLeaderChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onContactChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onOrcidAutoFill?: () => Promise<boolean>;
+  orcidError?: string | null;
   isEdit?: boolean;
 }
 
@@ -52,6 +56,8 @@ export default function ContributorFormFields({
   onPositionChange,
   onLeaderChange,
   onContactChange,
+  onOrcidAutoFill,
+  orcidError,
   isEdit = false,
 }: Readonly<ContributorFormFieldsProps>) {
   const idPrefix = isEdit ? "edit-" : "";
@@ -88,14 +94,40 @@ export default function ContributorFormFields({
         <Label htmlFor={`${idPrefix}orcidId`} className="text-right">
           ORCID ID
         </Label>
-        <Input
-          id={`${idPrefix}orcidId`}
-          name="orcidId"
-          className="col-span-3"
-          value={formData.orcidId}
-          onChange={onOrcidIdChange}
-          placeholder="0000-0000-0000-0000"
-        />
+        <div className="col-span-3 flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <Input
+              id={`${idPrefix}orcidId`}
+              name="orcidId"
+              className={`flex-1 ${orcidError ? "border-red-500" : ""}`}
+              value={formData.orcidId}
+              onChange={onOrcidIdChange}
+              placeholder="0000-0000-0000-0000"
+              aria-invalid={!!orcidError}
+            />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={onOrcidAutoFill}
+                    disabled={!formData.orcidId || !onOrcidAutoFill}
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Autofill details from ORCID</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          {orcidError && (
+            <div className="text-sm text-red-500">{orcidError}</div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-4 items-start gap-4">
