@@ -266,6 +266,7 @@ export default function AddContributorModal({
           <Plus className="h-4 w-4" />
         </Button>
       </DialogTrigger>
+
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add Contributor</DialogTitle>
@@ -275,114 +276,124 @@ export default function AddContributorModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          {searchError && (
-            <div className="bg-destructive/10 text-destructive flex items-center gap-2 rounded-md p-2 text-sm">
-              <AlertCircle className="h-4 w-4" />
-              <span>{searchError}</span>
-            </div>
-          )}
+        <ApiMutation
+          mutationFn={createContributor}
+          data={{}}
+          loadingMessage="Adding contributor..."
+          mode="component"
+          onSuccess={(createdContributor) => {
+            onContributorAdded(createdContributor);
+            onOpenChange(false);
+            resetForm();
+          }}
+        >
+          {({ onSubmit, isLoading, error }) => (
+            <>
+              <div className="space-y-4 py-4">
+                {searchError && (
+                  <div className="bg-destructive/10 text-destructive flex items-center gap-2 rounded-md p-2 text-sm">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>{searchError}</span>
+                  </div>
+                )}
 
-          <div className="flex items-end gap-2">
-            <div className="flex-1">
-              <Label htmlFor="orcidSearch">Search by ORCID</Label>
-              <div className="relative mt-2">
-                <Input
-                  id="orcidSearch"
-                  value={orcidSearchTerm}
-                  onChange={(e) => setOrcidSearchTerm(e.target.value)}
-                  className="pl-8"
-                  placeholder="0000-0000-0000-0000"
-                />
-                <OrcidIcon className="absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
-              </div>
-            </div>
-            <Button
-              type="button"
-              onClick={searchByOrcid}
-              disabled={isLoadingOrcidSearch}
-            >
-              {isLoadingOrcidSearch ? "Searching..." : "Search"}
-            </Button>
-          </div>
-
-          <div className="flex items-end gap-2">
-            <div className="flex-1">
-              <Label htmlFor="personSearch">Search for Existing People</Label>
-              <div className="relative mt-2">
-                <Input
-                  id="personSearch"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
-                  placeholder="Search by name or email"
-                />
-                <Search className="absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
-              </div>
-              {searchResults.length > 0 && (
-                <div className="absolute z-10 mt-1 max-h-40 w-full max-w-md overflow-y-auto rounded-md border bg-white shadow-md">
-                  {searchResults.map((person) => (
-                    <button
-                      key={person.id}
-                      className="w-full cursor-pointer px-4 py-2 text-left hover:bg-gray-100"
-                      onClick={() => selectPerson(person)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <User className="text-muted-foreground h-4 w-4" />
-                        <span>{person.name}</span>
-                      </div>
-                      {person.email && (
-                        <p className="text-muted-foreground text-xs">
-                          {person.email}
-                        </p>
-                      )}
-                    </button>
-                  ))}
+                <div className="flex items-end gap-2">
+                  <div className="flex-1">
+                    <Label htmlFor="orcidSearch">Search by ORCID</Label>
+                    <div className="relative mt-2">
+                      <Input
+                        id="orcidSearch"
+                        value={orcidSearchTerm}
+                        onChange={(e) => setOrcidSearchTerm(e.target.value)}
+                        className="pl-8"
+                        placeholder="0000-0000-0000-0000"
+                      />
+                      <OrcidIcon className="absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={searchByOrcid}
+                    disabled={isLoadingOrcidSearch}
+                  >
+                    {isLoadingOrcidSearch ? "Searching..." : "Search"}
+                  </Button>
                 </div>
-              )}
-            </div>
-          </div>
 
-          <ContributorFormFields
-            formData={formData}
-            onNameChange={(e) =>
-              setFormData((prev) => ({ ...prev, name: e.target.value }))
-            }
-            onEmailChange={(e) =>
-              setFormData((prev) => ({ ...prev, email: e.target.value }))
-            }
-            onOrcidIdChange={(e) =>
-              setFormData((prev) => ({ ...prev, orcidId: e.target.value }))
-            }
-            onRoleChange={handleRoleChange}
-            onPositionChange={handlePositionChange}
-            onLeaderChange={(e) =>
-              setFormData((prev) => ({ ...prev, leader: e.target.checked }))
-            }
-            onContactChange={(e) =>
-              setFormData((prev) => ({ ...prev, contact: e.target.checked }))
-            }
-          />
-        </div>
+                <div className="flex items-end gap-2">
+                  <div className="flex-1">
+                    <Label htmlFor="personSearch">
+                      Search for Existing People
+                    </Label>
+                    <div className="relative mt-2">
+                      <Input
+                        id="personSearch"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-8"
+                        placeholder="Search by name or email"
+                      />
+                      <Search className="absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
+                    </div>
+                    {searchResults.length > 0 && (
+                      <div className="absolute z-10 mt-1 max-h-40 w-full max-w-md overflow-y-auto rounded-md border bg-white shadow-md">
+                        {searchResults.map((person) => (
+                          <button
+                            key={person.id}
+                            className="w-full cursor-pointer px-4 py-2 text-left hover:bg-gray-100"
+                            onClick={() => selectPerson(person)}
+                          >
+                            <div className="flex items-center gap-2">
+                              <User className="text-muted-foreground h-4 w-4" />
+                              <span>{person.name}</span>
+                            </div>
+                            {person.email && (
+                              <p className="text-muted-foreground text-xs">
+                                {person.email}
+                              </p>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
+                <ContributorFormFields
+                  formData={formData}
+                  onNameChange={(e) =>
+                    setFormData((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                  onEmailChange={(e) =>
+                    setFormData((prev) => ({ ...prev, email: e.target.value }))
+                  }
+                  onOrcidIdChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      orcidId: e.target.value,
+                    }))
+                  }
+                  onRoleChange={handleRoleChange}
+                  onPositionChange={handlePositionChange}
+                  onLeaderChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      leader: e.target.checked,
+                    }))
+                  }
+                  onContactChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      contact: e.target.checked,
+                    }))
+                  }
+                />
+              </div>
 
-          <ApiMutation
-            mutationFn={createContributor}
-            data={{}}
-            loadingMessage="Adding contributor..."
-            mode="component"
-            onSuccess={(createdContributor) => {
-              onContributorAdded(createdContributor);
-              onOpenChange(false);
-              resetForm();
-            }}
-          >
-            {({ onSubmit, isLoading, error }) => (
-              <>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => onOpenChange(false)}>
+                  Cancel
+                </Button>
                 {error && (
                   <div className="text-destructive text-xs">
                     {error.message}
@@ -398,10 +409,10 @@ export default function AddContributorModal({
                 >
                   {isLoading ? "Adding..." : "Add Contributor"}
                 </Button>
-              </>
-            )}
-          </ApiMutation>
-        </DialogFooter>
+              </DialogFooter>
+            </>
+          )}
+        </ApiMutation>
       </DialogContent>
     </Dialog>
   );

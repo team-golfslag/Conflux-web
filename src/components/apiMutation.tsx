@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useCallback } from "react";
 import {
   ApiClient,
   SwaggerException,
@@ -81,7 +81,7 @@ export function ApiMutation<T, R>({
   const [error, setError] = useState<SwaggerException | null>(null);
   const [result, setResult] = useState<R | undefined>(undefined);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -113,7 +113,7 @@ export function ApiMutation<T, R>({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [apiClient, data, mutationFn, onSuccess, onError]);
 
   // Use useEffect to safely provide the submit function to the parent component
   // This runs after render and avoids setState-during-render issues
@@ -134,15 +134,23 @@ export function ApiMutation<T, R>({
       });
 
       return (
-        <div className="relative h-full w-full">
-          <div className="absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
-            <div className="flex flex-col items-center justify-center space-y-2 rounded-lg bg-white/80 p-4 shadow-md">
+        <div className="relative h-full w-full overflow-hidden">
+          <div
+            className="absolute -inset-4 z-50 flex items-center justify-center bg-white/30 backdrop-blur-sm"
+            style={{
+              WebkitMaskImage:
+                "radial-gradient(rectangle 200% 200% at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 80%)",
+              maskImage:
+                "radial-gradient(rectangle 200% 200% at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 80%)",
+            }}
+          >
+            <div className="flex flex-col items-center justify-center space-y-2 rounded-lg bg-white/90 p-4 shadow-lg ring-1 ring-white/30">
               <Loader2 className="text-primary h-6 w-6 animate-spin" />
               <span className="text-sm font-medium">{loadingMessage}</span>
             </div>
           </div>
           {/* Show a disabled version of children */}
-          <div className="pointer-events-none opacity-60">{childContent}</div>
+          <div className="pointer-events-none opacity-50">{childContent}</div>
         </div>
       );
     }
@@ -161,9 +169,17 @@ export function ApiMutation<T, R>({
   if (error && !children) {
     if (mode === "component") {
       return (
-        <div className="relative">
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
-            <div className="flex flex-col items-center justify-center space-y-2 rounded-lg bg-white/80 p-4 shadow-md">
+        <div className="relative overflow-hidden">
+          <div
+            className="absolute -inset-4 z-10 flex items-center justify-center bg-white/30 backdrop-blur-sm"
+            style={{
+              WebkitMaskImage:
+                "radial-gradient(rectangle 200% 200% at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 80%)",
+              maskImage:
+                "radial-gradient(rectangle 200% 200% at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 80%)",
+            }}
+          >
+            <div className="flex flex-col items-center justify-center space-y-2 rounded-lg bg-white/90 p-4 shadow-lg ring-1 ring-white/30">
               <AlertCircle className="text-destructive h-6 w-6" />
               <span className="text-sm font-medium">
                 Error: {error.message}
@@ -211,8 +227,16 @@ export function ApiMutation<T, R>({
 
     return (
       <div className="relative h-full w-full">
-        <div className="absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
-          <div className="flex flex-col items-center justify-center space-y-2 rounded-lg bg-white/80 p-4 shadow-md">
+        <div
+          className="absolute -inset-4 z-50 flex items-center justify-center bg-white/70 backdrop-blur-sm"
+          style={{
+            WebkitMaskImage:
+              "radial-gradient(rectangle 200% 200% at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 80%)",
+            maskImage:
+              "radial-gradient(rectangle 200% 200% at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 80%)",
+          }}
+        >
+          <div className="flex flex-col items-center justify-center space-y-2 rounded-lg bg-white/80 p-4 shadow-md ring-1 ring-white/30">
             <AlertCircle className="text-destructive h-6 w-6" />
             <span className="text-sm font-medium">Error: {error.message}</span>
             <Button
