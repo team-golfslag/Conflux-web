@@ -117,7 +117,7 @@ export function ApiMutation<T, R>({
 
   // Use useRef to track if we've already initialized to prevent infinite loops
   const initializeRef = React.useRef(false);
-  
+
   // Use useEffect to safely provide the submit function to the parent component
   // This runs after render and avoids setState-during-render issues
   React.useEffect(() => {
