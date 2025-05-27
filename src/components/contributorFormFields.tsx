@@ -28,7 +28,7 @@ export interface ContributorFormData {
   email?: string;
   orcidId?: string;
   roles: ContributorRoleType[];
-  positions: ContributorPositionType[];
+  position?: ContributorPositionType;
   leader: boolean;
   contact: boolean;
 }
@@ -148,9 +148,7 @@ export default function ContributorFormFields({
                     <Badge
                       key={position}
                       variant={
-                        formData.positions.includes(position)
-                          ? "default"
-                          : "outline"
+                        formData.position === position ? "default" : "outline"
                       }
                       className="cursor-pointer"
                       onClick={() => onPositionChange(position)}

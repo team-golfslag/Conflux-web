@@ -9,9 +9,9 @@ import { useState } from "react";
 import {
   OrderByType,
   ApiClient,
-  ProjectDTO,
-  UserDTO,
-  UserRoleDTO,
+  ProjectResponseDTO,
+  User,
+  UserRole,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Separator } from "@/components/ui/separator.tsx";
 import { Search } from "lucide-react";
@@ -142,7 +142,7 @@ const ProjectSearchPage = () => {
       </div>
       <Separator className="col-span-full my-4" />
 
-      <ApiWrapper<ProjectDTO[]>
+      <ApiWrapper<ProjectResponseDTO[]>
         queryFn={(apiClient: ApiClient) =>
           apiClient.projects_GetProjectByQuery(
             debouncedSearchTerm,
@@ -166,10 +166,10 @@ const ProjectSearchPage = () => {
                 {projects.slice(0, 15).map((project) => {
                   // Determine current user roles for search results
                   const currentUser = project.users.find(
-                    (user: UserDTO) => user.scim_id === session?.user?.scim_id,
+                    (user: User) => user.scim_id === session?.user?.scim_id,
                   );
                   const roles = currentUser?.roles
-                    ? currentUser.roles.map((role: UserRoleDTO) => role.type)
+                    ? currentUser.roles.map((role: UserRole) => role.type)
                     : [];
                   return (
                     <ProjectCard

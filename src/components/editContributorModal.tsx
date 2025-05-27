@@ -17,15 +17,15 @@ import {
 import ContributorFormFields from "./contributorFormFields";
 import {
   ContributorRoleType,
-  ContributorDTO,
-  ContributorPositionDTO,
   ContributorPositionType,
+  ContributorRequestDTO,
+  ContributorResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 
 interface ContributorFormData {
   roles: ContributorRoleType[];
-  positions: ContributorPositionType[];
+  position?: ContributorPositionType;
   leader: boolean;
   contact: boolean;
 }
@@ -33,9 +33,9 @@ interface ContributorFormData {
 interface EditContributorModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  contributor: ContributorDTO | null;
+  contributor: ContributorResponseDTO | null;
   projectId: string;
-  onContributorUpdated: (contributor: ContributorDTO) => void;
+  onContributorUpdated: (contributor: ContributorResponseDTO) => void;
 }
 
 export default function EditContributorModal({
@@ -47,7 +47,7 @@ export default function EditContributorModal({
 }: Readonly<EditContributorModalProps>) {
   const [formData, setFormData] = useState<ContributorFormData>({
     roles: [],
-    positions: [],
+    position: undefined,
     leader: false,
     contact: false,
   });
@@ -58,8 +58,8 @@ export default function EditContributorModal({
   useEffect(() => {
     if (contributor) {
       setFormData({
-        roles: contributor.roles,
-        positions: contributor.positions?.map((p) => p.type) ?? [],
+        roles: contributor.roles.map((role) => role.role_type),
+        position: contributor.positions.find((p) => !p.end_date)?.position,
         leader: contributor.leader,
         contact: contributor.contact,
       });
@@ -79,24 +79,22 @@ export default function EditContributorModal({
   const handlePositionChange = (position: ContributorPositionType) => {
     setFormData((prev) => ({
       ...prev,
-      positions: prev.positions.includes(position)
-        ? prev.positions.filter((p) => p !== position)
-        : [...prev.positions, position],
+      position: prev.position === position ? undefined : position,
     }));
   };
 
   const resetForm = () => {
     if (contributor) {
       setFormData({
-        roles: contributor.roles,
-        positions: contributor.positions?.map((p) => p.type) ?? [],
+        roles: contributor.roles.map((role) => role.role_type),
+        position: contributor.positions.find((p) => !p.end_date)?.position,
         leader: contributor.leader,
         contact: contributor.contact,
       });
     } else {
       setFormData({
         roles: [],
-        positions: [],
+        position: undefined,
         leader: false,
         contact: false,
       });
@@ -106,14 +104,9 @@ export default function EditContributorModal({
   const saveEditedContributor = async () => {
     if (!contributor) return;
     try {
-      const updatedContributor = new ContributorDTO({
-        person: contributor.person,
-        project_id: projectId,
+      const updatedContributor = new ContributorRequestDTO({
         roles: formData.roles,
-        positions: formData.positions.map(
-          (type) =>
-            new ContributorPositionDTO({ type, start_date: new Date() }),
-        ),
+        position: formData.position,
         leader: formData.leader,
         contact: formData.contact,
       });
@@ -169,12 +162,7 @@ export default function EditContributorModal({
           >
             Cancel
           </Button>
-          <Button
-            onClick={saveEditedContributor}
-            disabled={formData.positions.length === 0}
-          >
-            Save Changes
-          </Button>
+          <Button onClick={saveEditedContributor}>Save Changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

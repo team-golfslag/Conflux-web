@@ -17,8 +17,9 @@ import PageLinks from "@/components/pageLinks";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import {
-  ProjectDTO,
+  ProjectResponseDTO,
   SwaggerException,
+  TitleType,
   UserRoleType,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { useSession } from "@/hooks/SessionContext";
@@ -69,7 +70,7 @@ export default function ProjectPage() {
   const { id } = useParams();
   const session = useSession();
   const apiClient = useContext(ApiClientContext);
-  const [project, setProject] = useState<ProjectDTO | null>(null);
+  const [project, setProject] = useState<ProjectResponseDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError] = useState<SwaggerException | null>(null);
@@ -180,8 +181,10 @@ export default function ProjectPage() {
               <Card ref={overviewRef} className="scroll-mt-12" title="Overview">
                 <ProjectOverview
                   projectId={id}
-                  title={project.primary_title?.text ?? "No title available"}
-                  description={project.primary_description?.text}
+                  title={project.titles.find(
+                    (title) => title.type === TitleType.Primary,
+                  )}
+                  descriptions={project.descriptions}
                   onProjectUpdate={handleProjectUpdate}
                   isAdmin={isAdmin}
                 />

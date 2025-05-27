@@ -4,15 +4,16 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import {
-  ContributorDTO,
-  ContributorPositionDTO,
+  Contributor,
+  ContributorPosition,
   ContributorPositionType,
   ContributorRoleType,
+  ContributorRole,
   Person,
   ApiClient,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 
-const mockContributor: ContributorDTO = new ContributorDTO({
+const mockContributor: Contributor = new Contributor({
   person: new Person({
     id: "1",
     schema_uri: "",
@@ -20,13 +21,25 @@ const mockContributor: ContributorDTO = new ContributorDTO({
     name: "Jane Doe",
     email: "jane.doe@example.com",
   }),
+  person_id: "1", // Add missing required field
   project_id: "1",
-  roles: [ContributorRoleType.Supervision],
+  roles: [
+    new ContributorRole({
+      role_type: ContributorRoleType.Supervision,
+      schema_uri: "",
+      person_id: "1",
+      project_id: "1",
+    }),
+  ],
   positions: [
-    new ContributorPositionDTO({
+    new ContributorPosition({
       start_date: new Date(),
       end_date: new Date(2026, 1, 1),
-      type: ContributorPositionType.PrincipalInvestigator,
+      position: ContributorPositionType.PrincipalInvestigator,
+      schema_uri: "",
+      get_uri: "",
+      person_id: "1",
+      project_id: "1",
     }),
   ],
   leader: true,
@@ -43,7 +56,10 @@ export function createApiClientMock() {
     projects_GetProjects: () => [],
     projects_GetProject: () => ({}),
     projects_UpdateProject: () => ({}),
-    projects_PatchProject: () => ({}),
+    projects_PutProject: () => ({}),
+    projectTitles_UpdateTitle: () => ({}),
+    projectDescriptions_UpdateDescription: () => ({}),
+    projectDescriptions_CreateDescription: () => ({}),
     contributors_CreateContributor: () => ({}),
     contributors_UpdateContributor: () => ({}),
     contributors_DeleteContributor: () => ({}),

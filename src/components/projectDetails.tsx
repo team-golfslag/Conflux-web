@@ -5,10 +5,10 @@
  */
 import { useContext, useState } from "react";
 import {
-  ProjectDTO,
+  ProjectResponseDTO,
   ApiClient,
-  ContributorDTO,
-  ProjectPatchDTO,
+  ProjectRequestDTO,
+  ContributorRequestDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
@@ -33,7 +33,7 @@ import { DatePicker } from "./ui/datepicker";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 
 type ProjectDetailsProps = {
-  project: ProjectDTO;
+  project: ProjectResponseDTO;
   isAdmin: boolean;
   onProjectUpdate: () => void;
 };
@@ -70,7 +70,7 @@ export default function ProjectDetails({
   );
   const [selectedOrganizationId, setSelectedOrganizationId] = useState<
     string | undefined
-  >(project.organisations[0]?.id);
+  >(project.organisations[0]?.ror_id);
 
   const toggleEditMode = () => {
     if (editMode) {
@@ -80,7 +80,7 @@ export default function ProjectDetails({
       setSelectedLeaderId(
         project.contributors.find((c) => c.leader)?.person.id,
       );
-      setSelectedOrganizationId(project.organisations[0]?.id);
+      setSelectedOrganizationId(project.organisations[0]?.ror_id);
     }
     setEditMode(!editMode);
   };
@@ -124,9 +124,10 @@ export default function ProjectDetails({
           await apiClient.contributors_UpdateContributor(
             project.id,
             contributor.person.id,
-            new ContributorDTO({
-              ...contributor,
+            new ContributorRequestDTO({
+              contact: contributor.contact,
               leader: false,
+              roles: contributor.roles.map((role) => role.role_type),
             }),
           );
         }
@@ -136,22 +137,21 @@ export default function ProjectDetails({
       const newLeader = project.contributors.find(
         (c) => c.person.id === selectedLeaderId,
       );
-      if (newLeader && !newLeader.leader) {
-        await apiClient.contributors_UpdateContributor(
-          project.id,
-          newLeader.person.id,
-          new ContributorDTO({
-            ...newLeader,
-            leader: true,
-          }),
-        );
-      }
+      await apiClient.contributors_UpdateContributor(
+        project.id,
+        newLeader!.person.id,
+        new ContributorRequestDTO({
+          leader: true,
+          contact: newLeader!.contact,
+          roles: newLeader!.roles.map((role) => role.role_type),
+        }),
+      );
     }
     // Update project dates
-    return apiClient.projects_PatchProject(
+    return apiClient.projects_PutProject(
       project.id,
-      new ProjectPatchDTO({
-        start_date: selectedStartDate === null ? undefined : selectedStartDate,
+      new ProjectRequestDTO({
+        start_date: selectedStartDate ?? project.start_date ?? new Date(),
         end_date: selectedEndDate === null ? undefined : selectedEndDate,
       }),
     );
@@ -304,7 +304,7 @@ export default function ProjectDetails({
                     </SelectTrigger>
                     <SelectContent>
                       {project.organisations.map((org) => (
-                        <SelectItem key={org.id} value={org.id || ""}>
+                        <SelectItem key={org.ror_id} value={org.ror_id || ""}>
                           {org.name}
                         </SelectItem>
                       ))}

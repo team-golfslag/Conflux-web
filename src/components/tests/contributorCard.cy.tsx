@@ -4,41 +4,45 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import ContributorCard from "../contributorCard";
-import { ContributorDTO } from "@team-golfslag/conflux-api-client/src/client";
+import { Contributor } from "@team-golfslag/conflux-api-client/src/client";
 import { mockContributor } from "./mocks";
 import { mount } from "cypress/react";
 
 describe("ContributorCard Component", () => {
-  const mockCardContributor: ContributorDTO = mockContributor;
+  const mockCardContributor: Contributor = mockContributor;
 
   beforeEach(() => {
     mount(
       <ContributorCard
         onEdit={cy.stub().as("editHandler")}
         onDelete={cy.stub().as("deleteHandler")}
-        name={mockCardContributor.person.name}
-        roles={mockCardContributor.roles}
-        orcidId={mockCardContributor.person.orcid_id}
+        name={mockCardContributor.person?.name || ""}
+        roles={mockCardContributor.roles.map((r) => r.role_type)}
+        orcidId={mockCardContributor.person?.orcid_id}
         isLeader={mockCardContributor.leader}
         isContact={mockCardContributor.contact}
-        positions={mockCardContributor.positions}
-        id={mockCardContributor.person.id}
-        email={mockCardContributor.person.email}
+        position={
+          mockCardContributor.positions.find((p) => !p.end_date)?.position
+        }
+        id={mockCardContributor.person?.id || ""}
+        email={mockCardContributor.person?.email}
         editMode={false}
       />,
     );
   });
 
   it("renders the contributor information correctly", () => {
-    cy.contains(mockCardContributor.person.name).should("exist");
+    cy.contains(mockCardContributor.person?.name || "").should("exist");
   });
 
   it("renders the email correctly", () => {
-    cy.contains(mockCardContributor.person.email!).should("exist");
+    cy.contains(mockCardContributor.person?.email || "").should("exist");
   });
 
   it("renders the roles of the contributor", () => {
-    cy.contains(mockCardContributor.roles[0]).should("exist");
+    cy.contains(
+      mockCardContributor.roles[0]?.role_type.toString() || "",
+    ).should("exist");
   });
 
   it("indicates if the contributor is a leader", () => {
@@ -51,7 +55,7 @@ describe("ContributorCard Component", () => {
 });
 
 describe("ContributorCard Component in Edit Mode", () => {
-  const mockCardContributor: ContributorDTO = mockContributor;
+  const mockCardContributor: Contributor = mockContributor;
 
   beforeEach(() => {
     mount(
@@ -59,15 +63,17 @@ describe("ContributorCard Component in Edit Mode", () => {
         onEdit={cy.stub().as("editHandler")}
         onDelete={cy.stub().as("deleteHandler")}
         openDeleteDialog={cy.stub().as("openDeleteDialogHandler")}
-        name={mockCardContributor.person.name}
-        roles={mockCardContributor.roles}
-        orcidId={mockCardContributor.person.orcid_id}
+        name={mockCardContributor.person?.name || ""}
+        roles={mockCardContributor.roles.map((r) => r.role_type)}
+        orcidId={mockCardContributor.person?.orcid_id}
         isLeader={mockCardContributor.leader}
         isContact={mockCardContributor.contact}
         isConfluxUser={false}
-        positions={mockCardContributor.positions}
-        id={mockCardContributor.person.id}
-        email={mockCardContributor.person.email}
+        position={
+          mockCardContributor.positions.find((p) => !p.end_date)?.position
+        }
+        id={mockCardContributor.person?.id || ""}
+        email={mockCardContributor.person?.email}
         editMode={true}
       />,
     );
@@ -94,7 +100,7 @@ describe("ContributorCard Component in Edit Mode", () => {
 });
 
 describe("ContributorCard for Conflux User in Edit Mode", () => {
-  const mockCardContributor: ContributorDTO = mockContributor;
+  const mockCardContributor: Contributor = mockContributor;
 
   beforeEach(() => {
     mount(
@@ -102,15 +108,17 @@ describe("ContributorCard for Conflux User in Edit Mode", () => {
         onEdit={cy.stub().as("editHandler")}
         onDelete={cy.stub().as("deleteHandler")}
         openDeleteDialog={cy.stub().as("openDeleteDialogHandler")}
-        name={mockCardContributor.person.name}
-        roles={mockCardContributor.roles}
-        orcidId={mockCardContributor.person.orcid_id}
+        name={mockCardContributor.person?.name || ""}
+        roles={mockCardContributor.roles.map((r) => r.role_type)}
+        orcidId={mockCardContributor.person?.orcid_id}
         isLeader={mockCardContributor.leader}
         isConfluxUser={true}
         isContact={mockCardContributor.contact}
-        positions={mockCardContributor.positions}
-        id={mockCardContributor.person.id}
-        email={mockCardContributor.person.email}
+        position={
+          mockCardContributor.positions.find((p) => !p.end_date)?.position
+        }
+        id={mockCardContributor.person?.id || ""}
+        email={mockCardContributor.person?.email}
         editMode={true}
       />,
     );

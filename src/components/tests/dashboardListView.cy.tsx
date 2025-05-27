@@ -7,11 +7,12 @@ import DashboardListView from "../dashboardListView.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { mount } from "cypress/react";
 import {
-  ProjectDTO,
-  ProjectTitleDTO,
-  ProjectDescriptionDTO,
+  Project,
+  ProjectTitle,
+  ProjectDescription,
   TitleType,
   DescriptionType,
+  ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 
 /// <reference types="cypress" />
@@ -22,42 +23,56 @@ describe("<DashboardListView />", () => {
     { id: "456", title: "Project 2", description: "Description for project 2" },
     { id: "789", title: "Project 3", description: "Description for project 3" },
   ];
-  const mockProjects: ProjectDTO[] = mockInfo.map(
+  const mockProjects: Project[] = mockInfo.map(
     (info) =>
-      new ProjectDTO({
+      new Project({
         id: info.id,
         users: [],
         contributors: [],
         products: [],
         start_date: new Date(),
         organisations: [],
+        lastest_edit: new Date(),
         titles: [
-          new ProjectTitleDTO({
+          new ProjectTitle({
             text: info.title,
             type: TitleType.Primary,
             start_date: new Date(),
+            project_id: info.id,
+            id: `title-${info.id}`,
+            type_schema_uri: "",
+            type_uri: "",
           }),
         ],
         descriptions: [
-          new ProjectDescriptionDTO({
+          new ProjectDescription({
             text: info.description,
             type: DescriptionType.Primary,
+            project_id: info.id,
+            id: `desc-${info.id}`,
+            type_schema_uri: "",
+            type_uri: "",
           }),
         ],
       }),
   );
 
-  const mockData = mockProjects.map((p) => ({
-    project: new ProjectDTO({
+  // Create projects with primary_title and primary_description properties needed by ProjectCard
+  const mockData = mockProjects.map((p) => {
+    // Add the primary_title and primary_description properties expected by ProjectCard
+    const enhancedProject = {
       ...p,
-      start_date: new Date(p.start_date),
-      primary_title: p.titles.find((title) => title.type === TitleType.Primary),
+      primary_title: p.titles.find((t) => t.type === TitleType.Primary),
       primary_description: p.descriptions.find(
-        (desc) => desc.type === DescriptionType.Primary,
+        (d) => d.type === DescriptionType.Primary,
       ),
-    }),
-    role: "Member",
-  }));
+    };
+
+    return {
+      project: enhancedProject as unknown as ProjectResponseDTO,
+      role: "Member",
+    };
+  });
 
   beforeEach(() => {
     // Mount the component within BrowserRouter because ProjectCard uses <Link>

@@ -24,11 +24,10 @@ import ContributorFormFields from "./contributorFormFields";
 import {
   ContributorRoleType,
   Person,
-  PersonDTO,
-  ContributorDTO,
-  ContributorPositionDTO,
+  PersonRequestDTO,
   ContributorPositionType,
   ApiClient,
+  ContributorRequestDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import {
@@ -43,7 +42,7 @@ interface ContributorFormData {
   email: string;
   orcidId: string;
   roles: ContributorRoleType[];
-  positions: ContributorPositionType[];
+  position?: ContributorPositionType;
   leader: boolean;
   contact: boolean;
 }
@@ -52,7 +51,7 @@ interface AddContributorModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   projectId: string;
-  onContributorAdded: (contributor: ContributorDTO) => void;
+  onContributorAdded: (contributor: ContributorRequestDTO) => void;
 }
 
 export default function AddContributorModal({
@@ -67,7 +66,7 @@ export default function AddContributorModal({
     email: "",
     orcidId: "",
     roles: [],
-    positions: [],
+    position: undefined,
     leader: false,
     contact: false,
   });
@@ -101,9 +100,7 @@ export default function AddContributorModal({
   const handlePositionChange = (position: ContributorPositionType) => {
     setFormData((prev) => ({
       ...prev,
-      positions: prev.positions.includes(position)
-        ? prev.positions.filter((p) => p !== position)
-        : [...prev.positions, position],
+      position: prev.position === position ? undefined : position,
     }));
     setSelectedPerson(null);
   };
@@ -115,7 +112,7 @@ export default function AddContributorModal({
       email: "",
       orcidId: "",
       roles: [],
-      positions: [],
+      position: undefined,
       leader: false,
       contact: false,
     });
@@ -262,11 +259,12 @@ export default function AddContributorModal({
 
   // Prepare data for API mutation
   const prepareContributorData = async (): Promise<{
-    contributorData: ContributorDTO;
-    newPerson?: PersonDTO;
+    contributorData: ContributorRequestDTO;
+    existingPerson?: Person;
+    newPerson?: PersonRequestDTO;
   }> => {
     let personToUse: Person;
-    let newPerson: PersonDTO | undefined;
+    let newPerson: PersonRequestDTO | undefined;
 
     if (selectedPerson) {
       personToUse = selectedPerson;
@@ -274,7 +272,7 @@ export default function AddContributorModal({
       const formattedOrcid = formData.orcidId
         ? formatOrcidAsUrl(formData.orcidId)
         : null;
-      newPerson = new PersonDTO({
+      newPerson = new PersonRequestDTO({
         name: formData.name,
         email: formData.email,
         or_ci_d: formattedOrcid ?? undefined,
@@ -290,37 +288,42 @@ export default function AddContributorModal({
       });
     }
 
-    const contributorData = new ContributorDTO({
-      person: personToUse,
-      project_id: projectId,
+    const contributorData = new ContributorRequestDTO({
       roles: formData.roles,
-      positions: formData.positions.map(
-        (type) => new ContributorPositionDTO({ type, start_date: new Date() }),
-      ),
+      position: formData.position,
       leader: formData.leader,
       contact: formData.contact,
     });
 
-    return { contributorData, newPerson };
+    return { contributorData, newPerson, existingPerson: personToUse };
   };
 
   // Create or get person, then create contributor
   const createContributor = async (apiClient: ApiClient) => {
-    const { contributorData, newPerson } = await prepareContributorData();
+    const { contributorData, newPerson, existingPerson } =
+      await prepareContributorData();
 
+    let personId: string;
+    if (existingPerson && existingPerson.id !== "temp-id") {
+      personId = existingPerson.id;
+    }
     // If we need to create a new person first
-    if (newPerson) {
+    else if (newPerson) {
       const createdPerson = await apiClient.people_CreatePerson(newPerson);
       if (!createdPerson?.id) {
         throw new Error("Failed to create person");
       }
-
-      // Update the contributor with the created person
-      contributorData.person = createdPerson;
+      personId = createdPerson.id;
+    } else {
+      throw new Error("No person data available");
     }
 
     // Now create the contributor
-    return apiClient.contributors_CreateContributor(projectId, contributorData);
+    return apiClient.contributors_CreateContributor(
+      projectId,
+      personId,
+      contributorData,
+    );
   };
 
   return (
@@ -346,7 +349,15 @@ export default function AddContributorModal({
           loadingMessage="Adding contributor..."
           mode="component"
           onSuccess={(createdContributor) => {
-            onContributorAdded(createdContributor);
+            onContributorAdded(
+              new ContributorRequestDTO({
+                roles: createdContributor.roles.map((role) => role.role_type),
+                position: createdContributor.positions.find((p) => !p.end_date)!
+                  .position,
+                leader: createdContributor.leader,
+                contact: createdContributor.contact,
+              }),
+            );
             onOpenChange(false);
             resetForm();
           }}
@@ -512,11 +523,7 @@ export default function AddContributorModal({
                 )}
                 <Button
                   onClick={onSubmit}
-                  disabled={
-                    isLoading ||
-                    !formData.name ||
-                    formData.positions.length === 0
-                  }
+                  disabled={isLoading || !formData.name || !formData.position}
                 >
                   {isLoading ? "Adding..." : "Add Contributor"}
                 </Button>

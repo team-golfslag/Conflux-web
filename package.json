@@ -18,7 +18,7 @@
   "dependencies": {
     "@cypress/react": "^9.0.1",
     "@cypress/webpack-dev-server": "^4.1.0",
-    "@icons-pack/react-simple-icons": "^12.8.0",
+    "@icons-pack/react-simple-icons": "^12.9.0",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-collapsible": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.14",
@@ -55,7 +55,7 @@
     "@eslint/js": "^9.27.0",
     "@types/lodash": "^4.17.17",
     "@types/node": "^22.15.21",
-    "@types/react": "^19.1.5",
+    "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
     "@vitejs/plugin-react": "^4.5.0",
     "eslint": "^9.27.0",
