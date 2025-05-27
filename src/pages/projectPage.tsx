@@ -202,7 +202,10 @@ export default function ProjectPage() {
                 />
               </Card>
               <Card ref={worksRef} className="scroll-mt-12" title="Works">
-                <ProjectWorks products={project.products} />
+                <ProjectWorks
+                  project={project}
+                  onProjectUpdate={handleProjectUpdate}
+                />
               </Card>
             </div>
             {/* Side Panel */}
