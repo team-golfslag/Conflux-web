@@ -24,9 +24,9 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "./ui/button";
 
 export interface ContributorFormData {
-  name: string;
-  email: string;
-  orcidId: string;
+  name?: string;
+  email?: string;
+  orcidId?: string;
   roles: ContributorRoleType[];
   positions: ContributorPositionType[];
   leader: boolean;
@@ -35,9 +35,9 @@ export interface ContributorFormData {
 
 interface ContributorFormFieldsProps {
   formData: ContributorFormData;
-  onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onOrcidIdChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onNameChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onEmailChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onOrcidIdChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRoleChange: (role: ContributorRoleType) => void;
   onPositionChange: (position: ContributorPositionType) => void;
   onLeaderChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -63,72 +63,78 @@ export default function ContributorFormFields({
   const idPrefix = isEdit ? "edit-" : "";
   return (
     <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor={`${idPrefix}name`} className="text-right">
-          Name
-        </Label>
-        <Input
-          id={`${idPrefix}name`}
-          name="name"
-          className="col-span-3"
-          value={formData.name}
-          onChange={onNameChange}
-        />
-      </div>
-
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor={`${idPrefix}email`} className="text-right">
-          Email
-        </Label>
-        <Input
-          id={`${idPrefix}email`}
-          name="email"
-          type="email"
-          className="col-span-3"
-          value={formData.email}
-          onChange={onEmailChange}
-        />
-      </div>
-
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor={`${idPrefix}orcidId`} className="text-right">
-          ORCID ID
-        </Label>
-        <div className="col-span-3 flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <Input
-              id={`${idPrefix}orcidId`}
-              name="orcidId"
-              className={`flex-1 ${orcidError ? "border-red-500" : ""}`}
-              value={formData.orcidId}
-              onChange={onOrcidIdChange}
-              placeholder="0000-0000-0000-0000"
-              aria-invalid={!!orcidError}
-            />
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={onOrcidAutoFill}
-                    disabled={!formData.orcidId || !onOrcidAutoFill}
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Autofill details from ORCID</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          {orcidError && (
-            <div className="text-sm text-red-500">{orcidError}</div>
-          )}
+      {onNameChange && (
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor={`${idPrefix}name`} className="text-right">
+            Name
+          </Label>
+          <Input
+            id={`${idPrefix}name`}
+            name="name"
+            className="col-span-3"
+            value={formData.name}
+            onChange={onNameChange}
+          />
         </div>
-      </div>
+      )}
+
+      {onEmailChange && (
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor={`${idPrefix}email`} className="text-right">
+            Email
+          </Label>
+          <Input
+            id={`${idPrefix}email`}
+            name="email"
+            type="email"
+            className="col-span-3"
+            value={formData.email}
+            onChange={onEmailChange}
+          />
+        </div>
+      )}
+
+      {onOrcidIdChange && onOrcidAutoFill && (
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor={`${idPrefix}orcidId`} className="text-right">
+            ORCID ID
+          </Label>
+          <div className="col-span-3 flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Input
+                id={`${idPrefix}orcidId`}
+                name="orcidId"
+                className={`flex-1 ${orcidError ? "border-red-500" : ""}`}
+                value={formData.orcidId}
+                onChange={onOrcidIdChange}
+                placeholder="0000-0000-0000-0000"
+                aria-invalid={!!orcidError}
+              />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={onOrcidAutoFill}
+                      disabled={!formData.orcidId || !onOrcidAutoFill}
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Autofill details from ORCID</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            {orcidError && (
+              <div className="text-sm text-red-500">{orcidError}</div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-4 items-start gap-4">
         <Label className="pt-2 text-right">Positions</Label>

@@ -86,7 +86,7 @@ export default function ProjectContributors({
           }
         >
           {isAdmin && (
-            <div className="invisible group-hover/card:visible">
+            <div className="invisible group-hover/card:visible flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={toggleEditMode}>
                 {editMode ? (
                   <>
