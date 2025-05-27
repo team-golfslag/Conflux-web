@@ -319,11 +319,13 @@ export default function AddContributorModal({
     }
 
     // Now create the contributor
-    return apiClient.contributors_CreateContributor(
+    const con = await apiClient.contributors_CreateContributor(
       projectId,
       personId,
       contributorData,
     );
+    console.log("Created contributor:", con);
+    return con;
   };
 
   return (

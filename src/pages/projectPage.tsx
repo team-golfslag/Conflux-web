@@ -13,6 +13,7 @@ import { useParams } from "react-router";
 import { useContext, useEffect, useRef, useState } from "react";
 import ProjectDetails from "@/components/projectDetails.tsx";
 import ProjectTimeline from "@/components/projectTimeline.tsx";
+import RAiDInfo from "@/components/raidInfo.tsx";
 import PageLinks from "@/components/pageLinks";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { LoadingWrapper } from "@/components/loadingWrapper";
@@ -211,6 +212,7 @@ export default function ProjectPage() {
                 onProjectUpdate={handleProjectUpdate}
                 isAdmin={isAdmin}
               />
+              <RAiDInfo projectId={id} project={project} />
               <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
             </div>
           </main>
