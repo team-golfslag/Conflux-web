@@ -44,6 +44,7 @@ describe("ContributorFormFields Component", () => {
         onPositionChange={cy.stub().as("handlePositionChange")}
         onLeaderChange={cy.stub().as("handleLeaderChange")}
         onContactChange={cy.stub().as("handleContactChange")}
+        onOrcidAutoFill={cy.stub().as("handleOrcidAutoFill")}
       />,
     );
 
@@ -79,7 +80,7 @@ describe("ContributorFormFields Component", () => {
     cy.contains("Name").should("exist");
     cy.contains("Email").should("exist");
     cy.contains("Role").should("exist");
-    cy.contains("ORCID").should("exist");
+    cy.contains("ORCID ID").should("exist");
   });
 
   it("handles empty initial values gracefully", () => {
@@ -93,6 +94,7 @@ describe("ContributorFormFields Component", () => {
         onPositionChange={cy.stub().as("handlePositionChange")}
         onLeaderChange={cy.stub().as("handleLeaderChange")}
         onContactChange={cy.stub().as("handleContactChange")}
+        onOrcidAutoFill={cy.stub().as("handleOrcidAutoFill")}
       />,
     );
 

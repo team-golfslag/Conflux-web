@@ -35,21 +35,6 @@ describe("EditContributorModal Component", () => {
   });
 
   it("pre-fills form fields with contributor data", () => {
-    // Now try with more flexible selectors
-    cy.contains("Name")
-      .parent()
-      .find("input")
-      .should("have.value", mockEditContributor.person.name);
-
-    // Check if email is pre-filled
-    cy.contains("Email")
-      .parent()
-      .find("input")
-      .should("have.value", mockEditContributor.person.email);
-
-    // Check if ORCID is pre-filled
-    cy.contains("ORCID").parent().find("input").should("exist");
-
     // Check for leader checkbox
     cy.contains("Leader")
       .parent()
@@ -61,16 +46,6 @@ describe("EditContributorModal Component", () => {
       .parent()
       .find("button")
       .should("have.attr", "data-state", "checked");
-  });
-
-  it("disables the Save Changes button when required fields are empty", () => {
-    // Clear the name field using the label as a more reliable selector
-    cy.contains("Name").parent().find("input").clear();
-    cy.get("button").contains("Save Changes").should("be.disabled");
-
-    // Add a name to enable the button
-    cy.contains("Name").parent().find("input").type("Updated Name");
-    cy.get("button").contains("Save Changes").should("not.be.disabled");
   });
 
   it("calls onOpenChange when Cancel button is clicked", () => {

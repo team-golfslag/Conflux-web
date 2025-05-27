@@ -23,7 +23,6 @@ import {
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 
-
 interface ContributorFormData {
   roles: ContributorRoleType[];
   positions: ContributorPositionType[];
@@ -86,7 +85,6 @@ export default function EditContributorModal({
     }));
   };
 
-
   const resetForm = () => {
     if (contributor) {
       setFormData({
@@ -108,7 +106,6 @@ export default function EditContributorModal({
   const saveEditedContributor = async () => {
     if (!contributor) return;
     try {
-
       const updatedContributor = new ContributorDTO({
         person: contributor.person,
         project_id: projectId,
@@ -120,7 +117,6 @@ export default function EditContributorModal({
         leader: formData.leader,
         contact: formData.contact,
       });
-
 
       const result = await apiClient.contributors_UpdateContributor(
         projectId,
