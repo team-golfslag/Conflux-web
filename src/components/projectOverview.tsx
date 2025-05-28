@@ -3,7 +3,15 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { Edit, ChevronDown, ChevronUp, Check, X, Plus } from "lucide-react";
+import {
+  Edit,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  X,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card.tsx";
@@ -68,6 +76,9 @@ export default function ProjectOverview({
     DescriptionType.Primary,
   );
   const [newLanguage, setNewLanguage] = useState<string>("default");
+
+  // State for delete confirmation modal
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Helper function to find description by type and language
   const findDescription = (type: DescriptionType, language?: string) => {
@@ -233,6 +244,46 @@ export default function ProjectOverview({
     );
   };
 
+  const deleteDescription = async (
+    apiClient: ApiClient,
+    deleteData: {
+      type: DescriptionType;
+      language: string;
+    },
+  ) => {
+    const { type, language } = deleteData;
+    // Find the description to delete
+    const description = findDescription(type, language);
+    if (!description) {
+      throw new Error(
+        `Description type ${type} with language ${language} not found for project ${projectId}`,
+      );
+    }
+    await apiClient.projectDescriptions_DeleteDescription(
+      projectId,
+      description.id,
+    );
+
+    // After deletion, switch to another available description or reset selection
+    const remainingDescriptions = descriptions.filter(
+      (desc) =>
+        !(desc.type === type && (desc.language?.id || "default") === language),
+    );
+
+    if (remainingDescriptions.length > 0) {
+      // Switch to the first remaining description
+      const firstRemaining = remainingDescriptions[0];
+      setSelectedDescriptionType(firstRemaining.type);
+      setSelectedLanguage(firstRemaining.language?.id || "default");
+    } else {
+      // No descriptions left, reset to default
+      setSelectedDescriptionType(DescriptionType.Primary);
+      setSelectedLanguage("default");
+    }
+
+    onProjectUpdate();
+  };
+
   // Create new description handler
   const createNewDescription = async (
     apiClient: ApiClient,
@@ -357,6 +408,70 @@ export default function ProjectOverview({
                   }
                 >
                   <Plus size={16} /> Add Description
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+      </ApiMutation>
+
+      {/* Delete Confirmation Dialog */}
+      <ApiMutation
+        mutationFn={deleteDescription}
+        data={{
+          type: selectedDescriptionType,
+          language: selectedLanguage,
+        }}
+        loadingMessage="Deleting description..."
+        mode="component"
+        onSuccess={() => {
+          setIsDeleteModalOpen(false);
+          setEditDescriptionMode(false);
+          onProjectUpdate();
+        }}
+      >
+        {({ onSubmit, isLoading }) => (
+          <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete Description</DialogTitle>
+              </DialogHeader>
+              <div className="py-4">
+                <p className="text-sm text-gray-600">
+                  Are you sure you want to delete this description? This action
+                  cannot be undone.
+                </p>
+                <div className="mt-4 rounded-lg bg-gray-50 p-3">
+                  <p className="text-sm">
+                    <span className="font-medium">Type:</span>{" "}
+                    {selectedDescriptionType.charAt(0).toUpperCase() +
+                      selectedDescriptionType.slice(1).toLowerCase()}
+                  </p>
+                  <p className="text-sm">
+                    <span className="font-medium">Language:</span>{" "}
+                    {selectedLanguage === "default"
+                      ? "Default"
+                      : selectedLanguage.toUpperCase()}
+                  </p>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  disabled={isLoading}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="flex items-center gap-1"
+                  onClick={onSubmit}
+                  disabled={isLoading}
+                >
+                  <Trash2 size={16} /> Delete Description
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -515,6 +630,15 @@ export default function ProjectOverview({
                     </Button>
 
                     <Button
+                      variant="destructive"
+                      size="sm"
+                      className="flex items-center gap-1"
+                      onClick={() => setIsDeleteModalOpen(true)}
+                    >
+                      <Trash2 size={16} /> Delete
+                    </Button>
+
+                    <Button
                       variant="ghost"
                       size="sm"
                       className="flex items-center gap-1"
@@ -564,7 +688,7 @@ export default function ProjectOverview({
                       value={selectedLanguage}
                       onValueChange={(value) => setSelectedLanguage(value)}
                     >
-                      <SelectTrigger className="h-8 w-[80px] border-gray-100 bg-white/70 text-sm shadow-sm">
+                      <SelectTrigger className="h-8 w-[100px] border-gray-100 bg-white/70 text-sm shadow-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

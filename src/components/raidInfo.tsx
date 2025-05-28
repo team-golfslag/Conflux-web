@@ -86,7 +86,7 @@ export default function RAiDInfo({
       case RAiDIncompatibilityType.OverlappingContributorPositions:
         return "Overlapping contributor positions";
       case RAiDIncompatibilityType.NoProjectLeader:
-        return "No project leader";
+        return "No project lead";
       case RAiDIncompatibilityType.NoProjectContact:
         return "No project contact";
       case RAiDIncompatibilityType.OverlappingOrganisationRoles:
@@ -173,6 +173,16 @@ export default function RAiDInfo({
         };
       }
     }
+    // Handle all product-related incompatibilities
+    if (incompatibility.type === RAiDIncompatibilityType.NoProductCategory) {
+      const product = project.products?.find((prod) => prod.id === objectId);
+      if (product) {
+        return {
+          text: product.title,
+          type: product.type,
+        };
+      }
+    }
 
     return null;
   };
@@ -200,7 +210,9 @@ export default function RAiDInfo({
               {/* Description or Title content */}
               {enhancedInfo.text && (
                 <div className="text-xs">
-                  <span className="font-medium text-amber-700">Content:</span>
+                  <span className="font-medium text-amber-700">
+                    {enhancedInfo.language ? "Content" : "Title"}:
+                  </span>
                   <p className="mt-1 rounded bg-amber-100 px-2 py-1 text-amber-600 italic">
                     "{enhancedInfo.text}"
                   </p>
@@ -209,11 +221,17 @@ export default function RAiDInfo({
                       Type:{" "}
                       <span className="font-mono">{enhancedInfo.type}</span>
                     </span>
-                    <span className="text-amber-400">•</span>
-                    <span>
-                      Lang:{" "}
-                      <span className="font-mono">{enhancedInfo.language}</span>
-                    </span>
+                    {enhancedInfo.language && (
+                      <>
+                        <span className="text-amber-400">•</span>
+                        <span>
+                          Lang:{" "}
+                          <span className="font-mono">
+                            {enhancedInfo.language}
+                          </span>
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -237,7 +255,7 @@ export default function RAiDInfo({
                     {enhancedInfo.orcid && (
                       <span>
                         ORCID:{" "}
-                        <span className="font-mono text-xs">
+                        <span className="overflow-wrap-anywhere font-mono text-xs break-words break-all">
                           {enhancedInfo.orcid}
                         </span>
                       </span>
@@ -261,7 +279,7 @@ export default function RAiDInfo({
             incompatibility.object_id &&
             incompatibility.object_id !=
               "00000000-0000-0000-0000-000000000000" && (
-              <p className="mt-1 font-mono text-xs text-amber-600">
+              <p className="overflow-wrap-anywhere mt-1 font-mono text-xs break-words break-all text-amber-600">
                 ID: {incompatibility.object_id}
               </p>
             )
@@ -381,7 +399,7 @@ export default function RAiDInfo({
                 </div>
                 <ExternalLink className="h-4 w-4 text-gray-400" />
               </div>
-              <p className="mt-1 rounded bg-blue-50 px-2 py-1 font-mono text-sm text-blue-700">
+              <p className="overflow-wrap-anywhere mt-1 rounded bg-blue-50 px-2 py-1 font-mono text-sm break-words break-all text-blue-700">
                 {raidInfo.r_ai_d_id}
               </p>
             </div>
@@ -468,7 +486,7 @@ export default function RAiDInfo({
 
                 <div>
                   <Label className="font-medium text-gray-600">Owner ID</Label>
-                  <p className="mt-1 rounded bg-gray-50 px-2 py-1 font-mono text-xs text-gray-800">
+                  <p className="overflow-wrap-anywhere mt-1 rounded bg-gray-50 px-2 py-1 font-mono text-xs break-words break-all text-gray-800">
                     {raidInfo.owner_id}
                   </p>
                 </div>

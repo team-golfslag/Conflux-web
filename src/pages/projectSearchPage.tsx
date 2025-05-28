@@ -88,7 +88,7 @@ const ProjectSearchPage = () => {
 
   // CSV download functionality
   const [triggerDownload, setTriggerDownload] = useState(false);
-  
+
   const { data: csvData, isLoading: isDownloading } = useApiQuery(
     (apiClient: ApiClient) => {
       if (!triggerDownload) {
@@ -98,37 +98,39 @@ const ProjectSearchPage = () => {
         debouncedSearchTerm,
         startDate,
         endDate,
-        parseOrderBy(sort)
+        parseOrderBy(sort),
       );
     },
-    [debouncedSearchTerm, startDate, endDate, sort, triggerDownload]
+    [debouncedSearchTerm, startDate, endDate, sort, triggerDownload],
   );
 
   // Effect to handle the actual download when data is received
   React.useEffect(() => {
     if (csvData && triggerDownload && csvData !== null) {
-      console.log('CSV FileResponse received:', csvData);
-      
+      console.log("CSV FileResponse received:", csvData);
+
       try {
         // csvData is a FileResponse object with a data property containing the Blob
         const blob = csvData.data; // Use the blob directly from the FileResponse
-        const fileName = csvData.fileName || `projects_export_${new Date().toISOString().split('T')[0]}.csv`;
-        
-        const link = document.createElement('a');
+        const fileName =
+          csvData.fileName ||
+          `projects_export_${new Date().toISOString().split("T")[0]}.csv`;
+
+        const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', fileName);
-        link.style.visibility = 'hidden';
+        link.setAttribute("href", url);
+        link.setAttribute("download", fileName);
+        link.style.visibility = "hidden";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        
-        console.log('CSV download triggered successfully');
+
+        console.log("CSV download triggered successfully");
       } catch (error) {
-        console.error('Error downloading CSV:', error);
+        console.error("Error downloading CSV:", error);
       }
-      
+
       // Reset trigger
       setTriggerDownload(false);
     }
@@ -200,7 +202,9 @@ const ProjectSearchPage = () => {
                   Start date descending
                 </SelectItem>
                 <SelectItem value="end_date_asc">End date ascending</SelectItem>
-                <SelectItem value="end_date_desc">End date descending</SelectItem>
+                <SelectItem value="end_date_desc">
+                  End date descending
+                </SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
