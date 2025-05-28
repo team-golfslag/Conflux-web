@@ -8,7 +8,6 @@ import {
   ProjectResponseDTO,
   ApiClient,
   ProjectRequestDTO,
-  ContributorRequestDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
@@ -65,9 +64,6 @@ export default function ProjectDetails({
   const [selectedEndDate, setSelectedEndDate] = useState<
     Date | null | undefined
   >(project.end_date);
-  const [selectedLeaderId, setSelectedLeaderId] = useState<string | undefined>(
-    project.contributors.find((c) => c.leader)?.person.id,
-  );
   const [selectedOrganizationId, setSelectedOrganizationId] = useState<
     string | undefined
   >(project.organisations[0]?.ror_id);
@@ -77,9 +73,6 @@ export default function ProjectDetails({
       // Reset selections to current values if canceling
       setSelectedStartDate(project.start_date);
       setSelectedEndDate(project.end_date);
-      setSelectedLeaderId(
-        project.contributors.find((c) => c.leader)?.person.id,
-      );
       setSelectedOrganizationId(project.organisations[0]?.ror_id);
     }
     setEditMode(!editMode);
@@ -116,38 +109,7 @@ export default function ProjectDetails({
   };
 
   const updateProject = async (apiClient: ApiClient) => {
-    // Update contributor roles if leader changed
-    if (selectedLeaderId) {
-      // First, unset any existing leader
-      for (const contributor of project.contributors) {
-        if (contributor.leader && contributor.person.id !== selectedLeaderId) {
-          await apiClient.contributors_UpdateContributor(
-            project.id,
-            contributor.person.id,
-            new ContributorRequestDTO({
-              contact: contributor.contact,
-              leader: false,
-              roles: contributor.roles.map((role) => role.role_type),
-            }),
-          );
-        }
-      }
-
-      // Set the new leader
-      const newLeader = project.contributors.find(
-        (c) => c.person.id === selectedLeaderId,
-      );
-      await apiClient.contributors_UpdateContributor(
-        project.id,
-        newLeader!.person.id,
-        new ContributorRequestDTO({
-          leader: true,
-          contact: newLeader!.contact,
-          roles: newLeader!.roles.map((role) => role.role_type),
-        }),
-      );
-    }
-    // Update project dates
+    // Update project dates only
     return apiClient.projects_PutProject(
       project.id,
       new ProjectRequestDTO({
@@ -157,9 +119,25 @@ export default function ProjectDetails({
     );
   };
 
-  const projectLead = project.contributors.find(
-    (contributor) => contributor.leader,
-  );
+  // Helper function to get all project leads
+  const getProjectLeads = (
+    contributors: Array<{ leader: boolean; person: { name: string } }>,
+  ) => {
+    const leads = contributors.filter((contributor) => contributor.leader);
+    return leads.length > 0
+      ? leads.map((lead) => lead.person.name).join(", ")
+      : "N/A";
+  };
+
+  // Helper function to get all project contacts
+  const getProjectContacts = (
+    contributors: Array<{ contact: boolean; person: { name: string } }>,
+  ) => {
+    const contacts = contributors.filter((contributor) => contributor.contact);
+    return contacts.length > 0
+      ? contacts.map((contact) => contact.person.name).join(", ")
+      : "N/A";
+  };
 
   return (
     <Card className="">
@@ -243,28 +221,18 @@ export default function ProjectDetails({
                   <Label htmlFor="project-lead" className="font-semibold">
                     Project Lead
                   </Label>
-                  <Select
-                    value={selectedLeaderId}
-                    onValueChange={setSelectedLeaderId}
-                  >
-                    <SelectTrigger className="mt-1 w-full">
-                      <SelectValue
-                        placeholder="Select project lead"
-                        className="text-left whitespace-normal"
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {project.contributors.map((contributor) => (
-                        <SelectItem
-                          key={contributor.person.id}
-                          value={contributor.person.id}
-                          className="text-left whitespace-normal"
-                        >
-                          {contributor.person.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <p className="text-gray-700">
+                    {getProjectLeads(project.contributors)}
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="project-contacts" className="font-semibold">
+                    Project Contacts
+                  </Label>
+                  <p className="text-gray-700">
+                    {getProjectContacts(project.contributors)}
+                  </p>
                 </div>
 
                 <div>
@@ -341,7 +309,16 @@ export default function ProjectDetails({
                 Project Lead
               </Label>
               <p className="text-gray-700">
-                {projectLead ? projectLead.person.name : "N/A"}
+                {getProjectLeads(project.contributors)}
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="project-contacts" className="font-semibold">
+                Project Contacts
+              </Label>
+              <p className="text-gray-700">
+                {getProjectContacts(project.contributors)}
               </p>
             </div>
 
