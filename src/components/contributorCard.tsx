@@ -6,9 +6,9 @@
 
 import { Card } from "@/components/ui/card";
 import {
+  ContributorPositionType,
   ContributorRoleType,
-  UserRoleDTO,
-  ContributorPositionDTO, // Added import
+  UserRole,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Check, Crown, Contact, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,8 +30,8 @@ type ContributorCardProps = {
   name: string;
   email?: string | null;
   orcidId?: string | null;
-  roles: ContributorRoleType[] | UserRoleDTO[];
-  positions?: ContributorPositionDTO[] | null;
+  roles: ContributorRoleType[] | UserRole[];
+  position?: ContributorPositionType;
   isLeader?: boolean;
   isContact?: boolean;
   isConfluxUser?: boolean;
@@ -47,7 +47,7 @@ export default function ContributorCard({
   email,
   orcidId,
   roles,
-  positions,
+  position,
   isLeader,
   isContact,
   editMode,
@@ -167,11 +167,10 @@ export default function ContributorCard({
         </div>
 
         <div className="mt-auto flex flex-col gap-1 pt-3">
-          {positions && positions.length > 0 && (
+          {position && (
             <div className="flex flex-wrap justify-start gap-1">
-              {positions.map((positionDTO) => {
-                const displayablePosition = positionDTO.type;
-                const positionDisplay = getPositionDisplay(displayablePosition);
+              {(() => {
+                const positionDisplay = getPositionDisplay(position);
                 return (
                   <TooltipProvider key={positionDisplay.short}>
                     {" "}
@@ -191,7 +190,7 @@ export default function ContributorCard({
                     </Tooltip>
                   </TooltipProvider>
                 );
-              })}
+              })()}
             </div>
           )}
           {roles.length > 0 && (

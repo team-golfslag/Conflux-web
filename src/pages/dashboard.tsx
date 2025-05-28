@@ -7,13 +7,15 @@ import DashboardListView from "@/components/dashboardListView";
 import { ApiWrapper } from "@/components/apiWrapper";
 import { useSession } from "@/hooks/SessionContext";
 import { ProjectCardProps } from "@/components/projectCard";
-import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
+import { ProjectResponseDTO } from "@team-golfslag/conflux-api-client/src/client";
 
 const Dashboard = () => {
   const { session } = useSession();
 
   // Function to transform projects data to match DashboardCardProps format
-  const transformProjects = (projects: ProjectDTO[]): ProjectCardProps[] => {
+  const transformProjects = (
+    projects: ProjectResponseDTO[],
+  ): ProjectCardProps[] => {
     return projects.map((project) => {
       // Find the current user in the project
       const currentUser = project.users.find(

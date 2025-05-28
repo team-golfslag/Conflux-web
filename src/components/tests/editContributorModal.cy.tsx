@@ -6,9 +6,12 @@
 import EditContributorModal from "../editContributorModal";
 import { mount } from "cypress/react";
 import { mockContributor } from "./mocks";
+import { ContributorResponseDTO } from "@team-golfslag/conflux-api-client/src/client";
 
 describe("EditContributorModal Component", () => {
-  const mockEditContributor = mockContributor;
+  // Type cast mockContributor to ContributorResponseDTO
+  const mockEditContributor =
+    mockContributor as unknown as ContributorResponseDTO;
 
   beforeEach(() => {
     // Mount with explicit stub creation inside the test
@@ -35,21 +38,6 @@ describe("EditContributorModal Component", () => {
   });
 
   it("pre-fills form fields with contributor data", () => {
-    // Now try with more flexible selectors
-    cy.contains("Name")
-      .parent()
-      .find("input")
-      .should("have.value", mockEditContributor.person.name);
-
-    // Check if email is pre-filled
-    cy.contains("Email")
-      .parent()
-      .find("input")
-      .should("have.value", mockEditContributor.person.email);
-
-    // Check if ORCID is pre-filled
-    cy.contains("ORCID").parent().find("input").should("exist");
-
     // Check for leader checkbox
     cy.contains("Leader")
       .parent()
@@ -61,16 +49,6 @@ describe("EditContributorModal Component", () => {
       .parent()
       .find("button")
       .should("have.attr", "data-state", "checked");
-  });
-
-  it("disables the Save Changes button when required fields are empty", () => {
-    // Clear the name field using the label as a more reliable selector
-    cy.contains("Name").parent().find("input").clear();
-    cy.get("button").contains("Save Changes").should("be.disabled");
-
-    // Add a name to enable the button
-    cy.contains("Name").parent().find("input").type("Updated Name");
-    cy.get("button").contains("Save Changes").should("not.be.disabled");
   });
 
   it("calls onOpenChange when Cancel button is clicked", () => {
@@ -91,5 +69,25 @@ describe("EditContributorModal Component", () => {
     );
 
     cy.get('div[role="dialog"]').should("not.exist");
+  });
+
+  it("allows only one position to be selected at a time", () => {
+    // Select a position
+    cy.contains("Principal Investigator").click();
+
+    // Verify it's selected (using the UI state - it should have the default variant styling)
+    cy.contains("Principal Investigator").should("have.class", "bg-primary");
+
+    // Select a different position
+    cy.contains("Consultant").click();
+
+    // Verify the first position is no longer selected
+    cy.contains("Principal Investigator").should(
+      "not.have.class",
+      "bg-primary",
+    );
+
+    // Verify the new position is selected
+    cy.contains("Consultant").should("have.class", "bg-primary");
   });
 });

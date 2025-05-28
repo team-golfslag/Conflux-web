@@ -8,68 +8,40 @@ import { Card } from "@/components/ui/card";
 import ProjectOverview from "@/components/projectOverview.tsx";
 import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
-import { TimeLineImportance, TimelineItem } from "@/components/timeline";
 import { useParams } from "react-router";
 import { useContext, useEffect, useRef, useState } from "react";
 import ProjectDetails from "@/components/projectDetails.tsx";
 import ProjectTimeline from "@/components/projectTimeline.tsx";
+import RAiDInfo from "@/components/raidInfo.tsx";
 import PageLinks from "@/components/pageLinks";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import {
-  ProjectDTO,
+  ProjectResponseDTO,
   SwaggerException,
+  TitleType,
+  UserRoleType,
+  ITimelineItemResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
+import { useSession } from "@/hooks/SessionContext";
 
-/** List of timeline data as dummy data */
-const timelineData: TimelineItem[] = [
-  {
-    date: "01-01-2023",
-    name: "Project Start",
-    importance: TimeLineImportance.High,
-  },
-  {
-    date: "05-02-2023",
-    name: "Log Item",
-    importance: TimeLineImportance.Medium,
-  },
-  {
-    date: "15-03-2023",
-    name: "Event One",
-    importance: TimeLineImportance.High,
-  },
-  {
-    date: "10-06-2023",
-    name: "Event Two",
-    importance: TimeLineImportance.High,
-  },
-  {
-    date: "08-07-2023",
-    name: "Log Item 1",
-    importance: TimeLineImportance.Medium,
-  },
-  {
-    date: "02-08-2023",
-    name: "Log Item 2",
-    importance: TimeLineImportance.Medium,
-  },
-  {
-    date: "22-09-2023",
-    name: "Project End",
-    importance: TimeLineImportance.High,
-  },
-];
+// Initially empty, will be populated from API
 
 /** Project page component <br>
  * Uses the 'id' param from the react routing to get the correct page from the backend
  */
 export default function ProjectPage() {
   const { id } = useParams();
+  const session = useSession();
   const apiClient = useContext(ApiClientContext);
-  const [project, setProject] = useState<ProjectDTO | null>(null);
+  const [project, setProject] = useState<ProjectResponseDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError] = useState<SwaggerException | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [timelineData, setTimelineData] = useState<ITimelineItemResponseDTO[]>(
+    [],
+  );
 
   const overviewRef = useRef<HTMLDivElement>(null);
   const contributorsRef = useRef<HTMLDivElement>(null);
@@ -81,8 +53,19 @@ export default function ProjectPage() {
 
     setIsLoading(true);
     try {
+      // Fetch project details
       const data = await apiClient.projects_GetProjectById(id);
       setProject(data);
+      const admin = data.users
+        .find((user) => user.scim_id === session?.session?.user?.scim_id)
+        ?.roles.map((role) => role.type)
+        .includes(UserRoleType.Admin);
+      setIsAdmin(admin || false);
+
+      // Fetch timeline data
+      const timeline = await apiClient.projects_GetProjectTimeline(id);
+      setTimelineData(timeline);
+
       setError(null);
     } catch (err) {
       const swaggerError =
@@ -121,6 +104,21 @@ export default function ProjectPage() {
           }
           return prevProject;
         });
+
+        // Also update the timeline data silently
+        try {
+          const timeline = await apiClient.projects_GetProjectTimeline(id);
+          setTimelineData(timeline);
+        } catch (timelineErr) {
+          console.error("Error updating timeline:", timelineErr);
+        }
+
+        // Check if the current user is an admin
+        const admin = data.users
+          .find((user) => user.scim_id === session?.session?.user?.scim_id)
+          ?.roles.map((role) => role.type)
+          .includes(UserRoleType.Admin);
+        setIsAdmin(admin || false);
       } catch (err) {
         // Log error but don't update error state to avoid UI disruption
         console.error("Error updating project:", err);
@@ -163,9 +161,12 @@ export default function ProjectPage() {
               <Card ref={overviewRef} className="scroll-mt-12" title="Overview">
                 <ProjectOverview
                   projectId={id}
-                  title={project.primary_title?.text ?? "No title available"}
-                  description={project.primary_description?.text}
+                  title={project.titles.find(
+                    (title) => title.type === TitleType.Primary,
+                  )}
+                  descriptions={project.descriptions}
                   onProjectUpdate={handleProjectUpdate}
+                  isAdmin={isAdmin}
                 />
               </Card>
               <Card
@@ -176,10 +177,15 @@ export default function ProjectPage() {
                 <ProjectContributors
                   project={project}
                   onProjectUpdate={handleProjectUpdate}
+                  isAdmin={isAdmin}
                 />
               </Card>
               <Card ref={worksRef} className="scroll-mt-12" title="Works">
-                <ProjectWorks products={project.products} />
+                <ProjectWorks
+                  project={project}
+                  onProjectUpdate={handleProjectUpdate}
+                  isAdmin={isAdmin}
+                />
               </Card>
             </div>
             {/* Side Panel */}
@@ -187,7 +193,9 @@ export default function ProjectPage() {
               <ProjectDetails
                 project={project}
                 onProjectUpdate={handleProjectUpdate}
+                isAdmin={isAdmin}
               />
+              <RAiDInfo projectId={id} project={project} />
               <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
             </div>
           </main>

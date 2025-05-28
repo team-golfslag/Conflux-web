@@ -3,17 +3,22 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
-  ProjectDTO,
+  ProjectResponseDTO,
   ApiClient,
-  ContributorDTO,
-  ProjectPatchDTO,
+  ProjectRequestDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { format } from "date-fns";
-import { Edit, Check, X } from "lucide-react";
+import { Edit, Check, X, RefreshCw, CheckCircle, XCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 import { ApiMutation } from "./apiMutation";
 import {
   Select,
@@ -24,9 +29,11 @@ import {
 } from "./ui/select";
 import { Label } from "./ui/label";
 import { DatePicker } from "./ui/datepicker";
+import { ApiClientContext } from "@/lib/ApiClientContext";
 
 type ProjectDetailsProps = {
-  project: ProjectDTO;
+  project: ProjectResponseDTO;
+  isAdmin: boolean;
   onProjectUpdate: () => void;
 };
 
@@ -46,8 +53,10 @@ const determineStatus = (
 
 export default function ProjectDetails({
   project,
+  isAdmin,
   onProjectUpdate,
 }: Readonly<ProjectDetailsProps>) {
+  const apiClient = useContext(ApiClientContext);
   const [editMode, setEditMode] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState<
     Date | null | undefined
@@ -55,87 +64,135 @@ export default function ProjectDetails({
   const [selectedEndDate, setSelectedEndDate] = useState<
     Date | null | undefined
   >(project.end_date);
-  const [selectedLeaderId, setSelectedLeaderId] = useState<string | undefined>(
-    project.contributors.find((c) => c.leader)?.person.id,
-  );
   const [selectedOrganizationId, setSelectedOrganizationId] = useState<
     string | undefined
-  >(project.organisations[0]?.id);
+  >(project.organisations[0]?.ror_id);
 
   const toggleEditMode = () => {
     if (editMode) {
       // Reset selections to current values if canceling
       setSelectedStartDate(project.start_date);
       setSelectedEndDate(project.end_date);
-      setSelectedLeaderId(
-        project.contributors.find((c) => c.leader)?.person.id,
-      );
-      setSelectedOrganizationId(project.organisations[0]?.id);
+      setSelectedOrganizationId(project.organisations[0]?.ror_id);
     }
     setEditMode(!editMode);
   };
 
-  const updateProject = async (apiClient: ApiClient) => {
-    // Update contributor roles if leader changed
-    if (selectedLeaderId) {
-      // First, unset any existing leader
-      for (const contributor of project.contributors) {
-        if (contributor.leader && contributor.person.id !== selectedLeaderId) {
-          await apiClient.contributors_UpdateContributor(
-            project.id,
-            contributor.person.id,
-            new ContributorDTO({
-              ...contributor,
-              leader: false,
-            }),
-          );
-        }
-      }
+  // States to track sync progress
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
+  const [syncFailed, setSyncFailed] = useState(false);
 
-      // Set the new leader
-      const newLeader = project.contributors.find(
-        (c) => c.person.id === selectedLeaderId,
-      );
-      if (newLeader && !newLeader.leader) {
-        await apiClient.contributors_UpdateContributor(
-          project.id,
-          newLeader.person.id,
-          new ContributorDTO({
-            ...newLeader,
-            leader: true,
-          }),
-        );
-      }
+  // Method to sync project data with SRAM
+  const syncWithSram = async () => {
+    try {
+      setIsSyncing(true);
+      setSyncSuccess(false);
+      setSyncFailed(false);
+      await apiClient.projects_SyncProject(project.id);
+      onProjectUpdate();
+      setSyncSuccess(true);
+      // Reset success state after 2 seconds
+      setTimeout(() => {
+        setSyncSuccess(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error syncing with SRAM:", error);
+      setSyncFailed(true);
+      // Reset failure state after 2 seconds
+      setTimeout(() => {
+        setSyncFailed(false);
+      }, 2000);
+    } finally {
+      setIsSyncing(false);
     }
-    // Update project dates
-    return apiClient.projects_PatchProject(
+  };
+
+  const updateProject = async (apiClient: ApiClient) => {
+    // Update project dates only
+    return apiClient.projects_PutProject(
       project.id,
-      new ProjectPatchDTO({
-        start_date: selectedStartDate === null ? undefined : selectedStartDate,
+      new ProjectRequestDTO({
+        start_date: selectedStartDate ?? project.start_date ?? new Date(),
         end_date: selectedEndDate === null ? undefined : selectedEndDate,
       }),
     );
   };
 
-  const projectLead = project.contributors.find(
-    (contributor) => contributor.leader,
-  );
+  // Helper function to get all project leads
+  const getProjectLeads = (
+    contributors: Array<{ leader: boolean; person: { name: string } }>,
+  ) => {
+    const leads = contributors.filter((contributor) => contributor.leader);
+    return leads.length > 0
+      ? leads.map((lead) => lead.person.name).join(", ")
+      : "N/A";
+  };
+
+  // Helper function to get all project contacts
+  const getProjectContacts = (
+    contributors: Array<{ contact: boolean; person: { name: string } }>,
+  ) => {
+    const contacts = contributors.filter((contributor) => contributor.contact);
+    return contacts.length > 0
+      ? contacts.map((contact) => contact.person.name).join(", ")
+      : "N/A";
+  };
 
   return (
     <Card className="">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Project Details</CardTitle>
-        <Button variant="outline" size="sm" onClick={toggleEditMode}>
-          {editMode ? (
-            <>
-              <X className="mr-2 h-4 w-4" /> Cancel
-            </>
-          ) : (
-            <>
-              <Edit className="mr-2 h-4 w-4" /> Edit
-            </>
+
+        <div className="flex items-center gap-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="relative group-hover:inline-flex"
+                  onClick={syncWithSram}
+                  disabled={isSyncing}
+                >
+                  {syncSuccess ? (
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  ) : syncFailed ? (
+                    <XCircle className="h-4 w-4 text-red-500" />
+                  ) : (
+                    <RefreshCw
+                      className={`h-4 w-4 transition-transform duration-300 ${isSyncing ? "animate-spin" : "hover:rotate-90"}`}
+                    />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {isSyncing
+                    ? "Syncing..."
+                    : syncSuccess
+                      ? "Sync complete!"
+                      : syncFailed
+                        ? "Sync failed!"
+                        : "Sync this project with SRAM"}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          {isAdmin && (
+            <Button variant="outline" size="sm" onClick={toggleEditMode}>
+              {editMode ? (
+                <>
+                  <X className="mr-2 h-4 w-4" /> Cancel
+                </>
+              ) : (
+                <>
+                  <Edit className="mr-2 h-4 w-4" /> Edit
+                </>
+              )}
+            </Button>
           )}
-        </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {editMode ? (
@@ -164,28 +221,18 @@ export default function ProjectDetails({
                   <Label htmlFor="project-lead" className="font-semibold">
                     Project Lead
                   </Label>
-                  <Select
-                    value={selectedLeaderId}
-                    onValueChange={setSelectedLeaderId}
-                  >
-                    <SelectTrigger className="mt-1 w-full">
-                      <SelectValue
-                        placeholder="Select project lead"
-                        className="text-left whitespace-normal"
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {project.contributors.map((contributor) => (
-                        <SelectItem
-                          key={contributor.person.id}
-                          value={contributor.person.id}
-                          className="text-left whitespace-normal"
-                        >
-                          {contributor.person.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <p className="text-gray-700">
+                    {getProjectLeads(project.contributors)}
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="project-contacts" className="font-semibold">
+                    Project Contacts
+                  </Label>
+                  <p className="text-gray-700">
+                    {getProjectContacts(project.contributors)}
+                  </p>
                 </div>
 
                 <div>
@@ -225,7 +272,7 @@ export default function ProjectDetails({
                     </SelectTrigger>
                     <SelectContent>
                       {project.organisations.map((org) => (
-                        <SelectItem key={org.id} value={org.id || ""}>
+                        <SelectItem key={org.ror_id} value={org.ror_id || ""}>
                           {org.name}
                         </SelectItem>
                       ))}
@@ -262,7 +309,16 @@ export default function ProjectDetails({
                 Project Lead
               </Label>
               <p className="text-gray-700">
-                {projectLead ? projectLead.person.name : "N/A"}
+                {getProjectLeads(project.contributors)}
+              </p>
+            </div>
+
+            <div>
+              <Label htmlFor="project-contacts" className="font-semibold">
+                Project Contacts
+              </Label>
+              <p className="text-gray-700">
+                {getProjectContacts(project.contributors)}
               </p>
             </div>
 

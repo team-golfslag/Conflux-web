@@ -4,14 +4,19 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import { Card, CardContent, CardHeader } from "@/components/ui/card.tsx";
-import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
+import {
+  DescriptionType,
+  ProjectResponseDTO,
+  TitleType,
+  UserRoleType,
+} from "@team-golfslag/conflux-api-client/src/client";
 import { Link } from "react-router-dom";
 import { JSX } from "react";
 import { CalendarIcon, UsersIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export interface ProjectCardProps {
-  project: ProjectDTO;
+  project: ProjectResponseDTO;
   roles?: string[];
 }
 
@@ -47,6 +52,13 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
     return { label: "Active", color: "bg-green-100 text-green-800" };
   };
 
+  const primartTitle = project.titles?.find(
+    (title) => title.type === TitleType.Primary,
+  );
+  const primaryDescription = project.descriptions?.find(
+    (desc) => desc.type === DescriptionType.Primary,
+  );
+
   const status = getStatus();
 
   // Count contributors
@@ -61,10 +73,11 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
         <CardHeader className="bg-white px-4 pt-4 pb-2">
           <div className="flex items-start justify-between">
             <h3 className="line-clamp-2 text-xl font-semibold tracking-tight text-gray-900 group-hover:text-blue-800">
-              {project.primary_title?.text ?? "No title available"}
+              {primartTitle?.text ?? "No title available"}
             </h3>
             <Badge
               className={`${status.color} ml-2 font-medium whitespace-nowrap`}
+              data-cy="project-status"
             >
               {status.label}
             </Badge>
@@ -74,7 +87,7 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
         <CardContent className="flex flex-grow flex-col p-4 pt-0">
           {/* Project Description */}
           <p className="mt-2 mb-4 line-clamp-3 flex-grow text-sm text-gray-600 duration-200">
-            {project.primary_description?.text ?? "No description available"}
+            {primaryDescription?.text ?? "No description available"}
           </p>
 
           {/* Project Metadata */}
@@ -104,15 +117,17 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
               </div>
               {roles && roles.length > 0 && (
                 <div className="flex flex-col items-end gap-1">
-                  {roles.map((r) => (
-                    <Badge
-                      key={r}
-                      variant="secondary"
-                      className="h-5 px-2 py-0 text-xs"
-                    >
-                      {r}
-                    </Badge>
-                  ))}
+                  {roles
+                    .filter((r) => r !== UserRoleType.User)
+                    .map((r) => (
+                      <Badge
+                        key={r}
+                        variant="secondary"
+                        className="h-5 px-2 py-0 text-xs"
+                      >
+                        {r}
+                      </Badge>
+                    ))}
                 </div>
               )}
             </div>

@@ -17,23 +17,15 @@ import {
 import ContributorFormFields from "./contributorFormFields";
 import {
   ContributorRoleType,
-  ContributorDTO,
-  PersonDTO,
-  ContributorPositionDTO,
   ContributorPositionType,
+  ContributorRequestDTO,
+  ContributorResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
-import {
-  formatOrcidAsUrl,
-  extractOrcidFromUrl,
-} from "@/lib/formatters/orcidFormatter";
 
 interface ContributorFormData {
-  name: string;
-  email: string;
-  orcidId: string;
   roles: ContributorRoleType[];
-  positions: ContributorPositionType[];
+  position?: ContributorPositionType;
   leader: boolean;
   contact: boolean;
 }
@@ -41,9 +33,9 @@ interface ContributorFormData {
 interface EditContributorModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  contributor: ContributorDTO | null;
+  contributor: ContributorResponseDTO | null;
   projectId: string;
-  onContributorUpdated: (contributor: ContributorDTO) => void;
+  onContributorUpdated: (contributor: ContributorResponseDTO) => void;
 }
 
 export default function EditContributorModal({
@@ -54,16 +46,11 @@ export default function EditContributorModal({
   onContributorUpdated,
 }: Readonly<EditContributorModalProps>) {
   const [formData, setFormData] = useState<ContributorFormData>({
-    name: "",
-    email: "",
-    orcidId: "",
     roles: [],
-    positions: [],
+    position: undefined,
     leader: false,
     contact: false,
   });
-  const [orcidError, setOrcidError] = useState<string | null>(null);
-  const [, setIsLoadingOrcidSearch] = useState(false);
 
   const apiClient = useContext(ApiClientContext);
 
@@ -71,11 +58,8 @@ export default function EditContributorModal({
   useEffect(() => {
     if (contributor) {
       setFormData({
-        name: contributor.person.name,
-        email: contributor.person.email ?? "",
-        orcidId: extractOrcidFromUrl(contributor.person.orcid_id) ?? "",
-        roles: contributor.roles,
-        positions: contributor.positions?.map((p) => p.type) ?? [],
+        roles: contributor.roles.map((role) => role.role_type),
+        position: contributor.positions.find((p) => !p.end_date)?.position,
         leader: contributor.leader,
         contact: contributor.contact,
       });
@@ -95,62 +79,22 @@ export default function EditContributorModal({
   const handlePositionChange = (position: ContributorPositionType) => {
     setFormData((prev) => ({
       ...prev,
-      positions: prev.positions.includes(position)
-        ? prev.positions.filter((p) => p !== position)
-        : [...prev.positions, position],
+      position: prev.position === position ? undefined : position,
     }));
   };
 
-  // ORCID autofill from the form field
-  const handleOrcidAutoFill = async () => {
-    if (!formData.orcidId) return false;
-
-    setIsLoadingOrcidSearch(true);
-    setOrcidError(null);
-
-    try {
-      const person = await apiClient.orcid_GetPersonFromOrcid(formData.orcidId);
-      if (person) {
-        setFormData((prev) => ({
-          ...prev,
-          name: person.name,
-          email: person.email ?? "",
-          orcidId: extractOrcidFromUrl(person.orcid_id) ?? "",
-        }));
-        return true;
-      } else {
-        setOrcidError("No person found with this ORCID.");
-        return false;
-      }
-    } catch (error) {
-      console.error("Error searching ORCID:", error);
-      setOrcidError("Failed to search ORCID. Please try again.");
-      return false;
-    } finally {
-      setIsLoadingOrcidSearch(false);
-    }
-  };
-
   const resetForm = () => {
-    setOrcidError(null);
-
     if (contributor) {
       setFormData({
-        name: contributor.person.name,
-        email: contributor.person.email ?? "",
-        orcidId: extractOrcidFromUrl(contributor.person.orcid_id) ?? "",
-        roles: contributor.roles,
-        positions: contributor.positions?.map((p) => p.type) ?? [],
+        roles: contributor.roles.map((role) => role.role_type),
+        position: contributor.positions.find((p) => !p.end_date)?.position,
         leader: contributor.leader,
         contact: contributor.contact,
       });
     } else {
       setFormData({
-        name: "",
-        email: "",
-        orcidId: "",
         roles: [],
-        positions: [],
+        position: undefined,
         leader: false,
         contact: false,
       });
@@ -160,27 +104,12 @@ export default function EditContributorModal({
   const saveEditedContributor = async () => {
     if (!contributor) return;
     try {
-      const updatedPerson = new PersonDTO({
-        name: formData.name,
-        email: formData.email,
-        or_ci_d: formData.orcidId
-          ? (formatOrcidAsUrl(formData.orcidId) ?? undefined)
-          : undefined,
-      });
-
-      const updatedContributor = new ContributorDTO({
-        person: contributor.person,
-        project_id: projectId,
+      const updatedContributor = new ContributorRequestDTO({
         roles: formData.roles,
-        positions: formData.positions.map(
-          (type) =>
-            new ContributorPositionDTO({ type, start_date: new Date() }),
-        ),
+        position: formData.position,
         leader: formData.leader,
         contact: formData.contact,
       });
-
-      await apiClient.people_UpdatePerson(contributor.person.id, updatedPerson);
 
       const result = await apiClient.contributors_UpdateContributor(
         projectId,
@@ -212,17 +141,6 @@ export default function EditContributorModal({
 
         <ContributorFormFields
           formData={formData}
-          onNameChange={(e) =>
-            setFormData((prev) => ({ ...prev, name: e.target.value }))
-          }
-          onEmailChange={(e) =>
-            setFormData((prev) => ({ ...prev, email: e.target.value }))
-          }
-          onOrcidIdChange={(e) => {
-            setFormData((prev) => ({ ...prev, orcidId: e.target.value }));
-            // Clear error when input changes
-            if (orcidError) setOrcidError(null);
-          }}
           onRoleChange={handleRoleChange}
           onPositionChange={handlePositionChange}
           onLeaderChange={(e) =>
@@ -231,8 +149,6 @@ export default function EditContributorModal({
           onContactChange={(e) =>
             setFormData((prev) => ({ ...prev, contact: e.target.checked }))
           }
-          onOrcidAutoFill={handleOrcidAutoFill}
-          orcidError={orcidError}
           isEdit={true}
         />
 
@@ -246,12 +162,7 @@ export default function EditContributorModal({
           >
             Cancel
           </Button>
-          <Button
-            onClick={saveEditedContributor}
-            disabled={!formData.name || formData.positions.length === 0}
-          >
-            Save Changes
-          </Button>
+          <Button onClick={saveEditedContributor}>Save Changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
