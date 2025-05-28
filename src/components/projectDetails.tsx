@@ -32,6 +32,7 @@ import { DatePicker } from "./ui/datepicker";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { getStatus } from "@/utils/projectUtils";
 import ProjectDates from "@/components/projectDates.tsx";
+import ProjectOrganisations from "@/components/projectOrganisations.tsx";
 
 type ProjectDetailsProps = {
   project: ProjectResponseDTO;
@@ -143,6 +144,46 @@ export default function ProjectDetails({
     (contributor) => contributor.leader,
   );
 
+  // add demo data
+  if (project.organisations.length == 0) {
+    project.organisations.push(
+      new OrganisationDTO({
+        name: "Utrecht University",
+        id: "1",
+        ror_id: "https://ror.org/04pp8hn57",
+        roles: [
+          new OrganisationRoleDTO({
+            role: OrganisationRoleType.PartnerOrganization,
+            start_date: new Date(),
+          }),
+          new OrganisationRoleDTO({
+            role: OrganisationRoleType.Contractor,
+            start_date: new Date(2021),
+            end_date: new Date(),
+          }),
+        ],
+      }),
+    );
+  }
+  if (project.organisations.length <= 1) {
+    project.organisations.push(
+      new OrganisationDTO({
+        name: "Hogeschool Utrecht",
+        id: "2",
+        ror_id: "https://ror.org/04pp8hn57",
+        roles: [
+          new OrganisationRoleDTO({
+            role: OrganisationRoleType.LeadResearchOrganization,
+            start_date: new Date(),
+          }),
+        ],
+      }),
+    );
+  }
+
+  const handleEditOrg = (/*org: OrganisationDTO*/) => {
+    //TODO
+  };
 
   const status = getStatus(project.start_date, project.end_date);
 
@@ -250,27 +291,13 @@ export default function ProjectDetails({
                   setSelectedEndDate={setSelectedEndDate}
                 />
 
-
-                <div>
-                  <Label htmlFor="lead-organization" className="font-semibold">
-                    Lead Organisation
-                  </Label>
-                  <Select
-                    value={selectedOrganizationId}
-                    onValueChange={setSelectedOrganizationId}
-                  >
-                    <SelectTrigger className="mt-1 w-full">
-                      <SelectValue placeholder="Select lead organization" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {project.organisations.map((org) => (
-                        <SelectItem key={org.ror_id} value={org.ror_id ?? ""}>
-                          {org.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <ProjectOrganisations
+                  editMode={editMode}
+                  handleEditOrg={() => handleEditOrg}
+                  organisations={project.organisations}
+                  selectedLeadOrgId={selectedOrganizationId}
+                  setSelectedLeadOrgId={setSelectedOrganizationId}
+                />
 
                 <div className="flex justify-end gap-2 pt-4">
                   <Button
@@ -316,17 +343,6 @@ export default function ProjectDetails({
               </p>
             </div>
 
-
-            <div>
-              <Label htmlFor="lead-organization" className="font-semibold">
-                Lead Organisation
-              </Label>
-              <p className="text-gray-700">
-                {project.organisations.length > 0
-                  ? project.organisations[0].name
-                  : "N/A"}
-              </p>
-            </div>
             <ProjectDates
               editMode={editMode}
               start_date={project.start_date}
