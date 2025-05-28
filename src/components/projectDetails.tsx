@@ -8,10 +8,12 @@ import {
   ProjectResponseDTO,
   ApiClient,
   ProjectRequestDTO,
+  OrganisationDTO,
+  OrganisationRoleDTO,
+  OrganisationRoleType,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
-import { format } from "date-fns";
 import { Edit, Check, X, RefreshCw, CheckCircle, XCircle } from "lucide-react";
 import {
   Tooltip,
@@ -20,17 +22,10 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import { ApiMutation } from "./apiMutation";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
 import { Label } from "./ui/label";
-import { DatePicker } from "./ui/datepicker";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { getStatus } from "@/utils/projectUtils";
+import { Badge } from "@/components/ui/badge.tsx";
 import ProjectDates from "@/components/projectDates.tsx";
 import ProjectOrganisations from "@/components/projectOrganisations.tsx";
 
@@ -127,22 +122,6 @@ export default function ProjectDetails({
       ? contacts.map((contact) => contact.person.name).join(", ")
       : "N/A";
   };
-  const handleEditClick = () => {
-    setEditMode(true);
-  }
-
-  const handleCancelClick = () => {
-    setEditMode(false);
-  }
-
-  const handleSaveClick = () => {
-    onSave(editStartDate, editEndDate);
-    setEditMode(false);
-  }
-
-  const projectLead = project.contributors.find(
-    (contributor) => contributor.leader,
-  );
 
   // add demo data
   if (project.organisations.length == 0) {
@@ -260,9 +239,7 @@ export default function ProjectDetails({
                   <Label htmlFor="status" className="font-semibold">
                     Status
                   </Label>
-                  <p className="text-gray-700">
-                    {determineStatus(project.start_date, project.end_date)}
-                  </p>
+                  <p className="text-gray-700">{status.label}</p>
                 </div>
 
                 <div>

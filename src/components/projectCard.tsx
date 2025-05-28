@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import { JSX } from "react";
 import { CalendarIcon, UsersIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { getStatus } from "@/utils/projectUtils";
 
 export interface ProjectCardProps {
   project: ProjectResponseDTO;
@@ -38,19 +39,7 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
     ? new Date(project.end_date).toLocaleDateString()
     : "Ongoing";
 
-  // Determine project status
-  const getStatus = () => {
-    const now = new Date();
-    if (!project.start_date)
-      return { label: "Not Started", color: "bg-gray-200 text-gray-800" };
-    if (new Date(project.start_date) > now)
-      return { label: "Upcoming", color: "bg-blue-100 text-blue-800" };
-    if (!project.end_date)
-      return { label: "In Progress", color: "bg-green-100 text-green-800" };
-    if (new Date(project.end_date) < now)
-      return { label: "Completed", color: "bg-purple-100 text-purple-800" };
-    return { label: "Active", color: "bg-green-100 text-green-800" };
-  };
+  const status = getStatus(project.start_date, project.end_date);
 
   const primartTitle = project.titles?.find(
     (title) => title.type === TitleType.Primary,
