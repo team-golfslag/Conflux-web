@@ -10,6 +10,7 @@ import { JSX } from "react";
 type EditButtonProps = {
   handleEditClick: () => void;
   editOrSave?: "edit" | "save" | "cancel";
+  className?: string;
 };
 
 export function EditButton(props: Readonly<EditButtonProps>) {
@@ -39,7 +40,7 @@ export function EditButton(props: Readonly<EditButtonProps>) {
 
   return (
     <Button
-      className="float-end"
+      className={`float-end ${props.className ?? ""}`}
       variant="outline"
       size="sm"
       onClick={props.handleEditClick}

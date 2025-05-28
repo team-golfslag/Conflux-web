@@ -239,7 +239,11 @@ export default function ProjectDetails({
                   <Label htmlFor="status" className="font-semibold">
                     Status
                   </Label>
-                  <p className="text-gray-700">{status.label}</p>
+                  <Badge
+                    className={`${status.color} mt-1 font-medium whitespace-nowrap`}
+                  >
+                    {status.label}
+                  </Badge>
                 </div>
 
                 <div>
@@ -306,7 +310,7 @@ export default function ProjectDetails({
               <Label htmlFor="project-lead" className="font-semibold">
                 Project Lead
               </Label>
-              <p className="text-gray-700">
+              <p className="mt-2 mb-6 text-gray-700">
                 {getProjectLeads(project.contributors)}
               </p>
             </div>
