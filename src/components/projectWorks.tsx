@@ -8,15 +8,18 @@ import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AddProductModal from "@/components/addProductModal.tsx";
 import EditProductModal from "@/components/editProductModal.tsx";
 import {
-  ProductCategoryType,
-  ProductDTO,
-  ProjectDTO,
+  ProductResponseDTO,
+  ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Button } from "@/components/ui/button";
 import { Edit, X } from "lucide-react";
 import ProductCard from "@/components/productCard.tsx";
 
-type ProjectWorksProps = { project: ProjectDTO; onProjectUpdate: () => void };
+type ProjectWorksProps = {
+  project: ProjectResponseDTO;
+  onProjectUpdate: () => void;
+  isAdmin: boolean;
+};
 
 /**
  * Project Works component
@@ -25,41 +28,42 @@ type ProjectWorksProps = { project: ProjectDTO; onProjectUpdate: () => void };
 export default function ProjectWorks({
   project,
   onProjectUpdate,
+  isAdmin,
 }: Readonly<ProjectWorksProps>) {
   const [editMode, setEditMode] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
-  const [deletedProduct, setDeletedProduct] = React.useState<ProductDTO | null>(
-    null,
-  );
-  const [editedProduct, setEditedProduct] = React.useState<ProductDTO | null>(
-    null,
-  );
+  const [deletedProduct, setDeletedProduct] =
+    React.useState<ProductResponseDTO | null>(null);
+  const [editedProduct, setEditedProduct] =
+    React.useState<ProductResponseDTO | null>(null);
   const toggleEditMode = () => setEditMode(!editMode);
 
   return (
     <>
       <CardHeader className="relative flex justify-between">
         <CardTitle className="text-xl font-semibold">Products</CardTitle>
-        <div className="absolute right-0 flex items-center justify-between space-x-4 px-4">
-          <Button variant="outline" size="sm" onClick={toggleEditMode}>
-            {editMode ? (
-              <>
-                <X className="mr-2 h-4 w-4" /> Exit Edit Mode
-              </>
-            ) : (
-              <>
-                <Edit className="mr-2 h-4 w-4" /> Edit
-              </>
-            )}
-          </Button>
-          <AddProductModal
-            isOpen={isModalOpen}
-            onOpenChange={setIsModalOpen}
-            project={project}
-          />
-        </div>
+        {isAdmin && (
+          <div className="invisible absolute right-0 flex items-center justify-between space-x-4 px-4 group-hover/card:visible">
+            <Button variant="outline" size="sm" onClick={toggleEditMode}>
+              {editMode ? (
+                <>
+                  <X className="mr-2 h-4 w-4" /> Exit Edit Mode
+                </>
+              ) : (
+                <>
+                  <Edit className="mr-2 h-4 w-4" /> Edit
+                </>
+              )}
+            </Button>
+            <AddProductModal
+              isOpen={isModalOpen}
+              onOpenChange={setIsModalOpen}
+              project={project}
+            />
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         {editMode && (
@@ -68,36 +72,20 @@ export default function ProjectWorks({
           </div>
         )}
 
-        {[
-          ProductCategoryType.Input,
-          ProductCategoryType.Output,
-          ProductCategoryType.Internal,
-        ].map((catType) => (
-          <>
-            {project.products?.filter((p) =>
-              p.categories.some((c) => c === catType),
-            ).length > 0 ? (
-              <h2>{catType.toString()}</h2>
-            ) : (
-              ""
-            )}
-            {project.products
-              ?.filter((p) => p.categories.some((c) => c === catType))
-              .map((product) => (
-                <ProductCard
-                  product={product}
-                  editMode={editMode}
-                  setIsEditModalOpen={setIsEditModalOpen}
-                  setEditedProduct={setEditedProduct}
-                  isDeleteDialogOpen={isDeleteDialogOpen}
-                  setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-                  deletedProduct={deletedProduct!}
-                  setDeletedProduct={setDeletedProduct}
-                  project={project}
-                  onProjectUpdate={onProjectUpdate}
-                />
-              ))}
-          </>
+        {project.products?.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            editMode={editMode}
+            setIsEditModalOpen={setIsEditModalOpen}
+            setEditedProduct={setEditedProduct}
+            isDeleteDialogOpen={isDeleteDialogOpen}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+            deletedProduct={deletedProduct!}
+            setDeletedProduct={setDeletedProduct}
+            project={project}
+            onProjectUpdate={onProjectUpdate}
+          />
         ))}
       </CardContent>
       <EditProductModal
@@ -105,6 +93,7 @@ export default function ProjectWorks({
         onOpenChange={setIsEditModalOpen}
         product={editedProduct!}
         project={project}
+        onProductUpdate={onProjectUpdate}
       />
     </>
   );

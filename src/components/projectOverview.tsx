@@ -207,7 +207,6 @@ export default function ProjectOverview({
     }
     await apiClient.projectTitles_UpdateTitle(
       projectId,
-      title.id,
       new ProjectTitleRequestDTO({
         type: title.type,
         text: editTitle,

@@ -15,10 +15,11 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   ProductCategoryType,
-  ProductDTO,
+  ProductRequestDTO,
+  ProductResponseDTO,
   ProductType,
-  ProjectPatchDTO,
-  ProjectDTO,
+  ProductSchema,
+  ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import { useContext, useEffect } from "react";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
@@ -26,19 +27,21 @@ import ProductFormFields, {
   ProductFormData,
 } from "@/components/productFormFields.tsx";
 
-type AddWorkModalProps = {
+type EditProductModalProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  product: ProductDTO;
-  project: ProjectDTO;
+  product: ProductResponseDTO;
+  project: ProjectResponseDTO;
+  onProductUpdate?: () => void;
 };
 
-export default function AddProductModal({
+export default function EditProductModal({
   isOpen,
   onOpenChange,
   product,
   project,
-}: Readonly<AddWorkModalProps>) {
+  onProductUpdate,
+}: Readonly<EditProductModalProps>) {
   const apiClient = useContext(ApiClientContext);
 
   const [productTitle, setProductTitle] = React.useState<string>("");
@@ -46,16 +49,26 @@ export default function AddProductModal({
   const [productType, setProductType] = React.useState<
     ProductType | undefined
   >();
-  const [category, setCategory] = React.useState<
-    ProductCategoryType | undefined
+  const [productSchema, setProductSchema] = React.useState<
+    ProductSchema | undefined
   >();
+  const [categories, setCategories] = React.useState<ProductCategoryType[]>([]);
+
+  const handleCategoryChange = (category: ProductCategoryType) => {
+    setCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category],
+    );
+  };
 
   useEffect(() => {
     if (product) {
       setProductTitle(product.title);
       if (product.url) setUrl(product.url);
       setProductType(product.type);
-      setCategory(product.categories[0]);
+      setCategories(product.categories || []);
+      setProductSchema(product.schema);
     }
   }, [product]);
 
@@ -63,40 +76,38 @@ export default function AddProductModal({
     url: url,
     title: productTitle,
     productType: productType!,
-    productCategory: category!,
+    productSchema: productSchema!,
+    categories: categories,
   };
 
   const saveEditedProduct = async () => {
     if (!product) return;
     try {
-      if (productType && category) {
-        const newProduct = new ProductDTO({
-          id: product.id,
+      if (productType && productSchema && categories.length > 0) {
+        // Update the product using the products_UpdateProduct API
+        const updatedProduct = new ProductRequestDTO({
           url: url,
           title: productTitle,
           type: productType,
-          categories: [category],
+          categories: categories,
+          schema: productSchema,
         });
 
-        const index = project.products.findIndex((c) => c.id === newProduct.id);
-        if (index !== -1) {
-          project.products[index] = newProduct;
-        }
-
-        const projectPatchDTO = new ProjectPatchDTO({
-          products: project.products,
-        });
-        const updatedProject = await apiClient.projects_PatchProject(
+        const result = await apiClient.products_UpdateProduct(
           project.id,
-          projectPatchDTO,
+          product.id,
+          updatedProduct,
         );
 
-        if (!updatedProject) {
+        if (!result) {
           throw new Error("Server returned an invalid product");
         }
       }
 
       onOpenChange(false);
+      if (onProductUpdate) {
+        onProductUpdate();
+      }
     } catch (error) {
       console.error("Error updating product:", error);
       alert(
@@ -121,7 +132,8 @@ export default function AddProductModal({
           setProductTitle={setProductTitle}
           setUrl={setUrl}
           setProductType={setProductType}
-          setCategory={setCategory}
+          setSchema={setProductSchema}
+          onCategoryChange={handleCategoryChange}
         />
         <DialogFooter>
           <Button
@@ -134,7 +146,12 @@ export default function AddProductModal({
           </Button>
           <Button
             onClick={saveEditedProduct}
-            disabled={!productTitle || !productType}
+            disabled={
+              !productTitle ||
+              !productType ||
+              !productSchema ||
+              categories.length === 0
+            }
           >
             Apply Changes
           </Button>

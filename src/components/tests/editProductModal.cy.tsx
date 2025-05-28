@@ -7,11 +7,12 @@ import EditProductModal from "@/components/editProductModal.tsx";
 import {
   DescriptionType,
   ProductCategoryType,
-  ProductDTO,
+  ProductResponseDTO,
+  ProductSchema,
   ProductType,
-  ProjectDescriptionDTO,
-  ProjectDTO,
-  ProjectTitleDTO,
+  ProjectDescriptionResponseDTO,
+  ProjectResponseDTO,
+  ProjectTitleResponseDTO,
   TitleType,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import { mount } from "cypress/react";
@@ -20,30 +21,38 @@ describe("<EditProductModal/>", () => {
   const mockProducts = [
     {
       id: "123",
-      schema: undefined,
+      project_id: "proj-123",
+      schema: ProductSchema.Doi,
       url: "https://",
       title: "Lorem ipsum",
       type: ProductType.Workflow,
+      get_type_uri: "https://example.com/workflow",
       categories: [ProductCategoryType.Input],
     },
     {
       id: "456",
-      schema: undefined,
+      project_id: "proj-123",
+      schema: ProductSchema.Handle,
       url: "https://",
       title: "Dolor sit",
       type: ProductType.OutputManagementPlan,
+      get_type_uri: "https://example.com/omp",
       categories: [ProductCategoryType.Output],
     },
     {
       id: "789",
-      schema: undefined,
+      project_id: "proj-123",
+      schema: ProductSchema.Archive,
       url: "https://",
       title: "Amet, consectetur",
       type: ProductType.Dissertation,
+      get_type_uri: "https://example.com/dissertation",
       categories: [ProductCategoryType.Internal],
     },
   ];
-  const mockProductDTOs = mockProducts.map((p) => new ProductDTO({ ...p }));
+  const mockProductDTOs = mockProducts.map(
+    (p) => new ProductResponseDTO({ ...p }),
+  );
   const mockProject = {
     id: "123",
     title: "Project 1",
@@ -55,23 +64,27 @@ describe("<EditProductModal/>", () => {
     start_date: new Date(),
     organisations: [],
     titles: [
-      new ProjectTitleDTO({
+      new ProjectTitleResponseDTO({
         text: "Project 1",
         type: TitleType.Primary,
         start_date: new Date(),
+        id: "title-123",
+        project_id: "123",
       }),
     ],
     descriptions: [
-      new ProjectDescriptionDTO({
+      new ProjectDescriptionResponseDTO({
         text: "Description for project 1",
         type: DescriptionType.Primary,
+        id: "desc-123",
+        project_id: "123",
       }),
     ],
     latest_edit: new Date().toISOString(),
   };
 
   const mockData = {
-    project: new ProjectDTO(mockProject),
+    project: new ProjectResponseDTO(mockProject),
   };
 
   beforeEach(() => {

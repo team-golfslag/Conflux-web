@@ -13,8 +13,8 @@ import {
   Contributor,
   DescriptionType,
   Person,
-  ProjectDescription,
-  ProjectTitle,
+  ProjectDescriptionResponseDTO,
+  ProjectTitleResponseDTO,
   TitleType,
   ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
@@ -34,24 +34,20 @@ const createBaseProject = (): ProjectResponseDTO => {
   const project = new ProjectResponseDTO({
     id: "proj-123",
     titles: [
-      new ProjectTitle({
+      new ProjectTitleResponseDTO({
         text: "Test Project Alpha",
         type: TitleType.Primary,
         start_date: new Date("2023-01-01"),
         id: "title-1",
         project_id: "proj-123",
-        type_schema_uri: "",
-        type_uri: "",
       }),
     ],
     descriptions: [
-      new ProjectDescription({
+      new ProjectDescriptionResponseDTO({
         text: "This is a test project description.",
         type: DescriptionType.Primary,
         id: "desc-1",
         project_id: "proj-123",
-        type_schema_uri: "",
-        type_uri: "",
       }),
     ],
     users: [],
@@ -61,9 +57,8 @@ const createBaseProject = (): ProjectResponseDTO => {
     organisations: [],
   });
 
-  // Add these virtual properties expected by the component
-  project.primary_title = project.titles[0];
-  project.primary_description = project.descriptions[0];
+  // These properties are not needed, the component looks for titles and descriptions
+  // with TitleType.Primary and DescriptionType.Primary
 
   return project;
 };
@@ -117,10 +112,15 @@ describe("<ProjectCard /> Component Rendering", () => {
 
   it("renders basic project information", () => {
     mountCard(projectActive);
-    cy.contains("h3", projectActive.primary_title!.text).should("be.visible");
-    cy.contains("p", projectActive.primary_description!.text).should(
-      "be.visible",
+    const primaryTitle = projectActive.titles.find(
+      (title) => title.type === TitleType.Primary,
     );
+    const primaryDescription = projectActive.descriptions.find(
+      (desc) => desc.type === DescriptionType.Primary,
+    );
+
+    cy.contains("h3", primaryTitle!.text).should("be.visible");
+    cy.contains("p", primaryDescription!.text).should("be.visible");
     cy.get("a").should("have.attr", "href", `/projects/${projectActive.id}`);
   });
 

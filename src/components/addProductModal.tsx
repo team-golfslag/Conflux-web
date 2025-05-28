@@ -17,10 +17,10 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import {
   ProductCategoryType,
-  ProductDTO,
+  ProductRequestDTO,
+  ProductSchema,
   ProductType,
-  ProjectPatchDTO,
-  ProjectDTO,
+  ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import { useContext } from "react";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
@@ -30,7 +30,7 @@ import { ProductFormData } from "@/components/productFormFields.tsx";
 type AddWorkModalProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  project: ProjectDTO;
+  project: ProjectResponseDTO;
 };
 
 export default function AddProductModal({
@@ -45,46 +45,53 @@ export default function AddProductModal({
   const [productType, setProductType] = React.useState<
     ProductType | undefined
   >();
-  const [category, setCategory] = React.useState<
-    ProductCategoryType | undefined
+  const [productSchema, setProductSchema] = React.useState<
+    ProductSchema | undefined
   >();
+  const [categories, setCategories] = React.useState<ProductCategoryType[]>([]);
+
+  const handleCategoryChange = (category: ProductCategoryType) => {
+    setCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category],
+    );
+  };
 
   const resetModal = () => {
     setProductTitle("");
     setUrl("");
     setProductType(undefined);
-    setCategory(undefined);
+    setProductSchema(undefined);
+    setCategories([]);
   };
 
   const productData: ProductFormData = {
     url: url,
     title: productTitle,
     productType: productType!,
-    productCategory: category!,
+    productSchema: productSchema!,
+    categories: categories,
   };
 
   const addProduct = async () => {
     try {
-      if (productType && category) {
-        const newProduct = new ProductDTO({
+      if (productType && productSchema && categories.length > 0) {
+        const newProduct = new ProductRequestDTO({
           url: url,
           title: productTitle,
           type: productType,
-          categories: [category],
+          categories: categories,
+          schema: productSchema,
         });
 
-        project.products.push(newProduct);
-
-        const projectPatchDTO = new ProjectPatchDTO({
-          products: project.products,
-        });
-        const updatedProject = await apiClient.projects_PatchProject(
+        const createdProduct = await apiClient.products_CreateProduct(
           project.id,
-          projectPatchDTO,
+          newProduct,
         );
 
-        if (!updatedProject) {
-          throw new Error("Server returned an invalid product");
+        if (!createdProduct) {
+          throw new Error(`Failed to create product`);
         }
       }
       onOpenChange(false);
@@ -93,7 +100,7 @@ export default function AddProductModal({
       console.log("Error adding product:", error);
       alert(
         `Failed to add product: ${
-          error instanceof Error ? error.message : "Unkown error"
+          error instanceof Error ? error.message : "Unknown error"
         }`,
       );
     }
@@ -116,7 +123,8 @@ export default function AddProductModal({
           setProductTitle={setProductTitle}
           setUrl={setUrl}
           setProductType={setProductType}
-          setCategory={setCategory}
+          setSchema={setProductSchema}
+          onCategoryChange={handleCategoryChange}
         />
         <DialogFooter>
           <Button
@@ -128,7 +136,15 @@ export default function AddProductModal({
           >
             Cancel
           </Button>
-          <Button onClick={addProduct} disabled={!productTitle || !productType}>
+          <Button
+            onClick={addProduct}
+            disabled={
+              !productTitle ||
+              !productType ||
+              !productSchema ||
+              categories.length === 0
+            }
+          >
             Add Product
           </Button>
         </DialogFooter>

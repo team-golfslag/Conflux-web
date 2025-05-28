@@ -25,25 +25,22 @@ import {
 import { Badge } from "@/components/ui/badge.tsx";
 import { Card } from "@/components/ui/card.tsx";
 import {
-  ProductDTO,
-  ProjectDTO,
-} from "@team-golfslag/conflux-api-client/src/client";
-import {
   ApiClient,
-  ProjectPatchDTO,
-} from "@team-golfslag/conflux-api-client/src/client.ts";
+  ProductResponseDTO,
+  ProjectResponseDTO,
+} from "@team-golfslag/conflux-api-client/src/client";
 import { ApiMutation } from "@/components/apiMutation.tsx";
 
 type productCardProps = {
-  product: ProductDTO;
+  product: ProductResponseDTO;
   editMode: boolean;
   setIsEditModalOpen: (isOpen: boolean) => void;
-  setEditedProduct: (product: ProductDTO) => void;
+  setEditedProduct: (product: ProductResponseDTO) => void;
   isDeleteDialogOpen: boolean;
   setIsDeleteDialogOpen: (isOpen: boolean) => void;
-  deletedProduct: ProductDTO;
-  setDeletedProduct: (product: ProductDTO) => void;
-  project: ProjectDTO;
+  deletedProduct: ProductResponseDTO;
+  setDeletedProduct: (product: ProductResponseDTO) => void;
+  project: ProjectResponseDTO;
   onProjectUpdate: () => void;
 };
 
@@ -126,14 +123,7 @@ export default function ProductCard({
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <ApiMutation
                     mutationFn={(apiClient: ApiClient) =>
-                      apiClient.projects_PatchProject(
-                        project.id,
-                        new ProjectPatchDTO({
-                          products: project.products.filter(
-                            (c) => c.id !== deletedProduct.id,
-                          ),
-                        }),
-                      )
+                      apiClient.products_DeleteProduct(project.id, product.id)
                     }
                     data={{}}
                     loadingMessage="Deleting product..."
@@ -160,9 +150,25 @@ export default function ProductCard({
         )}
       </div>
       {product.url && <p className="text-sm text-gray-600">{product.url}</p>}
-      <Badge variant="secondary" className="h-5 px-2 py-0 text-xs">
-        {product.type}
-      </Badge>
+      <div className="flex flex-wrap gap-1">
+        <Badge variant="secondary" className="h-5 px-2 py-0 text-xs">
+          {product.type}
+        </Badge>
+        {product.schema && (
+          <Badge variant="outline" className="h-5 px-2 py-0 text-xs">
+            {product.schema}
+          </Badge>
+        )}
+        {product.categories?.map((category) => (
+          <Badge
+            key={category}
+            variant="default"
+            className="h-5 px-2 py-0 text-xs"
+          >
+            {category}
+          </Badge>
+        ))}
+      </div>
     </Card>
   );
 }
