@@ -8,7 +8,6 @@ import { Card } from "@/components/ui/card";
 import ProjectOverview from "@/components/projectOverview.tsx";
 import ProjectContributors from "@/components/projectContributors";
 import ProjectWorks from "@/components/projectWorks";
-import { TimeLineImportance, TimelineItem } from "@/components/timeline";
 import { useParams } from "react-router";
 import { useContext, useEffect, useRef, useState } from "react";
 import ProjectDetails from "@/components/projectDetails.tsx";
@@ -22,47 +21,11 @@ import {
   SwaggerException,
   TitleType,
   UserRoleType,
+  ITimelineItemResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { useSession } from "@/hooks/SessionContext";
 
-/** List of timeline data as dummy data */
-const timelineData: TimelineItem[] = [
-  {
-    date: "01-01-2023",
-    name: "Project Start",
-    importance: TimeLineImportance.High,
-  },
-  {
-    date: "05-02-2023",
-    name: "Log Item",
-    importance: TimeLineImportance.Medium,
-  },
-  {
-    date: "15-03-2023",
-    name: "Event One",
-    importance: TimeLineImportance.High,
-  },
-  {
-    date: "10-06-2023",
-    name: "Event Two",
-    importance: TimeLineImportance.High,
-  },
-  {
-    date: "08-07-2023",
-    name: "Log Item 1",
-    importance: TimeLineImportance.Medium,
-  },
-  {
-    date: "02-08-2023",
-    name: "Log Item 2",
-    importance: TimeLineImportance.Medium,
-  },
-  {
-    date: "22-09-2023",
-    name: "Project End",
-    importance: TimeLineImportance.High,
-  },
-];
+// Initially empty, will be populated from API
 
 /** Project page component <br>
  * Uses the 'id' param from the react routing to get the correct page from the backend
@@ -76,6 +39,9 @@ export default function ProjectPage() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [error, setError] = useState<SwaggerException | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [timelineData, setTimelineData] = useState<ITimelineItemResponseDTO[]>(
+    [],
+  );
 
   const overviewRef = useRef<HTMLDivElement>(null);
   const contributorsRef = useRef<HTMLDivElement>(null);
@@ -87,6 +53,7 @@ export default function ProjectPage() {
 
     setIsLoading(true);
     try {
+      // Fetch project details
       const data = await apiClient.projects_GetProjectById(id);
       setProject(data);
       const admin = data.users
@@ -94,6 +61,10 @@ export default function ProjectPage() {
         ?.roles.map((role) => role.type)
         .includes(UserRoleType.Admin);
       setIsAdmin(admin || false);
+
+      // Fetch timeline data
+      const timeline = await apiClient.projects_GetProjectTimeline(id);
+      setTimelineData(timeline);
 
       setError(null);
     } catch (err) {
@@ -133,6 +104,14 @@ export default function ProjectPage() {
           }
           return prevProject;
         });
+
+        // Also update the timeline data silently
+        try {
+          const timeline = await apiClient.projects_GetProjectTimeline(id);
+          setTimelineData(timeline);
+        } catch (timelineErr) {
+          console.error("Error updating timeline:", timelineErr);
+        }
 
         // Check if the current user is an admin
         const admin = data.users
