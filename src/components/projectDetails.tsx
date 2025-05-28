@@ -29,27 +29,14 @@ import {
 } from "./ui/select";
 import { Label } from "./ui/label";
 import { DatePicker } from "./ui/datepicker";
-import { EditButton } from "./ui/editButton";
 import { ApiClientContext } from "@/lib/ApiClientContext";
+import { getStatus } from "@/utils/projectUtils";
+import { Badge } from "./ui/badge"
 
 type ProjectDetailsProps = {
   project: ProjectResponseDTO;
   isAdmin: boolean;
   onProjectUpdate: () => void;
-};
-
-const determineStatus = (
-  startDate: Date | undefined | null,
-  endDate: Date | undefined | null,
-) => {
-  const now = new Date();
-  if (!startDate || startDate > now) {
-    return "Not started";
-  } else if (endDate && endDate < now) {
-    return "Ended";
-  } else {
-    return "Active";
-  }
 };
 
 export default function ProjectDetails({
@@ -155,6 +142,9 @@ export default function ProjectDetails({
   const projectLead = project.contributors.find(
     (contributor) => contributor.leader,
   );
+
+
+  const status = getStatus(project.start_date, project.end_date);
 
   return (
     <Card className="">
@@ -316,9 +306,11 @@ export default function ProjectDetails({
               <Label htmlFor="status" className="font-semibold">
                 Status
               </Label>
-              <p className="text-gray-700">
-                {determineStatus(project.start_date, project.end_date)}
-              </p>
+              <Badge
+                className={`${status.color} mt-1 font-medium whitespace-nowrap`}
+              >
+                {status.label}
+              </Badge>
             </div>
 
             <div>
