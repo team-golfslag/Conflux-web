@@ -205,6 +205,7 @@ export default function ProjectPage() {
                 <ProjectWorks
                   project={project}
                   onProjectUpdate={handleProjectUpdate}
+                  isAdmin={isAdmin}
                 />
               </Card>
             </div>

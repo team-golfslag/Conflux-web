@@ -5,7 +5,7 @@
  */
 import ProjectCard from "@/components/projectCard";
 import { Input } from "@/components/ui/input.tsx";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   OrderByType,
   ApiClient,
@@ -14,7 +14,7 @@ import {
   UserRole,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Separator } from "@/components/ui/separator.tsx";
-import { Search } from "lucide-react";
+import { Search, Download } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -28,6 +28,8 @@ import { DatePicker } from "@/components/ui/datepicker.tsx";
 import { useDebounce } from "@/hooks/useDebounce"; // Assuming you have or create this hook
 import { useSession } from "@/hooks/SessionContext";
 import { ApiWrapper } from "@/components/apiWrapper";
+import { Button } from "@/components/ui/button";
+import { useApiQuery } from "@/hooks/useApiQuery";
 
 /** Project Search Page component <br>
  * Fetches projects from the backend using a debounced search term and selected sort order.
@@ -84,6 +86,58 @@ const ProjectSearchPage = () => {
   // Define a state variable to track when the API returns no results
   // const [hasNoResults, setHasNoResults] = useState(false);
 
+  // CSV download functionality
+  const [triggerDownload, setTriggerDownload] = useState(false);
+  
+  const { data: csvData, isLoading: isDownloading } = useApiQuery(
+    (apiClient: ApiClient) => {
+      if (!triggerDownload) {
+        return Promise.resolve(null);
+      }
+      return apiClient.projects_ExportToCsv(
+        debouncedSearchTerm,
+        startDate,
+        endDate,
+        parseOrderBy(sort)
+      );
+    },
+    [debouncedSearchTerm, startDate, endDate, sort, triggerDownload]
+  );
+
+  // Effect to handle the actual download when data is received
+  React.useEffect(() => {
+    if (csvData && triggerDownload && csvData !== null) {
+      console.log('CSV FileResponse received:', csvData);
+      
+      try {
+        // csvData is a FileResponse object with a data property containing the Blob
+        const blob = csvData.data; // Use the blob directly from the FileResponse
+        const fileName = csvData.fileName || `projects_export_${new Date().toISOString().split('T')[0]}.csv`;
+        
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', fileName);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        console.log('CSV download triggered successfully');
+      } catch (error) {
+        console.error('Error downloading CSV:', error);
+      }
+      
+      // Reset trigger
+      setTriggerDownload(false);
+    }
+  }, [csvData, triggerDownload]);
+
+  const handleDownloadCSV = () => {
+    setTriggerDownload(true);
+  };
+
   return (
     <search>
       <div className="relative mx-auto mb-4 w-full max-w-2xl p-4">
@@ -96,7 +150,7 @@ const ProjectSearchPage = () => {
         />
         <Search className="text-muted-foreground absolute top-1/2 right-8 -translate-y-1/2" />
       </div>
-      <div className="flex w-full flex-col items-start gap-4 sm:flex-row sm:items-end">
+      <div className="flex w-full flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center">
             <span className="w-32 pr-2 text-sm font-semibold text-gray-600">
@@ -111,34 +165,46 @@ const ProjectSearchPage = () => {
             <DatePicker onDateChange={handleEndDateChange} />
           </div>
         </div>
-        <Select
-          value={sort}
-          onValueChange={(value) => {
-            setSort(value);
-            // Force refresh the query when the sort order changes
-            setRefreshKey((prev) => prev + 1);
-          }}
-        >
-          <SelectTrigger className="w-50 sm:ml-auto">
-            <SelectValue placeholder="Sort by.." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Sort by</SelectLabel>
-              <SelectItem value="relevance">Relevance</SelectItem>
-              <SelectItem value="title_asc">Title A-Z</SelectItem>
-              <SelectItem value="title_desc">Title Z-A</SelectItem>
-              <SelectItem value="start_date_asc">
-                Start date ascending
-              </SelectItem>
-              <SelectItem value="start_date_desc">
-                Start date descending
-              </SelectItem>
-              <SelectItem value="end_date_asc">End date ascending</SelectItem>
-              <SelectItem value="end_date_desc">End date descending</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleDownloadCSV}
+            disabled={isDownloading}
+            variant="outline"
+            size="default"
+            className="flex items-center gap-2"
+          >
+            <Download className="h-4 w-4" />
+            {isDownloading ? "Downloading..." : "Download CSV"}
+          </Button>
+          <Select
+            value={sort}
+            onValueChange={(value) => {
+              setSort(value);
+              // Force refresh the query when the sort order changes
+              setRefreshKey((prev) => prev + 1);
+            }}
+          >
+            <SelectTrigger className="w-50">
+              <SelectValue placeholder="Sort by.." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Sort by</SelectLabel>
+                <SelectItem value="relevance">Relevance</SelectItem>
+                <SelectItem value="title_asc">Title A-Z</SelectItem>
+                <SelectItem value="title_desc">Title Z-A</SelectItem>
+                <SelectItem value="start_date_asc">
+                  Start date ascending
+                </SelectItem>
+                <SelectItem value="start_date_desc">
+                  Start date descending
+                </SelectItem>
+                <SelectItem value="end_date_asc">End date ascending</SelectItem>
+                <SelectItem value="end_date_desc">End date descending</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
       <Separator className="col-span-full my-4" />
 
