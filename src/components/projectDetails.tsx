@@ -31,7 +31,7 @@ import { Label } from "./ui/label";
 import { DatePicker } from "./ui/datepicker";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { getStatus } from "@/utils/projectUtils";
-import { Badge } from "./ui/badge"
+import ProjectDates from "@/components/projectDates.tsx";
 
 type ProjectDetailsProps = {
   project: ProjectResponseDTO;
@@ -242,29 +242,14 @@ export default function ProjectDetails({
                   </p>
                 </div>
 
-                <div>
-                  <Label htmlFor="start-date" className="font-semibold">
-                    Start Date
-                  </Label>
-                  <DatePicker
-                    className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1"
-                    buttonClassName="w-full max-w-[calc(100%-44px)]"
-                    initialDate={project.start_date}
-                    onDateChange={setSelectedStartDate}
-                  />
-                </div>
+                <ProjectDates
+                  editMode={editMode}
+                  start_date={project.start_date}
+                  end_date={project.end_date}
+                  setSelectedStartDate={setSelectedStartDate}
+                  setSelectedEndDate={setSelectedEndDate}
+                />
 
-                <div>
-                  <Label htmlFor="end-date" className="font-semibold">
-                    End Date
-                  </Label>
-                  <DatePicker
-                    className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1"
-                    buttonClassName="w-full max-w-[calc(100%-44px)]"
-                    initialDate={project.end_date}
-                    onDateChange={setSelectedEndDate}
-                  />
-                </div>
 
                 <div>
                   <Label htmlFor="lead-organization" className="font-semibold">
@@ -331,27 +316,6 @@ export default function ProjectDetails({
               </p>
             </div>
 
-            <div>
-              <Label htmlFor="start-date" className="font-semibold">
-                Start Date
-              </Label>
-              <p className="text-gray-700">
-                {project.start_date
-                  ? format(project.start_date, "d MMMM yyyy")
-                  : "N/A"}
-              </p>
-            </div>
-
-            <div>
-              <Label htmlFor="end-date" className="font-semibold">
-                End Date
-              </Label>
-              <p className="text-gray-700">
-                {project.end_date
-                  ? format(project.end_date, "d MMMM yyyy")
-                  : "N/A"}
-              </p>
-            </div>
 
             <div>
               <Label htmlFor="lead-organization" className="font-semibold">
@@ -363,6 +327,15 @@ export default function ProjectDetails({
                   : "N/A"}
               </p>
             </div>
+            <ProjectDates
+              editMode={editMode}
+              start_date={project.start_date}
+              end_date={project.end_date}
+            />
+            <ProjectOrganisations
+              editMode={editMode}
+              organisations={project.organisations}
+            />
           </div>
         )}
       </CardContent>
