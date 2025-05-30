@@ -27,7 +27,7 @@ import { ApiClientContext } from "@/lib/ApiClientContext";
 import { getStatus } from "@/utils/projectUtils";
 import { Badge } from "@/components/ui/badge.tsx";
 import ProjectDates from "@/components/projectDates.tsx";
-import ProjectOrganisations from "@/components/projectOrganisations.tsx";
+import ProjectOrganizations from "@/components/projectOrganizations.tsx";
 
 type ProjectDetailsProps = {
   project: ProjectResponseDTO;
@@ -42,12 +42,8 @@ export default function ProjectDetails({
 }: Readonly<ProjectDetailsProps>) {
   const apiClient = useContext(ApiClientContext);
   const [editMode, setEditMode] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState<
-    Date | null | undefined
-  >(project.start_date);
-  const [selectedEndDate, setSelectedEndDate] = useState<
-    Date | null | undefined
-  >(project.end_date);
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(project.start_date);
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(project.end_date);
   const [selectedOrganizationId, setSelectedOrganizationId] = useState<
     string | undefined
   >(project.organisations[0]?.ror_id);
@@ -124,7 +120,7 @@ export default function ProjectDetails({
   };
 
   // add demo data
-  if (project.organisations.length == 0) {
+  if (!project.organisations.find((o) => o.name === "Utrecht University")) {
     project.organisations.push(
       new OrganisationDTO({
         name: "Utrecht University",
@@ -144,7 +140,7 @@ export default function ProjectDetails({
       }),
     );
   }
-  if (project.organisations.length <= 1) {
+  if (!project.organisations.find((o) => o.name === "Hogeschool Utrecht")) {
     project.organisations.push(
       new OrganisationDTO({
         name: "Hogeschool Utrecht",
@@ -153,7 +149,7 @@ export default function ProjectDetails({
         roles: [
           new OrganisationRoleDTO({
             role: OrganisationRoleType.LeadResearchOrganization,
-            start_date: new Date(),
+            start_date: new Date(2024),
           }),
         ],
       }),
@@ -167,7 +163,7 @@ export default function ProjectDetails({
   const status = getStatus(project.start_date, project.end_date);
 
   return (
-    <Card className="">
+    <Card>
       <CardHeader className="flex items-center justify-between">
         <CardTitle>Project Details</CardTitle>
 
@@ -222,6 +218,7 @@ export default function ProjectDetails({
         </div>
       </CardHeader>
       <CardContent>
+        <div className="flex flex-col gap-4">
         {editMode ? (
           <ApiMutation
             mutationFn={updateProject}
@@ -234,7 +231,7 @@ export default function ProjectDetails({
             }}
           >
             {({ onSubmit, isLoading: outerLoading }) => (
-              <div className="space-y-4">
+              <>
                 <div>
                   <Label htmlFor="status" className="font-semibold">
                     Status
@@ -272,13 +269,12 @@ export default function ProjectDetails({
                   setSelectedEndDate={setSelectedEndDate}
                 />
 
-                <ProjectOrganisations
-                  editMode={editMode}
-                  handleEditOrg={() => handleEditOrg}
-                  organisations={project.organisations}
-                  selectedLeadOrgId={selectedOrganizationId}
-                  setSelectedLeadOrgId={setSelectedOrganizationId}
-                />
+                <ProjectOrganizations
+                    projectId={project.id}
+                    editMode={editMode}
+                    organizations={project.organisations}
+                    onProjectUpdate={onProjectUpdate}
+                  />
 
                 <div className="flex justify-end gap-2 pt-4">
                   <Button
@@ -290,11 +286,11 @@ export default function ProjectDetails({
                     <Check size={16} /> Save Changes
                   </Button>
                 </div>
-              </div>
+              </>
             )}
           </ApiMutation>
         ) : (
-          <div className="space-y-4">
+          <>
             <div>
               <Label htmlFor="status" className="font-semibold">
                 Status
@@ -310,7 +306,7 @@ export default function ProjectDetails({
               <Label htmlFor="project-lead" className="font-semibold">
                 Project Lead
               </Label>
-              <p className="mt-2 mb-6 text-gray-700">
+              <p className="pt-1 pb-2 text-gray-700">
                 {getProjectLeads(project.contributors)}
               </p>
             </div>
@@ -319,7 +315,7 @@ export default function ProjectDetails({
               <Label htmlFor="project-contacts" className="font-semibold">
                 Project Contacts
               </Label>
-              <p className="text-gray-700">
+              <p className="pt-1 pb-2 text-gray-700">
                 {getProjectContacts(project.contributors)}
               </p>
             </div>
@@ -329,12 +325,14 @@ export default function ProjectDetails({
               start_date={project.start_date}
               end_date={project.end_date}
             />
-            <ProjectOrganisations
-              editMode={editMode}
-              organisations={project.organisations}
-            />
-          </div>
+            <ProjectOrganizations
+                projectId={project.id}
+                editMode={editMode}
+                organizations={project.organisations}
+              />
+          </>
         )}
+        </div>
       </CardContent>
     </Card>
   );
