@@ -26,7 +26,7 @@ export default function ProjectDates({
   return (
     <>
       {editMode ? (
-        <>
+        <div className="space-y-4">
           <div>
             <Label htmlFor="start-date" className="font-semibold">
               Start Date
@@ -49,14 +49,14 @@ export default function ProjectDates({
               onDateChange={setSelectedEndDate}
             />
           </div>
-        </>
+        </div>
       ) : (
-        <>
+        <div className="space-y-4">
           <div>
             <Label htmlFor="start-date" className="font-semibold">
               Start Date
             </Label>
-            <p className="my-2 text-gray-700">
+            <p className="pt-1 pb-2 text-gray-700">
               {start_date ? format(start_date, "d MMMM yyyy") : "N/A"}
             </p>
           </div>
@@ -65,11 +65,11 @@ export default function ProjectDates({
             <Label htmlFor="end-date" className="font-semibold">
               End Date
             </Label>
-            <p className="mt-2 mb-6 text-gray-700">
+            <p className="pt-1 pb-2 text-gray-700">
               {end_date ? format(end_date, "d MMMM yyyy") : "N/A"}
             </p>
           </div>
-        </>
+        </div>
       )}
     </>
   );
