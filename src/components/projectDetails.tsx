@@ -8,9 +8,6 @@ import {
   ProjectResponseDTO,
   ApiClient,
   ProjectRequestDTO,
-  OrganisationDTO,
-  OrganisationRoleDTO,
-  OrganisationRoleType,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
@@ -117,47 +114,6 @@ export default function ProjectDetails({
     return contacts.length > 0
       ? contacts.map((contact) => contact.person.name).join(", ")
       : "N/A";
-  };
-
-  // add demo data
-  if (!project.organisations.find((o) => o.name === "Utrecht University")) {
-    project.organisations.push(
-      new OrganisationDTO({
-        name: "Utrecht University",
-        id: "1",
-        ror_id: "https://ror.org/04pp8hn57",
-        roles: [
-          new OrganisationRoleDTO({
-            role: OrganisationRoleType.PartnerOrganization,
-            start_date: new Date(),
-          }),
-          new OrganisationRoleDTO({
-            role: OrganisationRoleType.Contractor,
-            start_date: new Date(2021),
-            end_date: new Date(),
-          }),
-        ],
-      }),
-    );
-  }
-  if (!project.organisations.find((o) => o.name === "Hogeschool Utrecht")) {
-    project.organisations.push(
-      new OrganisationDTO({
-        name: "Hogeschool Utrecht",
-        id: "2",
-        ror_id: "https://ror.org/04pp8hn57",
-        roles: [
-          new OrganisationRoleDTO({
-            role: OrganisationRoleType.LeadResearchOrganization,
-            start_date: new Date(2024),
-          }),
-        ],
-      }),
-    );
-  }
-
-  const handleEditOrg = (/*org: OrganisationDTO*/) => {
-    //TODO
   };
 
   const status = getStatus(project.start_date, project.end_date);
