@@ -190,9 +190,9 @@ export default function ProjectPage() {
             </div>
             {/* Side Panel */}
             <div className="space-y-8">
-            <ProjectDetails
-              project={project}
-            onProjectUpdate={handleProjectUpdate}
+              <ProjectDetails
+                project={project}
+                onProjectUpdate={handleProjectUpdate}
                 isAdmin={isAdmin}
               />
               <RAiDInfo projectId={id} project={project} />

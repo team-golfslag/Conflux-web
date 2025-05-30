@@ -39,18 +39,18 @@ export default function ProjectDetails({
 }: Readonly<ProjectDetailsProps>) {
   const apiClient = useContext(ApiClientContext);
   const [editMode, setEditMode] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(project.start_date);
-  const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(project.end_date);
-  const [selectedOrganizationId, setSelectedOrganizationId] = useState<
-    string | undefined
-  >(project.organisations[0]?.ror_id);
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(
+    project.start_date,
+  );
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(
+    project.end_date,
+  );
 
   const toggleEditMode = () => {
     if (editMode) {
       // Reset selections to current values if canceling
       setSelectedStartDate(project.start_date);
       setSelectedEndDate(project.end_date);
-      setSelectedOrganizationId(project.organisations[0]?.ror_id);
     }
     setEditMode(!editMode);
   };
@@ -136,24 +136,36 @@ export default function ProjectDetails({
                 >
                   {syncSuccess ? (
                     <CheckCircle className="h-4 w-4 text-green-500" />
-                  ) : syncFailed ? (
-                    <XCircle className="h-4 w-4 text-red-500" />
                   ) : (
-                    <RefreshCw
-                      className={`h-4 w-4 transition-transform duration-300 ${isSyncing ? "animate-spin" : "hover:rotate-90"}`}
-                    />
+                    <>
+                      {syncFailed ? (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      ) : (
+                        <RefreshCw
+                          className={`h-4 w-4 transition-transform duration-300 ${isSyncing ? "animate-spin" : "hover:rotate-90"}`}
+                        />
+                      )}
+                    </>
                   )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>
-                  {isSyncing
-                    ? "Syncing..."
-                    : syncSuccess
-                      ? "Sync complete!"
-                      : syncFailed
-                        ? "Sync failed!"
-                        : "Sync this project with SRAM"}
+                  {isSyncing ? (
+                    "Syncing..."
+                  ) : (
+                    <>
+                      {syncSuccess ? (
+                        "Sync complete!"
+                      ) : (
+                        <>
+                          {syncFailed
+                            ? "Sync failed!"
+                            : "Sync this project with SRAM"}
+                        </>
+                      )}
+                    </>
+                  )}
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -175,119 +187,119 @@ export default function ProjectDetails({
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4">
-        {editMode ? (
-          <ApiMutation
-            mutationFn={updateProject}
-            data={{}}
-            loadingMessage="Updating project details..."
-            mode="component"
-            onSuccess={() => {
-              setEditMode(false);
-              onProjectUpdate();
-            }}
-          >
-            {({ onSubmit, isLoading: outerLoading }) => (
-              <>
-                <div>
-                  <Label htmlFor="status" className="font-semibold">
-                    Status
-                  </Label>
-                  <Badge
-                    className={`${status.color} mt-1 font-medium whitespace-nowrap`}
-                  >
-                    {status.label}
-                  </Badge>
-                </div>
+          {editMode ? (
+            <ApiMutation
+              mutationFn={updateProject}
+              data={{}}
+              loadingMessage="Updating project details..."
+              mode="component"
+              onSuccess={() => {
+                setEditMode(false);
+                onProjectUpdate();
+              }}
+            >
+              {({ onSubmit, isLoading: outerLoading }) => (
+                <>
+                  <div>
+                    <Label htmlFor="status" className="font-semibold">
+                      Status
+                    </Label>
+                    <Badge
+                      className={`${status.color} mt-1 font-medium whitespace-nowrap`}
+                    >
+                      {status.label}
+                    </Badge>
+                  </div>
 
-                <div>
-                  <Label htmlFor="project-lead" className="font-semibold">
-                    Project Lead
-                  </Label>
-                  <p className="text-gray-700">
-                    {getProjectLeads(project.contributors)}
-                  </p>
-                </div>
+                  <div>
+                    <Label htmlFor="project-lead" className="font-semibold">
+                      Project Lead
+                    </Label>
+                    <p className="text-gray-700">
+                      {getProjectLeads(project.contributors)}
+                    </p>
+                  </div>
 
-                <div>
-                  <Label htmlFor="project-contacts" className="font-semibold">
-                    Project Contacts
-                  </Label>
-                  <p className="text-gray-700">
-                    {getProjectContacts(project.contributors)}
-                  </p>
-                </div>
+                  <div>
+                    <Label htmlFor="project-contacts" className="font-semibold">
+                      Project Contacts
+                    </Label>
+                    <p className="text-gray-700">
+                      {getProjectContacts(project.contributors)}
+                    </p>
+                  </div>
 
-                <ProjectDates
-                  editMode={editMode}
-                  start_date={project.start_date}
-                  end_date={project.end_date}
-                  setSelectedStartDate={setSelectedStartDate}
-                  setSelectedEndDate={setSelectedEndDate}
-                />
+                  <ProjectDates
+                    editMode={editMode}
+                    start_date={project.start_date}
+                    end_date={project.end_date}
+                    setSelectedStartDate={setSelectedStartDate}
+                    setSelectedEndDate={setSelectedEndDate}
+                  />
 
-                <ProjectOrganizations
+                  <ProjectOrganizations
                     projectId={project.id}
                     editMode={editMode}
                     organizations={project.organisations}
                     onProjectUpdate={onProjectUpdate}
                   />
 
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button
-                    variant="default"
-                    className="flex items-center gap-1"
-                    onClick={onSubmit}
-                    disabled={outerLoading}
-                  >
-                    <Check size={16} /> Save Changes
-                  </Button>
-                </div>
-              </>
-            )}
-          </ApiMutation>
-        ) : (
-          <>
-            <div>
-              <Label htmlFor="status" className="font-semibold">
-                Status
-              </Label>
-              <Badge
-                className={`${status.color} mt-1 font-medium whitespace-nowrap`}
-              >
-                {status.label}
-              </Badge>
-            </div>
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button
+                      variant="default"
+                      className="flex items-center gap-1"
+                      onClick={onSubmit}
+                      disabled={outerLoading}
+                    >
+                      <Check size={16} /> Save Changes
+                    </Button>
+                  </div>
+                </>
+              )}
+            </ApiMutation>
+          ) : (
+            <>
+              <div>
+                <Label htmlFor="status" className="font-semibold">
+                  Status
+                </Label>
+                <Badge
+                  className={`${status.color} mt-1 font-medium whitespace-nowrap`}
+                >
+                  {status.label}
+                </Badge>
+              </div>
 
-            <div>
-              <Label htmlFor="project-lead" className="font-semibold">
-                Project Lead
-              </Label>
-              <p className="pt-1 pb-2 text-gray-700">
-                {getProjectLeads(project.contributors)}
-              </p>
-            </div>
+              <div>
+                <Label htmlFor="project-lead" className="font-semibold">
+                  Project Lead
+                </Label>
+                <p className="pt-1 pb-2 text-gray-700">
+                  {getProjectLeads(project.contributors)}
+                </p>
+              </div>
 
-            <div>
-              <Label htmlFor="project-contacts" className="font-semibold">
-                Project Contacts
-              </Label>
-              <p className="pt-1 pb-2 text-gray-700">
-                {getProjectContacts(project.contributors)}
-              </p>
-            </div>
+              <div>
+                <Label htmlFor="project-contacts" className="font-semibold">
+                  Project Contacts
+                </Label>
+                <p className="pt-1 pb-2 text-gray-700">
+                  {getProjectContacts(project.contributors)}
+                </p>
+              </div>
 
-            <ProjectDates
-              editMode={editMode}
-              start_date={project.start_date}
-              end_date={project.end_date}
-            />
-            <ProjectOrganizations
+              <ProjectDates
+                editMode={editMode}
+                start_date={project.start_date}
+                end_date={project.end_date}
+              />
+              <ProjectOrganizations
                 projectId={project.id}
                 editMode={editMode}
                 organizations={project.organisations}
               />
-          </>
-        )}
+            </>
+          )}
         </div>
       </CardContent>
     </Card>

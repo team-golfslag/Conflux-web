@@ -25,7 +25,6 @@ export interface ProjectCardProps {
  * Represents a component that displays information about a project in a card layout. Used on dashboard and search page
  *
  * @param {ProjectCardProps} props - The properties required to render the project card.
- * @param {ProjectDTO} props.project - The project data to display.
  * @param {string[]} props.roles - The user's roles in the project, if available.
  *
  * @returns {JSX.Element} A styled card element showing project details, including title, description, dates, contributors count, and user roles.
@@ -41,14 +40,12 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
 
   const status = getStatus(project.start_date, project.end_date);
 
-  const primartTitle = project.titles?.find(
+  const primaryTitle = project.titles?.find(
     (title) => title.type === TitleType.Primary,
   );
   const primaryDescription = project.descriptions?.find(
     (desc) => desc.type === DescriptionType.Primary,
   );
-
-  const status = getStatus();
 
   // Count contributors
   const contributorCount = project.contributors?.length ?? 0;
@@ -62,7 +59,7 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
         <CardHeader className="bg-white px-4 pt-4 pb-2">
           <div className="flex items-start justify-between">
             <h3 className="line-clamp-2 text-xl font-semibold tracking-tight text-gray-900 group-hover:text-blue-800">
-              {primartTitle?.text ?? "No title available"}
+              {primaryTitle?.text ?? "No title available"}
             </h3>
             <Badge
               className={`${status.color} ml-2 font-medium whitespace-nowrap`}
