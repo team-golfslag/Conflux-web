@@ -19,23 +19,25 @@ import {
 } from "@team-golfslag/conflux-api-client/src/client";
 import { JSX } from "react";
 
-export interface OrganisationProps {
+export interface OrganizationProps {
   org: OrganisationDTO;
   roleType: OrganisationRoleType;
-  handleEditOrg: () => void;
+  editMode: boolean;
+  onEditClick: () => void;
 }
 
-const Organisation = ({
+const Organization = ({
   org,
   roleType,
-  handleEditOrg,
-}: OrganisationProps): JSX.Element => {
+  editMode,
+  onEditClick,
+}: OrganizationProps): JSX.Element => {
   return (
     <>
       <div className="flex justify-between">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 text-gray-700">
           {org.name}
-          {org.ror_id && (
+          {org.ror_id && !editMode && (
             <Button
               className="h-auto has-[>svg]:p-1 [&_svg:not([class*='size-'])]:size-5"
               variant="ghost"
@@ -48,22 +50,24 @@ const Organisation = ({
             </Button>
           )}
         </div>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-0 text-blue-500 hover:text-blue-700"
-                onClick={handleEditOrg}
-                aria-label="Edit contributor"
-              >
-                <Pencil className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Edit organisation</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {editMode && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-blue-500 hover:text-blue-700"
+                  onClick={onEditClick}
+                  aria-label="Edit contributor"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Edit organization</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
       {org.roles
         .filter((r) => r.role === roleType)
@@ -77,4 +81,4 @@ const Organisation = ({
   );
 };
 
-export default Organisation;
+export default Organization;
