@@ -50,7 +50,7 @@ const Dashboard = () => {
               <div className="from-primary/90 to-primary flex items-center justify-between rounded-lg bg-gradient-to-r p-6 shadow-md">
                 <div className="text-primary-foreground">
                   <h1 className="text-3xl font-bold">
-                    {session?.user?.name || session?.name}
+                    {session?.user?.person?.name || session?.name}
                   </h1>
                   <p className="mt-2 opacity-90">
                     Manage and track your research projects in one place

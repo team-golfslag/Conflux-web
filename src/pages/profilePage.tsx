@@ -26,22 +26,20 @@ import {
 import { useSession } from "@/hooks/SessionContext";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import config from "@/config";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import OrcidIcon from "@/components/icons/orcidIcon";
 import { ApiMutation } from "@/components/apiMutation";
 import {
   formatOrcidAsUrl,
   extractOrcidFromUrl,
 } from "@/lib/formatters/orcidFormatter";
-import {
-  User,
-  UserSession,
-  ApiClient,
-} from "@team-golfslag/conflux-api-client/src/client";
+import { ApiClient } from "@team-golfslag/conflux-api-client/src/client";
+import { ApiClientContext } from "@/lib/ApiClientContext";
 
 const ProfilePage = () => {
   const { session, loading, logout, saveSession } = useSession();
   const [isUnlinkDialogOpen, setIsUnlinkDialogOpen] = useState(false);
+  const apiClient = useContext(ApiClientContext);
 
   const handleLinkOrcid = () => {
     window.location.href = `${config.apiBaseURL}/orcid/link?redirectUri=${encodeURIComponent(window.location.href)}`;
@@ -70,13 +68,13 @@ const ProfilePage = () => {
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-500">ORCID</p>
                 <p>
-                  {session.user?.orcid_id == null ? (
+                  {session.user?.person?.orcid_id == null ? (
                     "Not linked"
                   ) : (
                     <a
                       href={
-                        session.user?.orcid_id
-                          ? (formatOrcidAsUrl(session.user.orcid_id) ??
+                        session.user?.person?.orcid_id
+                          ? (formatOrcidAsUrl(session.user.person?.orcid_id) ??
                             undefined)
                           : undefined
                       }
@@ -84,11 +82,11 @@ const ProfilePage = () => {
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
                     >
-                      {extractOrcidFromUrl(session.user?.orcid_id)}
+                      {extractOrcidFromUrl(session.user?.person?.orcid_id)}
                     </a>
                   )}
                 </p>
-                {session.user?.orcid_id ? (
+                {session.user?.person?.orcid_id ? (
                   <AlertDialog
                     open={isUnlinkDialogOpen}
                     onOpenChange={setIsUnlinkDialogOpen}
@@ -115,20 +113,30 @@ const ProfilePage = () => {
                           data={{}}
                           loadingMessage="Unlinking ORCID..."
                           mode="component"
-                          onSuccess={() => {
+                          onSuccess={async () => {
                             console.log("ORCID unlinked successfully");
-                            if (session?.user) {
-                              // Create a new session object with the updated user data
-                              const updatedSession = new UserSession({
-                                ...session,
-                                user: new User({
-                                  ...session.user,
-                                  orcid_id: undefined,
-                                }),
-                              });
-                              saveSession(updatedSession); // Pass the new object to saveSession
+                            try {
+                              // Fetch fresh session data from server after successful unlink
+                              const freshSession =
+                                await apiClient.userSession_UserSession();
+                              console.log(
+                                "Fetched fresh session:",
+                                freshSession,
+                              );
+                              saveSession(freshSession);
+                              setIsUnlinkDialogOpen(false);
+                            } catch (error) {
+                              console.error(
+                                "Failed to refresh session after ORCID unlink:",
+                                error,
+                              );
+                              // Fallback: just close dialog and let user refresh page if needed
+                              setIsUnlinkDialogOpen(false);
                             }
-                            setIsUnlinkDialogOpen(false);
+                          }}
+                          onError={(error) => {
+                            console.error("Failed to unlink ORCID:", error);
+                            // Keep the dialog open so user can try again
                           }}
                         >
                           {({ onSubmit }) => (
