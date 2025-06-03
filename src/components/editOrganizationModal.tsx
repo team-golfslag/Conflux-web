@@ -70,7 +70,7 @@ export default function EditOrganizationModal({
       setFormData({
         name: organization.name,
         rorId: organization.ror_id,
-        role: organization.roles.find(r => !r.end_date)!.role,
+        role: organization.roles.find((r) => !r.end_date)!.role,
       });
     } else {
       setFormData({
@@ -87,7 +87,7 @@ export default function EditOrganizationModal({
       setFormData({
         name: organization.name,
         rorId: organization.ror_id,
-        role: organization.roles.find(r => !r.end_date)?.role,
+        role: organization.roles.find((r) => !r.end_date)?.role,
       });
     }
   }, [organization]);
@@ -117,7 +117,8 @@ export default function EditOrganizationModal({
     } catch (error) {
       console.error("Error updating organization:", error);
       alert(
-        `Failed to update organization: ${error instanceof Error ? error.message : error
+        `Failed to update organization: ${
+          error instanceof Error ? error.message : error
         }`,
       );
     }
@@ -130,20 +131,22 @@ export default function EditOrganizationModal({
         ror_id: formData.rorId,
         role: formData.role,
       });
-      await apiClient.projectOrganisations_CreateOrganisation(projectId, newOrganization);
+      await apiClient.projectOrganisations_CreateOrganisation(
+        projectId,
+        newOrganization,
+      );
       onOrganizationAdded?.();
     } catch (error) {
       console.error("Error adding organization:", error);
       alert(
-        `Failed to add organization: ${error instanceof Error ? error.message : error
+        `Failed to add organization: ${
+          error instanceof Error ? error.message : error
         }`,
       );
     }
   };
 
-  const updateRole = (
-    value: string | Date | undefined,
-  ) => {
+  const updateRole = (value: string | Date | undefined) => {
     setFormData((prev) => {
       return { ...prev, role: value };
     });
@@ -164,7 +167,7 @@ export default function EditOrganizationModal({
       rorId: prev.rorId,
       role: undefined,
     }));
-  }
+  };
 
   const idPrefix = "edit-";
   return (
@@ -245,15 +248,11 @@ export default function EditOrganizationModal({
                     Role
                   </Label>
                   <div className="col-span-4 flex flex-col gap-4 sm:col-span-3">
-                    <div
-                      className="grid grid-cols-4 gap-3 border-t pt-2"
-                    >
+                    <div className="grid grid-cols-4 gap-3 border-t pt-2">
                       <div className="col-span-4 flex flex-col sm:flex-row sm:items-center">
                         <Select
                           value={formData.role}
-                          onValueChange={(value) =>
-                            updateRole(value)
-                          }
+                          onValueChange={(value) => updateRole(value)}
                         >
                           <SelectTrigger className="max-w-sm">
                             <SelectValue placeholder="Select role type" />

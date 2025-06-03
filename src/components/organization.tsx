@@ -42,7 +42,11 @@ const Organization = ({
               size="sm"
               asChild
             >
-              <a href={org.organisation.ror_id} target="_blank" rel="noopener noreferrer">
+              <a
+                href={org.organisation.ror_id}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <RorIcon></RorIcon>
               </a>
             </Button>
