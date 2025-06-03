@@ -24,7 +24,6 @@ import { ApiClientContext } from "@/lib/ApiClientContext";
 import { getStatus } from "@/utils/projectUtils";
 import { Badge } from "@/components/ui/badge.tsx";
 import ProjectDates from "@/components/projectDates.tsx";
-import ProjectOrganizations from "@/components/projectOrganizations.tsx";
 
 type ProjectDetailsProps = {
   project: ProjectResponseDTO;
@@ -123,7 +122,7 @@ export default function ProjectDetails({
       <CardHeader className="flex items-center justify-between">
         <CardTitle>Project Details</CardTitle>
 
-        <div className="flex items-center gap-2">
+        <div className="invisible flex items-center gap-2 group-hover/card:visible">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -237,13 +236,6 @@ export default function ProjectDetails({
                     setSelectedEndDate={setSelectedEndDate}
                   />
 
-                  <ProjectOrganizations
-                    projectId={project.id}
-                    editMode={editMode}
-                    organizations={project.organisations}
-                    onProjectUpdate={onProjectUpdate}
-                  />
-
                   <div className="flex justify-end gap-2 pt-4">
                     <Button
                       variant="default"
@@ -292,11 +284,6 @@ export default function ProjectDetails({
                 editMode={editMode}
                 start_date={project.start_date}
                 end_date={project.end_date}
-              />
-              <ProjectOrganizations
-                projectId={project.id}
-                editMode={editMode}
-                organizations={project.organisations}
               />
             </>
           )}

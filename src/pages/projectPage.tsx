@@ -24,6 +24,7 @@ import {
   ITimelineItemResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { useSession } from "@/hooks/SessionContext";
+import ProjectOrganizations from "@/components/projectOrganizations";
 
 // Initially empty, will be populated from API
 
@@ -194,6 +195,12 @@ export default function ProjectPage() {
                 project={project}
                 onProjectUpdate={handleProjectUpdate}
                 isAdmin={isAdmin}
+              />
+              <ProjectOrganizations
+                isAdmin={isAdmin}
+                projectId={project.id}
+                organizations={project.organisations}
+                onProjectUpdate={handleProjectUpdate}
               />
               <RAiDInfo projectId={id} project={project} />
               <ProjectTimeline timelineData={timelineData}></ProjectTimeline>

@@ -731,13 +731,18 @@ export default function ProjectOverview({
               )}
             </div>
             <p className="text-start text-sm/6 text-gray-700 sm:px-3 sm:text-base/7">
-              {isExpanded
-                ? currentDescription
-                : currentDescription &&
-                    currentDescription.length > descriptionTruncateLength
+              <div
+                className={`transition-max-height overflow-hidden duration-300 ${
+                  isExpanded ? "max-h-[1000px]" : "max-h-[280px]"
+                }`}
+              >
+                {!isExpanded &&
+                currentDescription &&
+                currentDescription.length > descriptionTruncateLength
                   ? currentDescription.substring(0, descriptionTruncateLength) +
                     "..."
                   : currentDescription}
+              </div>
             </p>
             {shouldShowExpandButton && !isExpanded && (
               <Button

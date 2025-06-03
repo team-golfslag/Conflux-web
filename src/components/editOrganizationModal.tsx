@@ -16,13 +16,12 @@ import { Button } from "@/components/ui/button.tsx";
 import { useContext, useEffect, useState } from "react";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import {
-  OrganisationDTO,
-  OrganisationRoleDTO,
+  OrganisationRequestDTO,
+  OrganisationResponseDTO,
   OrganisationRoleType,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import { DatePicker } from "@/components/ui/datepicker.tsx";
 import {
   Select,
   SelectContent,
@@ -31,18 +30,18 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx";
 import { ApiMutation } from "@/components/apiMutation.tsx";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
 interface OrganizationFormData {
   name: string;
   rorId?: string;
-  roles: OrganisationRoleDTO[];
+  role?: OrganisationRoleType;
 }
 
 export interface EditOrganizationModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  organization?: OrganisationDTO;
+  organization?: OrganisationResponseDTO;
   projectId: string;
   onOrganizationUpdated?: () => void;
   onOrganizationAdded?: () => void;
@@ -61,7 +60,7 @@ export default function EditOrganizationModal({
   const [formData, setFormData] = useState<OrganizationFormData>({
     name: "",
     rorId: "",
-    roles: [],
+    role: undefined,
   });
 
   const apiClient = useContext(ApiClientContext);
@@ -71,13 +70,13 @@ export default function EditOrganizationModal({
       setFormData({
         name: organization.name,
         rorId: organization.ror_id,
-        roles: organization.roles,
+        role: organization.roles.find(r => !r.end_date)!.role,
       });
     } else {
       setFormData({
         name: "",
         rorId: "",
-        roles: [],
+        role: undefined,
       });
     }
   };
@@ -88,7 +87,7 @@ export default function EditOrganizationModal({
       setFormData({
         name: organization.name,
         rorId: organization.ror_id,
-        roles: organization.roles,
+        role: organization.roles.find(r => !r.end_date)?.role,
       });
     }
   }, [organization]);
@@ -103,12 +102,12 @@ export default function EditOrganizationModal({
   const saveEditedOrganization = async () => {
     if (!organization) return;
     try {
-      const updatedOrganization = new OrganisationDTO({
+      const updatedOrganization = new OrganisationRequestDTO({
         name: formData.name,
         ror_id: formData.rorId,
-        roles: formData.roles,
+        role: formData.role,
       });
-      await apiClient.organization_UpdateOrganization(
+      await apiClient.projectOrganisations_UpdateOrganisation(
         projectId,
         organization.id,
         updatedOrganization,
@@ -118,58 +117,35 @@ export default function EditOrganizationModal({
     } catch (error) {
       console.error("Error updating organization:", error);
       alert(
-        `Failed to update organization: ${
-          error instanceof Error ? error.message : error
+        `Failed to update organization: ${error instanceof Error ? error.message : error
         }`,
       );
     }
   };
 
   const saveNewOrganization = async () => {
-    if (!organization) return;
     try {
-      const newOrganization = new OrganisationDTO({
+      const newOrganization = new OrganisationRequestDTO({
         name: formData.name,
         ror_id: formData.rorId,
-        roles: formData.roles,
+        role: formData.role,
       });
-      await apiClient.organization_AddOrganization(projectId, newOrganization);
+      await apiClient.projectOrganisations_CreateOrganisation(projectId, newOrganization);
       onOrganizationAdded?.();
     } catch (error) {
       console.error("Error adding organization:", error);
       alert(
-        `Failed to add organization: ${
-          error instanceof Error ? error.message : error
+        `Failed to add organization: ${error instanceof Error ? error.message : error
         }`,
       );
     }
   };
 
-  const addNewRole = () => {
-    setFormData((prev) => ({
-      ...prev,
-      roles: [
-        ...prev.roles,
-        new OrganisationRoleDTO({
-          role: OrganisationRoleType.PartnerOrganization,
-          start_date: new Date(),
-        }),
-      ],
-    }));
-  };
-
   const updateRole = (
-    index: number,
-    field: keyof OrganisationRoleDTO,
     value: string | Date | undefined,
   ) => {
     setFormData((prev) => {
-      const updatedRoles = [...prev.roles];
-      updatedRoles[index] = new OrganisationRoleDTO({
-        ...updatedRoles[index],
-        [field]: value,
-      });
-      return { ...prev, roles: updatedRoles };
+      return { ...prev, role: value };
     });
   };
 
@@ -181,6 +157,14 @@ export default function EditOrganizationModal({
   const checkRorUrl = (rorId?: string) => {
     return !rorId || rorId.startsWith("https://ror.org/");
   };
+
+  const removeRole = () => {
+    setFormData((prev) => ({
+      name: prev.name,
+      rorId: prev.rorId,
+      role: undefined,
+    }));
+  }
 
   const idPrefix = "edit-";
   return (
@@ -258,74 +242,44 @@ export default function EditOrganizationModal({
                     htmlFor={`${idPrefix}roles`}
                     className="self-start text-right sm:pt-4"
                   >
-                    Roles
+                    Role
                   </Label>
                   <div className="col-span-4 flex flex-col gap-4 sm:col-span-3">
-                    {formData.roles.map((role, index) => (
-                      <div
-                        key={index}
-                        className="grid grid-cols-4 gap-3 border-t pt-2"
-                      >
-                        <div className="col-span-4 flex flex-col sm:flex-row sm:items-center">
-                          <Label className="block w-16 text-xs">Role</Label>
-                          <Select
-                            value={role.role}
-                            onValueChange={(value) =>
-                              updateRole(index, "role", value)
-                            }
-                          >
-                            <SelectTrigger className="max-w-sm">
-                              <SelectValue placeholder="Select role type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.values(OrganisationRoleType).map(
-                                (roleType) => (
-                                  <SelectItem key={roleType} value={roleType}>
-                                    {formatRoleType(roleType)}
-                                  </SelectItem>
-                                ),
-                              )}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="col-span-4 flex flex-col gap-2">
-                          <div className="flex flex-col sm:flex-row sm:items-center">
-                            <Label className="block w-16 text-xs">
-                              Start Date
-                            </Label>
-                            <DatePicker
-                              initialDate={role.start_date}
-                              onDateChange={(date) =>
-                                updateRole(
-                                  index,
-                                  "start_date",
-                                  date || new Date(),
-                                )
-                              }
-                            />
-                          </div>
-                          <div className="flex flex-col sm:flex-row sm:items-center">
-                            <Label className="block w-16 text-xs">
-                              End Date
-                            </Label>
-                            <DatePicker
-                              initialDate={role.end_date}
-                              onDateChange={(date) =>
-                                updateRole(index, "end_date", date)
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      onClick={addNewRole}
-                      variant="outline"
-                      className="mt-2"
+                    <div
+                      className="grid grid-cols-4 gap-3 border-t pt-2"
                     >
-                      Add Role
-                    </Button>
+                      <div className="col-span-4 flex flex-col sm:flex-row sm:items-center">
+                        <Select
+                          value={formData.role}
+                          onValueChange={(value) =>
+                            updateRole(value)
+                          }
+                        >
+                          <SelectTrigger className="max-w-sm">
+                            <SelectValue placeholder="Select role type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.values(OrganisationRoleType).map(
+                              (roleType) => (
+                                <SelectItem key={roleType} value={roleType}>
+                                  {formatRoleType(roleType)}
+                                </SelectItem>
+                              ),
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          variant="ghost"
+                          className="text-muted-foreground mx-2 cursor-pointer"
+                          size="sm"
+                          onClick={() => {
+                            removeRole();
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -352,7 +306,7 @@ export default function EditOrganizationModal({
                   disabled={
                     isLoading ||
                     !formData.name ||
-                    formData.roles.length === 0 ||
+                    !formData.role ||
                     !checkRorUrl(formData.rorId)
                   }
                 >
