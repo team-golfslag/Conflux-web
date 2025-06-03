@@ -97,6 +97,8 @@ export default function RAiDInfo({
         return "Multiple lead research organisations";
       case RAiDIncompatibilityType.NoProductCategory:
         return "No product category";
+      case RAiDIncompatibilityType.OrganisationWithoutRor:
+        return "Organisation without ROR ID";
       default:
         return String(type);
     }
@@ -184,6 +186,27 @@ export default function RAiDInfo({
       }
     }
 
+    // Handle organisation-related incompatibilities
+    if (
+      incompatibility.type === RAiDIncompatibilityType.OrganisationWithoutRor ||
+      incompatibility.type ===
+        RAiDIncompatibilityType.OverlappingOrganisationRoles ||
+      incompatibility.type ===
+        RAiDIncompatibilityType.NoLeadResearchOrganisation ||
+      incompatibility.type ===
+        RAiDIncompatibilityType.MultipleLeadResearchOrganisation
+    ) {
+      const organisation = project.organisations?.find(
+        (org) => org.organisation.id === objectId,
+      )?.organisation;
+      if (organisation) {
+        return {
+          text: organisation.name,
+          ror: organisation.ror_id,
+        };
+      }
+    }
+
     return null;
   };
 
@@ -217,10 +240,12 @@ export default function RAiDInfo({
                     "{enhancedInfo.text}"
                   </p>
                   <div className="mt-1 flex items-center gap-2 text-amber-600">
-                    <span>
-                      Type:{" "}
-                      <span className="font-mono">{enhancedInfo.type}</span>
-                    </span>
+                    {enhancedInfo.type && (
+                      <span>
+                        Type:{" "}
+                        <span className="font-mono">{enhancedInfo.type}</span>
+                      </span>
+                    )}
                     {enhancedInfo.language && (
                       <>
                         <span className="text-amber-400">•</span>
