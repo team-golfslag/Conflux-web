@@ -5,8 +5,8 @@
  */
 import { Button } from "@/components/ui/button.tsx";
 import { Card } from "@/components/ui/card.tsx";
-import logo from "@/assets/golfslag.png";
 import config from "@/config.ts";
+import Logo from "@/components/icons/logo";
 
 function App() {
   return (
@@ -14,11 +14,7 @@ function App() {
       <div className="relative flex min-h-screen flex-col items-center justify-center p-4">
         <Card className="w-full max-w-2xl border-0 bg-white/60 p-8 shadow-2xl md:p-12">
           <div className="mb-8 flex justify-center">
-            <img
-              className="h-20 w-20 rounded-full object-contain md:h-28 md:w-28"
-              src={logo}
-              alt="Conflux project logo"
-            />
+            <Logo size="128" />
           </div>
 
           <div className="space-y-6 text-center">
