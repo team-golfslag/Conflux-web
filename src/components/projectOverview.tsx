@@ -730,20 +730,20 @@ export default function ProjectOverview({
                 </div>
               )}
             </div>
-            <p className="text-start text-sm/6 text-gray-700 sm:px-3 sm:text-base/7">
-              <div
-                className={`transition-max-height overflow-hidden duration-300 ${
-                  isExpanded ? "max-h-[1000px]" : "max-h-[280px]"
-                }`}
-              >
+            <div
+              className={`transition-max-height overflow-hidden duration-300 ${
+                isExpanded ? "max-h-[1000px]" : "max-h-[280px]"
+              }`}
+            >
+              <p className="text-start text-sm/6 text-gray-700 sm:px-3 sm:text-base/7">
                 {!isExpanded &&
                 currentDescription &&
                 currentDescription.length > descriptionTruncateLength
                   ? currentDescription.substring(0, descriptionTruncateLength) +
                     "..."
                   : currentDescription}
-              </div>
-            </p>
+              </p>
+            </div>
             {shouldShowExpandButton && !isExpanded && (
               <Button
                 variant="ghost"
