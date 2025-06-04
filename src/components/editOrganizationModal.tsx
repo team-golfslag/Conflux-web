@@ -19,6 +19,7 @@ import {
   OrganisationRequestDTO,
   OrganisationResponseDTO,
   OrganisationRoleType,
+  ProjectOrganisationResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
@@ -46,6 +47,7 @@ export interface EditOrganizationModalProps {
   onOrganizationUpdated?: () => void;
   onOrganizationAdded?: () => void;
   isEdit?: boolean;
+  organizations?: ProjectOrganisationResponseDTO[];
 }
 
 export default function EditOrganizationModal({
@@ -56,6 +58,7 @@ export default function EditOrganizationModal({
   onOrganizationUpdated,
   onOrganizationAdded,
   isEdit = false,
+  organizations = [],
 }: Readonly<EditOrganizationModalProps>) {
   const [formData, setFormData] = useState<OrganizationFormData>({
     name: "",
@@ -124,18 +127,62 @@ export default function EditOrganizationModal({
     }
   };
 
+  // Find archived organization with matching ROR ID or name
+  const findArchivedOrganization = () => {
+    // First try to match by ROR ID if available
+    if (formData.rorId) {
+      const matchByRorId = organizations.find(
+        (org) =>
+          org.organisation.ror_id === formData.rorId &&
+          org.organisation.roles.every((r) => r.end_date !== null),
+      );
+      if (matchByRorId) return matchByRorId;
+    }
+
+    // Then try to match by name if no ROR ID match found
+    return organizations.find(
+      (org) =>
+        org.organisation.name === formData.name &&
+        org.organisation.roles.every((r) => r.end_date !== null),
+    );
+  };
+
   const saveNewOrganization = async () => {
     try {
-      const newOrganization = new OrganisationRequestDTO({
-        name: formData.name,
-        ror_id: formData.rorId,
-        role: formData.role,
-      });
-      await apiClient.projectOrganisations_CreateOrganisation(
-        projectId,
-        newOrganization,
-      );
-      onOrganizationAdded?.();
+      // Check if there's an archived organization we can reuse
+      const archivedOrg = findArchivedOrganization();
+
+      if (archivedOrg) {
+        // Reuse the archived organization
+        const updatedOrganization = new OrganisationRequestDTO({
+          name: formData.name,
+          ror_id: formData.rorId || archivedOrg.organisation.ror_id,
+          role: formData.role,
+        });
+
+        // Update the existing archived organization
+        await apiClient.projectOrganisations_UpdateOrganisation(
+          projectId,
+          archivedOrg.organisation.id,
+          updatedOrganization,
+        );
+
+        onOrganizationAdded?.();
+      } else {
+        // Create a new organization
+        const newOrganization = new OrganisationRequestDTO({
+          name: formData.name,
+          ror_id: formData.rorId,
+          role: formData.role,
+        });
+
+        await apiClient.projectOrganisations_CreateOrganisation(
+          projectId,
+          newOrganization,
+        );
+
+        onOrganizationAdded?.();
+      }
     } catch (error) {
       console.error("Error adding organization:", error);
       alert(

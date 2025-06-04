@@ -110,6 +110,7 @@ export default function ProjectOrganizations({
                 isOpen={isAddModalOpen}
                 onOpenChange={setIsAddModalOpen}
                 projectId={projectId}
+                organizations={organizations}
                 onOrganizationAdded={onProjectUpdate}
               />
             </div>
@@ -188,6 +189,7 @@ export default function ProjectOrganizations({
         onOpenChange={setIsEditModalOpen}
         organization={editingOrganization?.organisation}
         projectId={projectId}
+        organizations={organizations}
         onOrganizationUpdated={onProjectUpdate}
         isEdit={true}
       />
