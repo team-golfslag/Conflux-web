@@ -16,6 +16,7 @@ const ProjectPage = lazy(() => import("./pages/projectPage.tsx"));
 const ProjectSearchPage = lazy(() => import("./pages/projectSearchPage.tsx"));
 const SettingsPage = lazy(() => import("./pages/settingsPage.tsx"));
 const ProfilePage = lazy(() => import("./pages/profilePage.tsx"));
+const SysAdminPortal = lazy(() => import("./pages/sysAdminPortal.tsx"));
 
 /**
  * This contains all different routes to the different pages.
@@ -40,6 +41,7 @@ const allRoutes = (
           <Route path=":id" element={<ProjectPage />} />
         </Route>
         <Route path="profile" element={<ProfilePage />} />
+        <Route path="admin" element={<SysAdminPortal />} />
       </Route>
     </Routes>
   </Suspense>

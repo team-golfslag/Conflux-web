@@ -22,6 +22,7 @@ import {
   TitleType,
   UserRoleType,
   ITimelineItemResponseDTO,
+  UserTier,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { useSession } from "@/hooks/SessionContext";
 import ProjectOrganizations from "@/components/projectOrganizations";
@@ -62,6 +63,28 @@ export default function ProjectPage() {
         ?.roles.map((role) => role.type)
         .includes(UserRoleType.Admin);
       setIsAdmin(admin || false);
+
+      if (session?.session?.user?.tier === UserTier.SuperAdmin) {
+        // If the user is a super admin, they are always an admin for this project
+        setIsAdmin(true);
+      }
+
+      if (session?.session?.user?.tier === UserTier.SystemAdmin) {
+        // If the user is a system admin, if the project owner organization is not in the user's assigned organizations, they are not an admin
+        const userOrganizations =
+          session.session.user.assigned_organisations || [];
+        if (
+          data.owner_organisation &&
+          userOrganizations.includes(data.owner_organisation)
+        ) {
+          setIsAdmin(true);
+        }
+
+        const userLectorates = session.session.user.assigned_lectorates || [];
+        if (data.lectoraat && userLectorates.includes(data.lectoraat)) {
+          setIsAdmin(true);
+        }
+      }
 
       // Fetch timeline data
       const timeline = await apiClient.projects_GetProjectTimeline(id);
@@ -120,6 +143,28 @@ export default function ProjectPage() {
           ?.roles.map((role) => role.type)
           .includes(UserRoleType.Admin);
         setIsAdmin(admin || false);
+
+        if (session?.session?.user?.tier === UserTier.SuperAdmin) {
+          // If the user is a super admin, they are always an admin for this project
+          setIsAdmin(true);
+        }
+
+        if (session?.session?.user?.tier === UserTier.SystemAdmin) {
+          // If the user is a system admin, if the project owner organization is not in the user's assigned organizations, they are not an admin
+          const userOrganizations =
+            session.session.user.assigned_organisations || [];
+          if (
+            data.owner_organisation &&
+            userOrganizations.includes(data.owner_organisation)
+          ) {
+            setIsAdmin(true);
+          }
+
+          const userLectorates = session.session.user.assigned_lectorates || [];
+          if (data.lectoraat && userLectorates.includes(data.lectoraat)) {
+            setIsAdmin(true);
+          }
+        }
       } catch (err) {
         // Log error but don't update error state to avoid UI disruption
         console.error("Error updating project:", err);
