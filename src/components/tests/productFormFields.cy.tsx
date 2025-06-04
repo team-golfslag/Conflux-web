@@ -3,7 +3,10 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { ProductType } from "@team-golfslag/conflux-api-client/src/client.ts";
+import {
+  ProductSchema,
+  ProductType,
+} from "@team-golfslag/conflux-api-client/src/client.ts";
 import { ProductCategoryType } from "@team-golfslag/conflux-api-client/src/client";
 import ProductFormFields from "@/components/productFormFields.tsx";
 import { ProductFormData } from "@/components/productFormFields.tsx";
@@ -14,14 +17,16 @@ describe("productFormFields Component", () => {
     title: "Lorem Ipsum",
     url: "https://lorem-ipsum.vercel.app/",
     productType: ProductType.Workflow,
-    productCategory: ProductCategoryType.Input,
+    categories: [ProductCategoryType.Input],
+    productSchema: ProductSchema.Ark,
   };
 
   const emptyInitialValues: ProductFormData = {
     title: "",
     url: "",
     productType: undefined!,
-    productCategory: undefined!,
+    categories: [],
+    productSchema: undefined!,
   };
 
   beforeEach(() => {
@@ -30,8 +35,9 @@ describe("productFormFields Component", () => {
         formData={initialValues}
         setProductTitle={cy.stub().as("handleTitleChange")}
         setUrl={cy.stub().as("handleUrlChange")}
-        setCategory={cy.stub().as("handleCategoryChange")}
+        onCategoryChange={cy.stub().as("handleCategoryChange")}
         setProductType={cy.stub().as("handleTypeChange")}
+        setSchema={cy.stub().as("handleSchemaChange")}
       />,
     );
 
@@ -43,7 +49,8 @@ describe("productFormFields Component", () => {
     cy.get('input[id="title"]').should("have.value", initialValues.title);
     cy.get('input[id="url"]').should("have.value", initialValues.url);
     cy.contains(initialValues.productType).should("exist");
-    cy.contains(initialValues.productCategory).should("exist");
+    cy.contains(initialValues.categories[0]).should("exist");
+    cy.contains(initialValues.productSchema).should("exist");
   });
 
   it("triggers onChange handlers when inputs change", () => {
@@ -57,12 +64,13 @@ describe("productFormFields Component", () => {
     cy.get('input[id="url"]').type("https://dolor-sit.vercel.app/");
     cy.get("@handleUrlChange").should("have.been.called");
 
-    // Test type input
-    cy.contains(initialValues.productType).type("Dissertation{Enter}");
+    // Test type input by clicking the select trigger and choosing an option
+    cy.get('[data-slot="select-trigger"]').first().click();
+    cy.contains("Dissertation").click();
     cy.get("@handleTypeChange").should("have.been.called");
 
-    // Test category input
-    cy.contains(initialValues.productCategory).type("Output{Enter}");
+    // Test category input by clicking on a badge
+    cy.contains("Output").click();
     cy.get("@handleCategoryChange").should("have.been.called");
   });
 
@@ -70,7 +78,7 @@ describe("productFormFields Component", () => {
     cy.contains("Title").should("exist");
     cy.contains("url").should("exist");
     cy.contains("Type").should("exist");
-    cy.contains("Category").should("exist");
+    cy.contains("Categories").should("exist");
   });
 
   it("handles empty initial values gracefully", () => {
@@ -79,14 +87,15 @@ describe("productFormFields Component", () => {
         formData={emptyInitialValues}
         setProductTitle={cy.stub().as("handleTitleChange")}
         setUrl={cy.stub().as("handleUrlChange")}
-        setCategory={cy.stub().as("handleCategoryChange")}
+        onCategoryChange={cy.stub().as("handleCategoryChange")}
         setProductType={cy.stub().as("handleTypeChange")}
+        setSchema={cy.stub().as("handleSchemaChange")}
       />,
     );
 
     cy.get('input[id="title"]').should("have.value", emptyInitialValues.title);
     cy.get('input[id="url"]').should("have.value", emptyInitialValues.url);
-    cy.contains("Select a product type").should("have.value", "");
-    cy.contains("Select a product category type").should("have.value", "");
+    cy.contains("Select a product type").should("exist");
+    cy.contains("Select a schema").should("exist");
   });
 });

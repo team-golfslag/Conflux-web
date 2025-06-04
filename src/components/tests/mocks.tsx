@@ -33,6 +33,7 @@ const mockContributor: Contributor = new Contributor({
   ],
   positions: [
     new ContributorPosition({
+      id: "1",
       start_date: new Date(),
       end_date: new Date(2026, 1, 1),
       position: ContributorPositionType.PrincipalInvestigator,

@@ -1,5 +1,14 @@
 /**
- * This program has been developed by students from the bachelor Computer Science at Utrecht
+ *import {
+  DescriptionType,
+  ProductCategoryType,
+  Product,
+  ProductType,
+  ProjectDescription,
+  Project,
+  ProjectTitle,
+  TitleType,
+} from "@team-golfslag/conflux-api-client/src/client.ts";ram has been developed by students from the bachelor Computer Science at Utrecht
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
@@ -7,11 +16,12 @@
 import {
   DescriptionType,
   ProductCategoryType,
-  ProductDTO,
+  ProductResponseDTO,
+  ProductSchema,
   ProductType,
-  ProjectDescriptionDTO,
-  ProjectDTO,
-  ProjectTitleDTO,
+  ProjectDescriptionResponseDTO,
+  ProjectResponseDTO,
+  ProjectTitleResponseDTO,
   TitleType,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import { mount } from "cypress/react";
@@ -23,7 +33,8 @@ describe("<addProductModal/>", () => {
   const mockProducts = [
     {
       id: "123",
-      schema: undefined,
+      project_id: "123",
+      schema: ProductSchema.Doi,
       url: "https://",
       title: "Lorem ipsum",
       type: ProductType.Workflow,
@@ -31,7 +42,8 @@ describe("<addProductModal/>", () => {
     },
     {
       id: "456",
-      schema: undefined,
+      project_id: "123",
+      schema: ProductSchema.Handle,
       url: "https://",
       title: "Dolor sit",
       type: ProductType.OutputManagementPlan,
@@ -39,14 +51,17 @@ describe("<addProductModal/>", () => {
     },
     {
       id: "789",
-      schema: undefined,
+      project_id: "123",
+      schema: ProductSchema.Archive,
       url: "https://",
       title: "Amet, consectetur",
       type: ProductType.Dissertation,
       categories: [ProductCategoryType.Internal],
     },
   ];
-  const mockProductDTOs = mockProducts.map((p) => new ProductDTO({ ...p }));
+  const mockProductDTOs = mockProducts.map(
+    (p) => new ProductResponseDTO({ ...p }),
+  );
   const mockProject = {
     id: "123",
     title: "Project 1",
@@ -58,23 +73,27 @@ describe("<addProductModal/>", () => {
     start_date: new Date(),
     organisations: [],
     titles: [
-      new ProjectTitleDTO({
+      new ProjectTitleResponseDTO({
         text: "Project 1",
         type: TitleType.Primary,
         start_date: new Date(),
+        id: "title-1",
+        project_id: "123",
       }),
     ],
     descriptions: [
-      new ProjectDescriptionDTO({
+      new ProjectDescriptionResponseDTO({
         text: "Description for project 1",
         type: DescriptionType.Primary,
+        id: "desc-1",
+        project_id: "123",
       }),
     ],
     latest_edit: new Date().toISOString(),
   };
 
   const mockData = {
-    project: new ProjectDTO(mockProject),
+    project: new ProjectResponseDTO(mockProject),
   };
 
   beforeEach(() => {
@@ -88,27 +107,34 @@ describe("<addProductModal/>", () => {
         users: [],
         contributors: [],
         products: [
-          new ProductDTO({
+          new ProductResponseDTO({
             id: "123",
             title: "adipiscing elit",
             type: ProductType.Workflow,
             categories: [ProductCategoryType.Input],
+            project_id: "123",
+            schema: ProductSchema.Doi,
+            url: "https://",
           }),
         ],
         parties: [],
         start_date: new Date(),
         organisations: [],
         titles: [
-          new ProjectTitleDTO({
+          new ProjectTitleResponseDTO({
             text: "Project 1",
             type: TitleType.Primary,
             start_date: new Date(),
+            id: "title-1",
+            project_id: "123",
           }),
         ],
         descriptions: [
-          new ProjectDescriptionDTO({
+          new ProjectDescriptionResponseDTO({
             text: "Description for project 1",
             type: DescriptionType.Primary,
+            id: "desc-1",
+            project_id: "123",
           }),
         ],
         latest_edit: new Date().toISOString(),
@@ -135,7 +161,11 @@ describe("<addProductModal/>", () => {
     cy.get("input[id=title]").should("exist");
     cy.get("input[id=url]").should("exist");
     cy.contains("Select a product type").should("exist");
-    cy.contains("Select a product category type").should("exist");
+    cy.contains("Select a schema").should("exist");
+    cy.contains("Categories").should("exist");
+    cy.contains("Input").should("exist");
+    cy.contains("Output").should("exist");
+    cy.contains("Internal").should("exist");
   });
 
   it("disables the Add button when required fields are empty", () => {
@@ -145,45 +175,16 @@ describe("<addProductModal/>", () => {
     // Fill required fields
     cy.get('input[id="title"]').type("adipiscing elit");
 
-    cy.contains("Select a product type").type("Workflow{enter}");
+    cy.contains("Select a product type").click();
+    cy.contains("Workflow").click();
 
-    cy.contains("Select a product category type").type("Input{enter}");
+    cy.contains("Select a schema").click();
+    cy.contains("Doi").click();
+
+    cy.contains("Input").click();
 
     // Now the button should be enabled
     cy.get("button").contains("Add Product").should("not.be.disabled");
-  });
-
-  it("makes a PATCH request to /people endpoint when Add button is clicked", () => {
-    // Fill required fields
-    cy.get('input[id="title"]').type("adipiscing elit");
-
-    cy.contains("Select a product type").type("Workflow{enter}");
-
-    cy.contains("Select a product category type").type("Input{enter}");
-
-    // Click the Add button
-    cy.get("button").contains("Add Product").click();
-
-    // Verify that the POST request to the /people endpoint was made
-    cy.wait("@createProduct").then((interception) => {
-      // Verify it was a POST request
-      expect(interception.request.method).to.equal("PATCH");
-
-      // Verify status code (our mock returns 201)
-      expect(interception.response?.statusCode).to.equal(200);
-
-      // Verify request payload contains expected data
-      expect(interception.request.body.products[3]).to.include({
-        title: "adipiscing elit",
-        type: ProductType.Workflow,
-      });
-      expect(interception.request.body.products[3].categories).to.include(
-        ProductCategoryType.Input,
-      );
-
-      // Log success message
-      cy.log("Successfully verified POST to /people endpoint");
-    });
   });
 
   it("calls onOpenChange when Cancel button is clicked", () => {

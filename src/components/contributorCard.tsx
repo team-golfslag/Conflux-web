@@ -224,7 +224,7 @@ export default function ContributorCard({
                       variant="secondary"
                       className="h-5 px-2 py-0 text-xs"
                     >
-                      {role.name}
+                      {role.type}
                     </Badge>
                   );
                 }

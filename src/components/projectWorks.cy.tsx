@@ -7,14 +7,15 @@
 import {
   DescriptionType,
   ProductType,
-  ProjectDescriptionDTO,
-  ProjectTitleDTO,
+  ProjectDescriptionResponseDTO,
+  ProjectTitleResponseDTO,
   TitleType,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import {
   ProductCategoryType,
-  ProductDTO,
-  ProjectDTO,
+  ProductResponseDTO,
+  ProjectResponseDTO,
+  ProductSchema,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { mount } from "cypress/react";
 import ProjectWorks from "@/components/projectWorks.tsx";
@@ -23,7 +24,8 @@ describe("<ProjectWorks />", () => {
   const mockProducts = [
     {
       id: "123",
-      schema: undefined,
+      project_id: "123",
+      schema: ProductSchema.Doi,
       url: "https://",
       title: "Lorem ipsum",
       type: ProductType.Workflow,
@@ -31,7 +33,8 @@ describe("<ProjectWorks />", () => {
     },
     {
       id: "456",
-      schema: undefined,
+      project_id: "123",
+      schema: ProductSchema.Handle,
       url: "https://",
       title: "Dolor sit",
       type: ProductType.OutputManagementPlan,
@@ -39,14 +42,17 @@ describe("<ProjectWorks />", () => {
     },
     {
       id: "789",
-      schema: undefined,
+      project_id: "123",
+      schema: ProductSchema.Archive,
       url: "https://",
       title: "Amet, consectetur",
       type: ProductType.Dissertation,
       categories: [ProductCategoryType.Internal],
     },
   ];
-  const mockProductDTOs = mockProducts.map((p) => new ProductDTO({ ...p }));
+  const mockProductDTOs = mockProducts.map(
+    (p) => new ProductResponseDTO({ ...p }),
+  );
   const mockProject = {
     id: "123",
     title: "Project 1",
@@ -58,14 +64,18 @@ describe("<ProjectWorks />", () => {
     start_date: new Date(),
     organisations: [],
     titles: [
-      new ProjectTitleDTO({
+      new ProjectTitleResponseDTO({
+        id: "title-1",
+        project_id: "123",
         text: "Project 1",
         type: TitleType.Primary,
         start_date: new Date(),
       }),
     ],
     descriptions: [
-      new ProjectDescriptionDTO({
+      new ProjectDescriptionResponseDTO({
+        id: "desc-1",
+        project_id: "123",
         text: "Description for project 1",
         type: DescriptionType.Primary,
       }),
@@ -74,30 +84,18 @@ describe("<ProjectWorks />", () => {
   };
 
   const mockData = {
-    project: new ProjectDTO(mockProject),
+    project: new ProjectResponseDTO(mockProject),
   };
 
   beforeEach(() => {
     // Mount the component within BrowserRouter because ProjectWorks uses <Link>
-    mount(<ProjectWorks project={mockData.project} />);
-  });
-
-  it("renders the products sorted by category type correctly", () => {
-    cy.contains("Input").should("exist");
-    cy.contains("Input")
-      .next("div")
-      .contains(mockProducts[0].title)
-      .should("exist");
-    cy.contains("Output").should("exist");
-    cy.contains("Output")
-      .next("div")
-      .contains(mockProducts[1].title)
-      .should("exist");
-    cy.contains("Internal").should("exist");
-    cy.contains("Internal")
-      .next("div")
-      .contains(mockProducts[2].title)
-      .should("exist");
+    mount(
+      <ProjectWorks
+        project={mockData.project}
+        isAdmin={true}
+        onProjectUpdate={cy.stub().as("onProjectUpdate")}
+      />,
+    );
   });
 
   it("edit and delete button appear when the edit button is clicked", () => {

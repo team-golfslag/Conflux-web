@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { JSX, useContext, useState } from "react";
+import { JSX, useState } from "react";
 import {
   ProjectOrganisationResponseDTO,
   OrganisationRoleType,
@@ -14,7 +14,6 @@ import EditOrganizationModal from "@/components/editOrganizationModal.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Edit, X } from "lucide-react";
 import { Button } from "./ui/button";
-import { ApiClientContext } from "@/lib/ApiClientContext";
 
 export interface ProjectOrganizationsProps {
   isAdmin?: boolean;
@@ -29,7 +28,6 @@ export default function ProjectOrganizations({
   organizations,
   onProjectUpdate,
 }: Readonly<ProjectOrganizationsProps>): JSX.Element {
-  const apiClient = useContext(ApiClientContext);
   const [editMode, setEditMode] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
