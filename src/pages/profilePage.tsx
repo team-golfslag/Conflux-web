@@ -114,15 +114,10 @@ const ProfilePage = () => {
                           loadingMessage="Unlinking ORCID..."
                           mode="component"
                           onSuccess={async () => {
-                            console.log("ORCID unlinked successfully");
                             try {
                               // Fetch fresh session data from server after successful unlink
                               const freshSession =
                                 await apiClient.userSession_UserSession();
-                              console.log(
-                                "Fetched fresh session:",
-                                freshSession,
-                              );
                               saveSession(freshSession);
                               setIsUnlinkDialogOpen(false);
                             } catch (error) {

@@ -97,7 +97,6 @@ export default function AddProductModal({
       onOpenChange(false);
       resetModal();
     } catch (error) {
-      console.log("Error adding product:", error);
       alert(
         `Failed to add product: ${
           error instanceof Error ? error.message : "Unknown error"

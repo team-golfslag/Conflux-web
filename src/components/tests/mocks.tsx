@@ -21,7 +21,7 @@ const mockContributor: Contributor = new Contributor({
     name: "Jane Doe",
     email: "jane.doe@example.com",
   }),
-  person_id: "1", // Add missing required field
+  person_id: "1",
   project_id: "1",
   roles: [
     new ContributorRole({

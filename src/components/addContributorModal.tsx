@@ -263,31 +263,6 @@ export default function AddContributorModal({
     existingPerson?: Person;
     newPerson?: PersonRequestDTO;
   }> => {
-    let personToUse: Person;
-    let newPerson: PersonRequestDTO | undefined;
-
-    if (selectedPerson) {
-      personToUse = selectedPerson;
-    } else {
-      const formattedOrcid = formData.orcidId
-        ? formatOrcidAsUrl(formData.orcidId)
-        : null;
-      newPerson = new PersonRequestDTO({
-        name: formData.name,
-        email: formData.email,
-        or_ci_d: formattedOrcid ?? undefined,
-      });
-
-      // We'll use a temporary person object until the actual creation
-      personToUse = new Person({
-        id: "temp-id", // Will be replaced by the actual created person
-        name: formData.name,
-        email: formData.email,
-        orcid_id: formattedOrcid ?? undefined,
-        schema_uri: "",
-      });
-    }
-
     const contributorData = new ContributorRequestDTO({
       roles: formData.roles,
       position: formData.position,
@@ -295,7 +270,20 @@ export default function AddContributorModal({
       contact: formData.contact,
     });
 
-    return { contributorData, newPerson, existingPerson: personToUse };
+    if (selectedPerson) {
+      return { contributorData, existingPerson: selectedPerson };
+    } else {
+      const formattedOrcid = formData.orcidId
+        ? formatOrcidAsUrl(formData.orcidId)
+        : null;
+      const newPerson = new PersonRequestDTO({
+        name: formData.name,
+        email: formData.email,
+        or_ci_d: formattedOrcid ?? undefined,
+      });
+
+      return { contributorData, newPerson };
+    }
   };
 
   // Create or get person, then create contributor
@@ -304,10 +292,12 @@ export default function AddContributorModal({
       await prepareContributorData();
 
     let personId: string;
-    if (existingPerson && existingPerson.id !== "temp-id") {
+
+    // Use existing person if available
+    if (existingPerson) {
       personId = existingPerson.id;
     }
-    // If we need to create a new person first
+    // Create new person if needed
     else if (newPerson) {
       const createdPerson = await apiClient.people_CreatePerson(newPerson);
       if (!createdPerson?.id) {
@@ -318,13 +308,11 @@ export default function AddContributorModal({
       throw new Error("No person data available");
     }
 
-    // Now create the contributor
     const con = await apiClient.contributors_CreateContributor(
       projectId,
       personId,
       contributorData,
     );
-    console.log("Created contributor:", con);
     return con;
   };
 

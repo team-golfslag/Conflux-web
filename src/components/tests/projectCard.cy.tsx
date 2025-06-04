@@ -191,7 +191,7 @@ describe("<ProjectCard /> Component Rendering", () => {
               name: c.name,
               schema_uri: "",
             }),
-            person_id: c.id, // Add required field
+            person_id: c.id,
             roles: [],
             project_id: projectActive.id,
             positions: [],
@@ -216,7 +216,7 @@ describe("<ProjectCard /> Component Rendering", () => {
             name: "Single Contributor",
             schema_uri: "",
           }),
-          person_id: "1", // Add required field
+          person_id: "1",
           roles: [],
           project_id: projectActive.id,
           positions: [],

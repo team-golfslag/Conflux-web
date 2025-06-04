@@ -132,6 +132,7 @@ export default function ProjectContributors({
                 position={
                   contributor.positions.find((p) => !p.end_date)?.position
                 }
+                isConfluxUser={contributor.person.user_id !== null}
                 isLeader={contributor.leader}
                 isContact={contributor.contact}
                 editMode={editMode}
@@ -157,8 +158,14 @@ export default function ProjectContributors({
                       Are you absolutely sure?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
+                      <strong>
+                        In most cases you should end the users position to
+                        signify their departure form the project
+                      </strong>
+                      <br />
                       This will remove {contributor.person.name} from this
-                      project. This action cannot be undone.
+                      project and from any future syncs with RAiD. This action
+                      cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -202,6 +209,7 @@ export default function ProjectContributors({
         contributor={editingContributor}
         projectId={project.id}
         onContributorUpdated={handleContributorUpdated}
+        isConfluxUser={editingContributor?.person.user_id !== null}
       />
     </>
   );

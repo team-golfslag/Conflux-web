@@ -48,7 +48,6 @@ export function SessionProvider({ children }: SessionProviderProps) {
         // Check if session is expired
         const now = new Date().getTime();
         if (now - storedSession.timestamp > SESSION_EXPIRATION_TIME) {
-          console.log("Session expired, removing from storage");
           localStorage.removeItem(SESSION_STORAGE_KEY);
           return null;
         }
@@ -56,7 +55,6 @@ export function SessionProvider({ children }: SessionProviderProps) {
         // Return valid non-expired session
         return storedSession.userData;
       } catch (e) {
-        console.error("Failed to parse stored session:", e);
         localStorage.removeItem(SESSION_STORAGE_KEY);
         return null;
       }
@@ -73,7 +71,6 @@ export function SessionProvider({ children }: SessionProviderProps) {
       try {
         setLoading(true);
         const userData = await apiClient.userSession_UserSession();
-        console.log("Fetched session:", userData);
 
         // Store session with timestamp
         const sessionWithTimestamp: StoredSession = {

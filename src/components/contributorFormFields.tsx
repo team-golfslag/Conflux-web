@@ -45,6 +45,7 @@ interface ContributorFormFieldsProps {
   onOrcidAutoFill?: () => Promise<boolean>;
   orcidError?: string | null;
   isEdit?: boolean;
+  isConfluxUser?: boolean;
 }
 
 export default function ContributorFormFields({
@@ -59,6 +60,7 @@ export default function ContributorFormFields({
   onOrcidAutoFill,
   orcidError,
   isEdit = false,
+  isConfluxUser = false,
 }: Readonly<ContributorFormFieldsProps>) {
   const idPrefix = isEdit ? "edit-" : "";
   return (
@@ -74,7 +76,13 @@ export default function ContributorFormFields({
             className="col-span-3"
             value={formData.name}
             onChange={onNameChange}
+            disabled={isConfluxUser}
           />
+          {isConfluxUser && (
+            <div className="text-muted-foreground col-span-3 col-start-2 -mt-2 ml-1 text-xs">
+              Name cannot be edited for registered Conflux users
+            </div>
+          )}
         </div>
       )}
 
@@ -90,7 +98,13 @@ export default function ContributorFormFields({
             className="col-span-3"
             value={formData.email}
             onChange={onEmailChange}
+            disabled={isConfluxUser}
           />
+          {isConfluxUser && (
+            <div className="text-muted-foreground col-span-3 col-start-2 -mt-2 ml-1 text-xs">
+              Email cannot be edited for registered Conflux users
+            </div>
+          )}
         </div>
       )}
 
@@ -109,6 +123,7 @@ export default function ContributorFormFields({
                 onChange={onOrcidIdChange}
                 placeholder="0000-0000-0000-0000"
                 aria-invalid={!!orcidError}
+                disabled={isConfluxUser}
               />
               <TooltipProvider>
                 <Tooltip>
@@ -118,7 +133,9 @@ export default function ContributorFormFields({
                       variant="outline"
                       size="sm"
                       onClick={onOrcidAutoFill}
-                      disabled={!formData.orcidId || !onOrcidAutoFill}
+                      disabled={
+                        !formData.orcidId || !onOrcidAutoFill || isConfluxUser
+                      }
                     >
                       <ArrowRight className="h-4 w-4" />
                     </Button>
@@ -133,6 +150,11 @@ export default function ContributorFormFields({
               <div className="text-sm text-red-500">{orcidError}</div>
             )}
           </div>
+          {isConfluxUser && (
+            <div className="text-muted-foreground col-span-3 col-start-2 -mt-2 ml-1 text-xs">
+              ORCID ID cannot be edited for registered Conflux users
+            </div>
+          )}
         </div>
       )}
 

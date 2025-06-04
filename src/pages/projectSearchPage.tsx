@@ -105,8 +105,6 @@ const ProjectSearchPage = () => {
   // Effect to handle the actual download when data is received
   React.useEffect(() => {
     if (csvData && triggerDownload && csvData !== null) {
-      console.log("CSV FileResponse received:", csvData);
-
       try {
         // csvData is a FileResponse object with a data property containing the Blob
         const blob = csvData.data; // Use the blob directly from the FileResponse
@@ -123,8 +121,6 @@ const ProjectSearchPage = () => {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-
-        console.log("CSV download triggered successfully");
       } catch (error) {
         console.error("Error downloading CSV:", error);
       }

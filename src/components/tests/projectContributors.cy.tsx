@@ -25,8 +25,9 @@ describe("ProjectContributors Component", () => {
           name: "John Doe",
           email: "john.doe@example.com",
           orcid_id: "0000-0001-2345-6789",
+          user_id: undefined,
         }),
-        person_id: "1", // Add missing required field
+        person_id: "1",
         leader: true,
         contact: true,
         roles: [],
@@ -40,8 +41,9 @@ describe("ProjectContributors Component", () => {
           name: "Jane Smith",
           email: "jane.smith@example.com",
           orcid_id: "0000-0002-3456-7890",
+          user_id: undefined,
         }),
-        person_id: "2", // Add missing required field
+        person_id: "2",
         leader: false,
         contact: false,
         roles: [],
