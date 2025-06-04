@@ -23,18 +23,22 @@ export interface OrganizationProps {
   roleType: OrganisationRoleType;
   editMode: boolean;
   onEditClick: () => void;
+  isArchived?: boolean;
 }
 
 const Organization = ({
   org,
   editMode,
   onEditClick,
+  isArchived = false,
 }: OrganizationProps): JSX.Element => {
   return (
     <>
       <div className="flex justify-between">
         <div className="flex items-center gap-1 text-gray-700">
-          {org.organisation.name}
+          <span className={isArchived ? "opacity-60" : ""}>
+            {org.organisation.name}
+          </span>
           {org.organisation.ror_id && !editMode && (
             <Button
               className="h-auto has-[>svg]:p-1 [&_svg:not([class*='size-'])]:size-5"
@@ -59,7 +63,7 @@ const Organization = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-blue-500 hover:text-blue-700"
+                  className={`${isArchived ? "text-gray-500 hover:text-gray-700" : "text-blue-500 hover:text-blue-700"}`}
                   onClick={onEditClick}
                   aria-label="Edit organization"
                 >

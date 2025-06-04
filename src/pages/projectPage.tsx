@@ -202,7 +202,12 @@ export default function ProjectPage() {
                 organizations={project.organisations}
                 onProjectUpdate={handleProjectUpdate}
               />
-              <RAiDInfo projectId={id} project={project} />
+              <RAiDInfo
+                projectId={id}
+                project={project}
+                isAdmin={isAdmin}
+                onProjectUpdate={handleProjectUpdate}
+              />
               <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
             </div>
           </main>

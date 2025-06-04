@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import {
   OrganisationRequestDTO,
@@ -65,12 +65,12 @@ export default function EditOrganizationModal({
 
   const apiClient = useContext(ApiClientContext);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     if (organization) {
       setFormData({
         name: organization.name,
         rorId: organization.ror_id,
-        role: organization.roles.find((r) => !r.end_date)!.role,
+        role: organization.roles.find((r) => !r.end_date)?.role,
       });
     } else {
       setFormData({
@@ -79,7 +79,7 @@ export default function EditOrganizationModal({
         role: undefined,
       });
     }
-  };
+  }, [organization]);
 
   //update form if organization changes
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function EditOrganizationModal({
     if (!isOpen && !isEdit) {
       resetForm();
     }
-  }, [isEdit, isOpen]);
+  }, [isEdit, isOpen, resetForm]);
 
   const saveEditedOrganization = async () => {
     if (!organization) return;
@@ -165,7 +165,7 @@ export default function EditOrganizationModal({
     setFormData((prev) => ({
       name: prev.name,
       rorId: prev.rorId,
-      role: undefined,
+      role: null,
     }));
   };
 
@@ -205,7 +205,7 @@ export default function EditOrganizationModal({
             resetForm();
           }}
         >
-          {({ isLoading, error }) => (
+          {({ isLoading, error, onSubmit }) => (
             <>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center">
@@ -299,13 +299,11 @@ export default function EditOrganizationModal({
                   </div>
                 )}
                 <Button
-                  onClick={
-                    isEdit ? saveEditedOrganization : saveNewOrganization
-                  }
+                  onClick={onSubmit}
                   disabled={
                     isLoading ||
                     !formData.name ||
-                    !formData.role ||
+                    (!formData.role && !isEdit) ||
                     !checkRorUrl(formData.rorId)
                   }
                 >

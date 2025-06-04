@@ -7,8 +7,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import { useApiQuery } from "@/hooks/useApiQuery";
+import { ApiMutation } from "@/components/apiMutation";
 import { format } from "date-fns";
 import {
   ExternalLink,
@@ -19,6 +21,7 @@ import {
   Building,
   AlertTriangle,
   CheckCircle,
+  Zap,
 } from "lucide-react";
 import {
   RAiDIncompatibilityType,
@@ -28,16 +31,22 @@ import {
 type RAiDInfoProps = {
   projectId: string;
   project?: ProjectResponseDTO;
+  isAdmin?: boolean;
+  onProjectUpdate?: () => void;
 };
 
 /**
  * RAiD Info component that displays research metadata information
  * @param projectId the project ID to fetch RAiD info for
  * @param project the project data for enhanced incompatibility display
+ * @param isAdmin whether the current user is an admin
+ * @param onProjectUpdate callback to update project data after minting
  */
 export default function RAiDInfo({
   projectId,
   project,
+  isAdmin = false,
+  onProjectUpdate,
 }: Readonly<RAiDInfoProps>) {
   // Create a dependency that changes when project data that affects RAiD changes
   const projectDataHash = project
@@ -361,17 +370,58 @@ export default function RAiDInfo({
                   </div>
                 </div>
               ) : incompatibilities && incompatibilities.length === 0 ? (
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <div>
-                    <Label className="font-semibold text-green-700">
-                      Ready for RAiD minting
-                    </Label>
-                    <p className="mt-1 text-sm text-green-600">
-                      This project meets all requirements and can be minted as a
-                      RAiD.
-                    </p>
+                <div className="rounded-lg border border-green-100 bg-green-50 p-4">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <div>
+                      <Label className="font-semibold text-green-700">
+                        Ready for RAiD minting
+                      </Label>
+                      <p className="mt-1 text-sm text-green-600">
+                        This project meets all requirements and can be minted as
+                        a RAiD.
+                      </p>
+                    </div>
                   </div>
+                  {isAdmin && (
+                    <ApiMutation
+                      mutationFn={(client, data: string) =>
+                        client.raidInfo_MintRaid(data)
+                      }
+                      data={projectId}
+                      onSuccess={() => {
+                        // Update project data to reflect the minted RAiD
+                        onProjectUpdate?.();
+                      }}
+                      onError={(error) => {
+                        console.error("Failed to mint RAiD:", error);
+                      }}
+                    >
+                      {({ isLoading, error, onSubmit }) => (
+                        <div className="mt-3 border-t border-green-200 pt-3">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              onClick={onSubmit}
+                              disabled={isLoading}
+                              className="bg-green-600 text-white hover:bg-green-700"
+                              size="sm"
+                            >
+                              <Zap className="mr-1 h-4 w-4" />
+                              {isLoading ? "Minting..." : "Mint RAiD"}
+                            </Button>
+                            <span className="text-xs text-green-600">
+                              Admin only
+                            </span>
+                          </div>
+                          {error && (
+                            <p className="mt-2 text-xs text-red-600">
+                              Error: {error.message || "Failed to mint RAiD"}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </ApiMutation>
+                  )}
                 </div>
               ) : null}
             </div>
