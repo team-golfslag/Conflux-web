@@ -52,9 +52,9 @@ export default function ProjectDetails({
   const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(
     project.end_date,
   );
-  const [selectedLectorate, setSelectedLectorate] = useState<string | undefined>(
-    project.lectorate || undefined,
-  );
+  const [selectedLectorate, setSelectedLectorate] = useState<
+    string | undefined
+  >(project.lectorate || undefined);
 
   // Fetch available lectorates
   const { data: availableLectorates } = useApiQuery(
@@ -254,10 +254,10 @@ export default function ProjectDetails({
                     >
                       Lectorate
                     </Label>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="mt-1 flex items-center gap-2">
                       <Select
-                                              value={selectedLectorate || ""}
-                        onValueChange={(value) => 
+                        value={selectedLectorate || ""}
+                        onValueChange={(value) =>
                           setSelectedLectorate(value === "" ? undefined : value)
                         }
                       >

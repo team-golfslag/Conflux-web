@@ -175,7 +175,6 @@ export default function ContributorCard({
           {position && (
             <div className="flex flex-wrap justify-start gap-1">
               <TooltipProvider key={positionDisplay!.short}>
-                {" "}
                 {/* Using positionDisplay.short as key */}
                 <Tooltip>
                   <TooltipTrigger asChild>
