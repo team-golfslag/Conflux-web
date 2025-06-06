@@ -22,7 +22,7 @@ import {
   TitleType,
   UserRoleType,
   ITimelineItemResponseDTO,
-  UserTier,
+  PermissionLevel,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { useSession } from "@/hooks/SessionContext";
 import ProjectOrganizations from "@/components/projectOrganizations";
@@ -64,12 +64,16 @@ export default function ProjectPage() {
         .includes(UserRoleType.Admin);
       setIsAdmin(admin || false);
 
-      if (session?.session?.user?.tier === UserTier.SuperAdmin) {
+      if (
+        session?.session?.user?.permission_level === PermissionLevel.SuperAdmin
+      ) {
         // If the user is a super admin, they are always an admin for this project
         setIsAdmin(true);
       }
 
-      if (session?.session?.user?.tier === UserTier.SystemAdmin) {
+      if (
+        session?.session?.user?.permission_level === PermissionLevel.SystemAdmin
+      ) {
         // If the user is a system admin, if the project owner organization is not in the user's assigned organizations, they are not an admin
         const userOrganizations =
           session.session.user.assigned_organisations || [];
@@ -81,7 +85,7 @@ export default function ProjectPage() {
         }
 
         const userLectorates = session.session.user.assigned_lectorates || [];
-        if (data.lectoraat && userLectorates.includes(data.lectoraat)) {
+        if (data.lectorate && userLectorates.includes(data.lectorate)) {
           setIsAdmin(true);
         }
       }
@@ -144,12 +148,18 @@ export default function ProjectPage() {
           .includes(UserRoleType.Admin);
         setIsAdmin(admin || false);
 
-        if (session?.session?.user?.tier === UserTier.SuperAdmin) {
+        if (
+          session?.session?.user?.permission_level ===
+          PermissionLevel.SuperAdmin
+        ) {
           // If the user is a super admin, they are always an admin for this project
           setIsAdmin(true);
         }
 
-        if (session?.session?.user?.tier === UserTier.SystemAdmin) {
+        if (
+          session?.session?.user?.permission_level ===
+          PermissionLevel.SystemAdmin
+        ) {
           // If the user is a system admin, if the project owner organization is not in the user's assigned organizations, they are not an admin
           const userOrganizations =
             session.session.user.assigned_organisations || [];
@@ -161,7 +171,7 @@ export default function ProjectPage() {
           }
 
           const userLectorates = session.session.user.assigned_lectorates || [];
-          if (data.lectoraat && userLectorates.includes(data.lectoraat)) {
+          if (data.lectorate && userLectorates.includes(data.lectorate)) {
             setIsAdmin(true);
           }
         }

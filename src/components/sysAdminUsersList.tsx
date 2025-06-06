@@ -54,7 +54,7 @@ import { ApiWrapper } from "@/components/apiWrapper";
 import { ApiMutation } from "@/components/apiMutation";
 import {
   UserResponseDTO,
-  UserTier,
+  PermissionLevel,
   ApiClient,
 } from "@team-golfslag/conflux-api-client/src/client";
 
@@ -73,12 +73,12 @@ export default function SysAdminUsersList({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const getRoleBadgeVariant = (role: UserTier) => {
-    return role === UserTier.SuperAdmin ? "destructive" : "secondary";
+  const getRoleBadgeVariant = (role: PermissionLevel) => {
+    return role === PermissionLevel.SuperAdmin ? "destructive" : "secondary";
   };
 
-  const getRoleDisplayName = (role: UserTier) => {
-    return role === UserTier.SuperAdmin ? "Super Admin" : "Sys Admin";
+  const getRoleDisplayName = (role: PermissionLevel) => {
+    return role === PermissionLevel.SuperAdmin ? "Super Admin" : "Sys Admin";
   };
 
   const handleEditUser = (user: UserResponseDTO) => {
@@ -147,13 +147,18 @@ export default function SysAdminUsersList({
                               </div>
                             </TableCell>
                             <TableCell>
-                              <Badge variant={getRoleBadgeVariant(user.tier)}>
-                                {getRoleDisplayName(user.tier)}
+                              <Badge
+                                variant={getRoleBadgeVariant(
+                                  user.permission_level,
+                                )}
+                              >
+                                {getRoleDisplayName(user.permission_level)}
                               </Badge>
                             </TableCell>
                             <TableCell>
                               <div className="space-y-1">
-                                {user.tier === UserTier.SuperAdmin ? (
+                                {user.permission_level ===
+                                PermissionLevel.SuperAdmin ? (
                                   <div className="text-sm font-medium text-green-600">
                                     Full System Access
                                   </div>
@@ -193,7 +198,8 @@ export default function SysAdminUsersList({
                               </div>
                             </TableCell>
                             <TableCell>
-                              {user.tier !== UserTier.SuperAdmin ? (
+                              {user.permission_level !==
+                              PermissionLevel.SuperAdmin ? (
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
@@ -271,7 +277,10 @@ export default function SysAdminUsersList({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <ApiMutation
               mutationFn={(apiClient: ApiClient) =>
-                apiClient.admin_SetUserTier(UserTier.User, deleteUser!.id)
+                apiClient.admin_SetUserPermissionLevel(
+                  PermissionLevel.User,
+                  deleteUser!.id,
+                )
               }
               data={{}}
               loadingMessage="Removing administrator role..."

@@ -21,7 +21,7 @@ import { ApiMutation } from "@/components/apiMutation";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import {
   UserResponseDTO,
-  UserTier,
+  PermissionLevel,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Search, User, AlertCircle } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -111,7 +111,10 @@ export default function AddSysAdminModal({
     }
 
     // Create the admin user
-    await apiClient.admin_SetUserTier(UserTier.SystemAdmin, selectedUser.id);
+    await apiClient.admin_SetUserPermissionLevel(
+      PermissionLevel.SystemAdmin,
+      selectedUser.id,
+    );
 
     // Assign organizations if any
     await apiClient.admin_AssignOrganisationsToUser(

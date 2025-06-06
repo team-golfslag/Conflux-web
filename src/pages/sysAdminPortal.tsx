@@ -11,21 +11,21 @@ import { Shield, UserPlus } from "lucide-react";
 import SysAdminUsersList from "@/components/sysAdminUsersList";
 import AddSysAdminModal from "@/components/addSysAdminModal";
 import { useSession } from "@/hooks/SessionContext";
-import { UserTier } from "@team-golfslag/conflux-api-client/src/client";
+import { PermissionLevel } from "@team-golfslag/conflux-api-client/src/client";
 
 export default function SysAdminPortal() {
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const session = useSession();
 
-  const tier = session?.session?.user?.tier;
+  const permissionLevel = session?.session?.user?.permission_level;
 
   const handleUserAdded = () => {
     setRefreshTrigger((prev) => prev + 1);
   };
 
   // Check if user has admin access
-  if (tier !== UserTier.SuperAdmin) {
+  if (permissionLevel !== PermissionLevel.SuperAdmin) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Alert className="max-w-md">
