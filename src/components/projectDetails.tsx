@@ -18,12 +18,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { ApiMutation } from "./apiMutation";
 import { Label } from "./ui/label";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { getStatus } from "@/utils/projectUtils";
 import { Badge } from "@/components/ui/badge.tsx";
 import ProjectDates from "@/components/projectDates.tsx";
+import { useApiQuery } from "@/hooks/useApiQuery";
 
 type ProjectDetailsProps = {
   project: ProjectResponseDTO;
@@ -44,12 +52,22 @@ export default function ProjectDetails({
   const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(
     project.end_date,
   );
+  const [selectedLectorate, setSelectedLectorate] = useState<string | undefined>(
+    project.lectorate || undefined,
+  );
+
+  // Fetch available lectorates
+  const { data: availableLectorates } = useApiQuery(
+    (client) => client.admin_GetLectorates(),
+    [],
+  );
 
   const toggleEditMode = () => {
     if (editMode) {
       // Reset selections to current values if canceling
       setSelectedStartDate(project.start_date);
       setSelectedEndDate(project.end_date);
+      setSelectedLectorate(project.lectorate || undefined);
     }
     setEditMode(!editMode);
   };
@@ -85,12 +103,13 @@ export default function ProjectDetails({
   };
 
   const updateProject = async (apiClient: ApiClient) => {
-    // Update project dates only
+    // Update project dates and lectorate
     return apiClient.projects_PutProject(
       project.id,
       new ProjectRequestDTO({
         start_date: selectedStartDate ?? project.start_date ?? new Date(),
         end_date: selectedEndDate === null ? undefined : selectedEndDate,
+        lectorate: selectedLectorate || undefined,
       }),
     );
   };
@@ -228,6 +247,44 @@ export default function ProjectDetails({
                     </p>
                   </div>
 
+                  <div>
+                    <Label
+                      htmlFor="project-lectorate"
+                      className="font-semibold"
+                    >
+                      Lectorate
+                    </Label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Select
+                                              value={selectedLectorate || ""}
+                        onValueChange={(value) => 
+                          setSelectedLectorate(value === "" ? undefined : value)
+                        }
+                      >
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Select a lectorate..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableLectorates?.map((lectorate) => (
+                            <SelectItem key={lectorate} value={lectorate}>
+                              {lectorate}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {selectedLectorate && (
+                        <Button
+                          variant="ghost"
+                          className="text-muted-foreground mx-2 cursor-pointer"
+                          size="sm"
+                          onClick={() => setSelectedLectorate(undefined)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
                   <ProjectDates
                     editMode={editMode}
                     start_date={project.start_date}
@@ -277,6 +334,15 @@ export default function ProjectDetails({
                 </Label>
                 <p className="pt-1 pb-2 text-gray-700">
                   {getProjectContacts(project.contributors)}
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="project-lectorate" className="font-semibold">
+                  Lectorate
+                </Label>
+                <p className="text-gray-700">
+                  {project.lectorate ? project.lectorate : "Not specified"}
                 </p>
               </div>
 
