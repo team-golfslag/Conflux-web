@@ -4,14 +4,20 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import { Card, CardContent, CardHeader } from "@/components/ui/card.tsx";
-import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
+import {
+  DescriptionType,
+  ProjectResponseDTO,
+  TitleType,
+  UserRoleType,
+} from "@team-golfslag/conflux-api-client/src/client";
 import { Link } from "react-router-dom";
 import { JSX } from "react";
 import { CalendarIcon, UsersIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { getStatus } from "@/utils/projectUtils";
 
 export interface ProjectCardProps {
-  project: ProjectDTO;
+  project: ProjectResponseDTO;
   roles?: string[];
 }
 
@@ -19,7 +25,6 @@ export interface ProjectCardProps {
  * Represents a component that displays information about a project in a card layout. Used on dashboard and search page
  *
  * @param {ProjectCardProps} props - The properties required to render the project card.
- * @param {ProjectDTO} props.project - The project data to display.
  * @param {string[]} props.roles - The user's roles in the project, if available.
  *
  * @returns {JSX.Element} A styled card element showing project details, including title, description, dates, contributors count, and user roles.
@@ -33,21 +38,14 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
     ? new Date(project.end_date).toLocaleDateString()
     : "Ongoing";
 
-  // Determine project status
-  const getStatus = () => {
-    const now = new Date();
-    if (!project.start_date)
-      return { label: "Not Started", color: "bg-gray-200 text-gray-800" };
-    if (new Date(project.start_date) > now)
-      return { label: "Upcoming", color: "bg-blue-100 text-blue-800" };
-    if (!project.end_date)
-      return { label: "In Progress", color: "bg-green-100 text-green-800" };
-    if (new Date(project.end_date) < now)
-      return { label: "Completed", color: "bg-purple-100 text-purple-800" };
-    return { label: "Active", color: "bg-green-100 text-green-800" };
-  };
+  const status = getStatus(project.start_date, project.end_date);
 
-  const status = getStatus();
+  const primaryTitle = project.titles?.find(
+    (title) => title.type === TitleType.Primary,
+  );
+  const primaryDescription = project.descriptions?.find(
+    (desc) => desc.type === DescriptionType.Primary,
+  );
 
   // Count contributors
   const contributorCount = project.contributors?.length ?? 0;
@@ -61,10 +59,11 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
         <CardHeader className="bg-white px-4 pt-4 pb-2">
           <div className="flex items-start justify-between">
             <h3 className="line-clamp-2 text-xl font-semibold tracking-tight text-gray-900 group-hover:text-blue-800">
-              {project.primary_title?.text ?? "No title available"}
+              {primaryTitle?.text ?? "No title available"}
             </h3>
             <Badge
               className={`${status.color} ml-2 font-medium whitespace-nowrap`}
+              data-cy="project-status"
             >
               {status.label}
             </Badge>
@@ -74,7 +73,7 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
         <CardContent className="flex flex-grow flex-col p-4 pt-0">
           {/* Project Description */}
           <p className="mt-2 mb-4 line-clamp-3 flex-grow text-sm text-gray-600 duration-200">
-            {project.primary_description?.text ?? "No description available"}
+            {primaryDescription?.text ?? "No description available"}
           </p>
 
           {/* Project Metadata */}
@@ -104,15 +103,17 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
               </div>
               {roles && roles.length > 0 && (
                 <div className="flex flex-col items-end gap-1">
-                  {roles.map((r) => (
-                    <Badge
-                      key={r}
-                      variant="secondary"
-                      className="h-5 px-2 py-0 text-xs"
-                    >
-                      {r}
-                    </Badge>
-                  ))}
+                  {roles
+                    .filter((r) => r !== UserRoleType.User)
+                    .map((r) => (
+                      <Badge
+                        key={r}
+                        variant="secondary"
+                        className="h-5 px-2 py-0 text-xs"
+                      >
+                        {r}
+                      </Badge>
+                    ))}
                 </div>
               )}
             </div>

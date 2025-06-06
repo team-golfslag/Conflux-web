@@ -9,11 +9,17 @@ import { Search, User } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { Link } from "react-router-dom";
 import config from "@/config";
+import { PermissionLevel } from "@team-golfslag/conflux-api-client/src/client";
+import { useSession } from "@/hooks/SessionContext";
 
 /** Header component <br>
  * Displays the main pages, search icon and the profile menu with fold-out functionality. <br>On mobile, the menu folds to a menu icon.
  */
 export default function Header() {
+  const session = useSession();
+  const superAdmin =
+    session?.session?.user?.permission_level === PermissionLevel.SuperAdmin;
+
   const [isUserMenuHovered, setIsUserMenuHovered] = useState(false);
   const [isScrollingUp, setIsScrollingUp] = useState(true);
   const [lastScrollTop, setLastScrollTop] = useState(0);
@@ -174,6 +180,16 @@ export default function Header() {
                 >
                   Settings
                 </Link>
+                {superAdmin && (
+                  <Link
+                    to="/admin"
+                    className="hover:bg-secondary hover:text-secondary-foreground text-foreground block px-4 py-2"
+                    role="menuitem"
+                    tabIndex={0}
+                  >
+                    System Admin
+                  </Link>
+                )}
                 <Link
                   to={`${config.apiBaseURL}/session/logout?redirectUri=${encodeURIComponent(
                     config.webUIUrl,

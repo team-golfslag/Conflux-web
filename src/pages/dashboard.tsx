@@ -7,13 +7,15 @@ import DashboardListView from "@/components/dashboardListView";
 import { ApiWrapper } from "@/components/apiWrapper";
 import { useSession } from "@/hooks/SessionContext";
 import { ProjectCardProps } from "@/components/projectCard";
-import { ProjectDTO } from "@team-golfslag/conflux-api-client/src/client";
+import { ProjectResponseDTO } from "@team-golfslag/conflux-api-client/src/client";
 
 const Dashboard = () => {
   const { session } = useSession();
 
   // Function to transform projects data to match DashboardCardProps format
-  const transformProjects = (projects: ProjectDTO[]): ProjectCardProps[] => {
+  const transformProjects = (
+    projects: ProjectResponseDTO[],
+  ): ProjectCardProps[] => {
     return projects.map((project) => {
       // Find the current user in the project
       const currentUser = project.users.find(
@@ -48,7 +50,7 @@ const Dashboard = () => {
               <div className="from-primary/90 to-primary flex items-center justify-between rounded-lg bg-gradient-to-r p-6 shadow-md">
                 <div className="text-primary-foreground">
                   <h1 className="text-3xl font-bold">
-                    {session?.user?.name || session?.name}
+                    {session?.user?.person?.name || session?.name}
                   </h1>
                   <p className="mt-2 opacity-90">
                     Manage and track your research projects in one place

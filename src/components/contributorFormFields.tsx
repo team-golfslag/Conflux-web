@@ -24,20 +24,20 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "./ui/button";
 
 export interface ContributorFormData {
-  name: string;
-  email: string;
-  orcidId: string;
+  name?: string;
+  email?: string;
+  orcidId?: string;
   roles: ContributorRoleType[];
-  positions: ContributorPositionType[];
+  position?: ContributorPositionType;
   leader: boolean;
   contact: boolean;
 }
 
 interface ContributorFormFieldsProps {
   formData: ContributorFormData;
-  onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onOrcidIdChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onNameChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onEmailChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onOrcidIdChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRoleChange: (role: ContributorRoleType) => void;
   onPositionChange: (position: ContributorPositionType) => void;
   onLeaderChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -45,6 +45,7 @@ interface ContributorFormFieldsProps {
   onOrcidAutoFill?: () => Promise<boolean>;
   orcidError?: string | null;
   isEdit?: boolean;
+  isConfluxUser?: boolean;
 }
 
 export default function ContributorFormFields({
@@ -59,76 +60,103 @@ export default function ContributorFormFields({
   onOrcidAutoFill,
   orcidError,
   isEdit = false,
+  isConfluxUser = false,
 }: Readonly<ContributorFormFieldsProps>) {
   const idPrefix = isEdit ? "edit-" : "";
   return (
     <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor={`${idPrefix}name`} className="text-right">
-          Name
-        </Label>
-        <Input
-          id={`${idPrefix}name`}
-          name="name"
-          className="col-span-3"
-          value={formData.name}
-          onChange={onNameChange}
-        />
-      </div>
-
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor={`${idPrefix}email`} className="text-right">
-          Email
-        </Label>
-        <Input
-          id={`${idPrefix}email`}
-          name="email"
-          type="email"
-          className="col-span-3"
-          value={formData.email}
-          onChange={onEmailChange}
-        />
-      </div>
-
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor={`${idPrefix}orcidId`} className="text-right">
-          ORCID ID
-        </Label>
-        <div className="col-span-3 flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <Input
-              id={`${idPrefix}orcidId`}
-              name="orcidId"
-              className={`flex-1 ${orcidError ? "border-red-500" : ""}`}
-              value={formData.orcidId}
-              onChange={onOrcidIdChange}
-              placeholder="0000-0000-0000-0000"
-              aria-invalid={!!orcidError}
-            />
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={onOrcidAutoFill}
-                    disabled={!formData.orcidId || !onOrcidAutoFill}
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Autofill details from ORCID</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          {orcidError && (
-            <div className="text-sm text-red-500">{orcidError}</div>
+      {onNameChange && (
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor={`${idPrefix}name`} className="text-right">
+            Name
+          </Label>
+          <Input
+            id={`${idPrefix}name`}
+            name="name"
+            className="col-span-3"
+            value={formData.name}
+            onChange={onNameChange}
+            disabled={isConfluxUser}
+          />
+          {isConfluxUser && (
+            <div className="text-muted-foreground col-span-3 col-start-2 -mt-2 ml-1 text-xs">
+              Name cannot be edited for registered Conflux users
+            </div>
           )}
         </div>
-      </div>
+      )}
+
+      {onEmailChange && (
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor={`${idPrefix}email`} className="text-right">
+            Email
+          </Label>
+          <Input
+            id={`${idPrefix}email`}
+            name="email"
+            type="email"
+            className="col-span-3"
+            value={formData.email}
+            onChange={onEmailChange}
+            disabled={isConfluxUser}
+          />
+          {isConfluxUser && (
+            <div className="text-muted-foreground col-span-3 col-start-2 -mt-2 ml-1 text-xs">
+              Email cannot be edited for registered Conflux users
+            </div>
+          )}
+        </div>
+      )}
+
+      {onOrcidIdChange && onOrcidAutoFill && (
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor={`${idPrefix}orcidId`} className="text-right">
+            ORCID ID
+          </Label>
+          <div className="col-span-3 flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Input
+                id={`${idPrefix}orcidId`}
+                name="orcidId"
+                className={`flex-1 ${orcidError ? "border-red-500" : ""}`}
+                value={formData.orcidId}
+                onChange={onOrcidIdChange}
+                placeholder="0000-0000-0000-0000"
+                aria-invalid={!!orcidError}
+                disabled={isConfluxUser}
+              />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={onOrcidAutoFill}
+                      disabled={
+                        !formData.orcidId || !onOrcidAutoFill || isConfluxUser
+                      }
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Autofill details from ORCID</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            {orcidError && (
+              <div className="text-sm text-red-500">{orcidError}</div>
+            )}
+          </div>
+          {isConfluxUser && (
+            <div className="text-muted-foreground col-span-3 col-start-2 -mt-2 ml-1 text-xs">
+              ORCID ID cannot be edited for registered Conflux users
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-4 items-start gap-4">
         <Label className="pt-2 text-right">Positions</Label>
@@ -142,9 +170,7 @@ export default function ContributorFormFields({
                     <Badge
                       key={position}
                       variant={
-                        formData.positions.includes(position)
-                          ? "default"
-                          : "outline"
+                        formData.position === position ? "default" : "outline"
                       }
                       className="cursor-pointer"
                       onClick={() => onPositionChange(position)}

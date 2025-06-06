@@ -6,9 +6,9 @@
 
 import { Card } from "@/components/ui/card";
 import {
+  ContributorPositionType,
   ContributorRoleType,
-  UserRoleDTO,
-  ContributorPositionDTO, // Added import
+  UserRole,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Check, Crown, Contact, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getRoleDisplay } from "@/lib/formatters/roleFormatter";
-import { getPositionDisplay } from "@/lib/formatters/positionFormatter"; // Added import
+import { getPositionDisplay } from "@/lib/formatters/positionFormatter";
 import { AlertDialog, AlertDialogTrigger } from "./ui/alert-dialog";
 import { useState } from "react";
 
@@ -30,8 +30,8 @@ type ContributorCardProps = {
   name: string;
   email?: string | null;
   orcidId?: string | null;
-  roles: ContributorRoleType[] | UserRoleDTO[];
-  positions?: ContributorPositionDTO[] | null;
+  roles: ContributorRoleType[] | UserRole[];
+  position?: ContributorPositionType;
   isLeader?: boolean;
   isContact?: boolean;
   isConfluxUser?: boolean;
@@ -47,9 +47,10 @@ export default function ContributorCard({
   email,
   orcidId,
   roles,
-  positions,
+  position,
   isLeader,
   isContact,
+  isConfluxUser = false,
   editMode,
   onEdit,
   onDelete,
@@ -67,6 +68,8 @@ export default function ContributorCard({
       }, 2000);
     });
   };
+
+  const positionDisplay = position ? getPositionDisplay(position) : undefined;
 
   return (
     <Card className="flex h-full flex-col border border-gray-200 p-3 shadow-sm">
@@ -140,26 +143,28 @@ export default function ContributorCard({
                   </Tooltip>
                 </TooltipProvider>
 
-                <AlertDialog>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive/80 p-0"
-                            onClick={openDeleteDialog}
-                            aria-label="Delete contributor"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                      </TooltipTrigger>
-                      <TooltipContent>Delete contributor</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </AlertDialog>
+                {!isConfluxUser && (
+                  <AlertDialog>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive/80 p-0"
+                              onClick={openDeleteDialog}
+                              aria-label="Delete contributor"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent>Delete contributor</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </AlertDialog>
+                )}
               </div>
             )}
           </div>
@@ -167,31 +172,21 @@ export default function ContributorCard({
         </div>
 
         <div className="mt-auto flex flex-col gap-1 pt-3">
-          {positions && positions.length > 0 && (
+          {position && (
             <div className="flex flex-wrap justify-start gap-1">
-              {positions.map((positionDTO) => {
-                const displayablePosition = positionDTO.type;
-                const positionDisplay = getPositionDisplay(displayablePosition);
-                return (
-                  <TooltipProvider key={positionDisplay.short}>
-                    {" "}
-                    {/* Using positionDisplay.short as key */}
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Badge
-                          variant="outline"
-                          className="h-5 px-2 py-0 text-xs"
-                        >
-                          {positionDisplay.short}
-                        </Badge>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        {positionDisplay.long}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                );
-              })}
+              <TooltipProvider key={positionDisplay!.short}>
+                {/* Using positionDisplay.short as key */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge variant="outline" className="h-5 px-2 py-0 text-xs">
+                      {positionDisplay!.short}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    {positionDisplay!.long}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           )}
           {roles.length > 0 && (

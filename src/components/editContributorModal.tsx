@@ -4,7 +4,7 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,26 +14,29 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { AlertTriangle } from "lucide-react";
 import ContributorFormFields from "./contributorFormFields";
 import {
   ContributorRoleType,
-  ContributorDTO,
-  PersonDTO,
-  ContributorPositionDTO,
   ContributorPositionType,
+  ContributorRequestDTO,
+  ContributorResponseDTO,
+  PersonRequestDTO,
+  ApiClient,
 } from "@team-golfslag/conflux-api-client/src/client";
-import { ApiClientContext } from "@/lib/ApiClientContext";
 import {
   formatOrcidAsUrl,
   extractOrcidFromUrl,
 } from "@/lib/formatters/orcidFormatter";
+import { ApiMutation } from "@/components/apiMutation";
+import { ApiClientContext } from "@/lib/ApiClientContext";
 
 interface ContributorFormData {
   name: string;
   email: string;
   orcidId: string;
   roles: ContributorRoleType[];
-  positions: ContributorPositionType[];
+  position?: ContributorPositionType;
   leader: boolean;
   contact: boolean;
 }
@@ -41,9 +44,10 @@ interface ContributorFormData {
 interface EditContributorModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  contributor: ContributorDTO | null;
+  contributor: ContributorResponseDTO | null;
   projectId: string;
-  onContributorUpdated: (contributor: ContributorDTO) => void;
+  onContributorUpdated: (contributor: ContributorResponseDTO) => void;
+  isConfluxUser?: boolean;
 }
 
 export default function EditContributorModal({
@@ -52,19 +56,19 @@ export default function EditContributorModal({
   contributor,
   projectId,
   onContributorUpdated,
+  isConfluxUser = false,
 }: Readonly<EditContributorModalProps>) {
   const [formData, setFormData] = useState<ContributorFormData>({
     name: "",
     email: "",
     orcidId: "",
     roles: [],
-    positions: [],
+    position: undefined,
     leader: false,
     contact: false,
   });
-  const [orcidError, setOrcidError] = useState<string | null>(null);
-  const [, setIsLoadingOrcidSearch] = useState(false);
 
+  const [autoFillError, setAutoFillError] = useState<string | null>(null);
   const apiClient = useContext(ApiClientContext);
 
   // Update form when contributor changes
@@ -72,10 +76,10 @@ export default function EditContributorModal({
     if (contributor) {
       setFormData({
         name: contributor.person.name,
-        email: contributor.person.email ?? "",
-        orcidId: extractOrcidFromUrl(contributor.person.orcid_id) ?? "",
-        roles: contributor.roles,
-        positions: contributor.positions?.map((p) => p.type) ?? [],
+        email: contributor.person.email || "",
+        orcidId: extractOrcidFromUrl(contributor.person.orcid_id) || "",
+        roles: contributor.roles.map((role) => role.role_type),
+        position: contributor.positions.find((p) => !p.end_date)?.position,
         leader: contributor.leader,
         contact: contributor.contact,
       });
@@ -95,18 +99,28 @@ export default function EditContributorModal({
   const handlePositionChange = (position: ContributorPositionType) => {
     setFormData((prev) => ({
       ...prev,
-      positions: prev.positions.includes(position)
-        ? prev.positions.filter((p) => p !== position)
-        : [...prev.positions, position],
+      position: prev.position === position ? undefined : position,
     }));
   };
 
-  // ORCID autofill from the form field
-  const handleOrcidAutoFill = async () => {
-    if (!formData.orcidId) return false;
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, name: e.target.value }));
+  };
 
-    setIsLoadingOrcidSearch(true);
-    setOrcidError(null);
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, email: e.target.value }));
+  };
+
+  const handleOrcidIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, orcidId: e.target.value }));
+    // Clear error when input changes
+    if (autoFillError) setAutoFillError(null);
+  };
+
+  const handleOrcidAutoFill = async (): Promise<boolean> => {
+    if (!formData.orcidId || isConfluxUser) return false;
+
+    setAutoFillError(null);
 
     try {
       const person = await apiClient.orcid_GetPersonFromOrcid(formData.orcidId);
@@ -119,28 +133,24 @@ export default function EditContributorModal({
         }));
         return true;
       } else {
-        setOrcidError("No person found with this ORCID.");
+        setAutoFillError("No person found with this ORCID.");
         return false;
       }
     } catch (error) {
       console.error("Error searching ORCID:", error);
-      setOrcidError("Failed to search ORCID. Please try again.");
+      setAutoFillError("Failed to search ORCID. Please try again.");
       return false;
-    } finally {
-      setIsLoadingOrcidSearch(false);
     }
   };
 
   const resetForm = () => {
-    setOrcidError(null);
-
     if (contributor) {
       setFormData({
         name: contributor.person.name,
-        email: contributor.person.email ?? "",
-        orcidId: extractOrcidFromUrl(contributor.person.orcid_id) ?? "",
-        roles: contributor.roles,
-        positions: contributor.positions?.map((p) => p.type) ?? [],
+        email: contributor.person.email || "",
+        orcidId: extractOrcidFromUrl(contributor.person.orcid_id) || "",
+        roles: contributor.roles.map((role) => role.role_type),
+        position: contributor.positions.find((p) => !p.end_date)?.position,
         leader: contributor.leader,
         contact: contributor.contact,
       });
@@ -150,54 +160,51 @@ export default function EditContributorModal({
         email: "",
         orcidId: "",
         roles: [],
-        positions: [],
+        position: undefined,
         leader: false,
         contact: false,
       });
     }
   };
 
-  const saveEditedContributor = async () => {
-    if (!contributor) return;
-    try {
-      const updatedPerson = new PersonDTO({
+  const saveEditedContributor = async (apiClient: ApiClient) => {
+    if (!contributor) {
+      throw new Error("No contributor selected");
+    }
+
+    // Only update person data if it's not a Conflux user
+    if (!isConfluxUser) {
+      const formattedOrcid = formData.orcidId
+        ? formatOrcidAsUrl(formData.orcidId)
+        : null;
+
+      const personUpdateData = new PersonRequestDTO({
         name: formData.name,
         email: formData.email,
-        or_ci_d: formData.orcidId
-          ? (formatOrcidAsUrl(formData.orcidId) ?? undefined)
-          : undefined,
+        or_ci_d: formattedOrcid ?? undefined,
       });
 
-      const updatedContributor = new ContributorDTO({
-        person: contributor.person,
-        project_id: projectId,
-        roles: formData.roles,
-        positions: formData.positions.map(
-          (type) =>
-            new ContributorPositionDTO({ type, start_date: new Date() }),
-        ),
-        leader: formData.leader,
-        contact: formData.contact,
-      });
-
-      await apiClient.people_UpdatePerson(contributor.person.id, updatedPerson);
-
-      const result = await apiClient.contributors_UpdateContributor(
-        projectId,
+      await apiClient.people_UpdatePerson(
         contributor.person.id,
-        updatedContributor,
-      );
-
-      onContributorUpdated(result);
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Error updating contributor:", error);
-      alert(
-        `Failed to update contributor: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
+        personUpdateData,
       );
     }
+
+    // Then update contributor data
+    const contributorUpdateData = new ContributorRequestDTO({
+      roles: formData.roles,
+      position: formData.position,
+      leader: formData.leader,
+      contact: formData.contact,
+    });
+
+    const result = await apiClient.contributors_UpdateContributor(
+      projectId,
+      contributor.person.id,
+      contributorUpdateData,
+    );
+
+    return result;
   };
 
   return (
@@ -206,53 +213,86 @@ export default function EditContributorModal({
         <DialogHeader>
           <DialogTitle>Edit Contributor</DialogTitle>
           <DialogDescription>
-            Update the contributor information for this project.
+            {!isConfluxUser && (
+              <p className="text-muted-foreground mb-2 text-sm">
+                Update the contributor and person information for this project.
+              </p>
+            )}
+            {isConfluxUser && (
+              <div className="flex items-start gap-2 rounded border border-amber-200 bg-amber-50 p-3">
+                <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
+                <div className="flex-1 text-sm">
+                  <p className="font-medium text-amber-800">
+                    Personal details cannot be edited for registered Conflux
+                    users
+                  </p>
+                  <p className="mt-1 text-amber-700">
+                    Name, email, and ORCID ID are managed through the user's
+                    Conflux account. You can still update contributor-specific
+                    details like roles, positions, and project settings.
+                  </p>
+                </div>
+              </div>
+            )}
           </DialogDescription>
         </DialogHeader>
 
-        <ContributorFormFields
-          formData={formData}
-          onNameChange={(e) =>
-            setFormData((prev) => ({ ...prev, name: e.target.value }))
-          }
-          onEmailChange={(e) =>
-            setFormData((prev) => ({ ...prev, email: e.target.value }))
-          }
-          onOrcidIdChange={(e) => {
-            setFormData((prev) => ({ ...prev, orcidId: e.target.value }));
-            // Clear error when input changes
-            if (orcidError) setOrcidError(null);
+        <ApiMutation
+          mutationFn={saveEditedContributor}
+          data={{}}
+          loadingMessage="Updating contributor..."
+          mode="component"
+          onSuccess={(updatedContributor) => {
+            onContributorUpdated(updatedContributor);
+            onOpenChange(false);
           }}
-          onRoleChange={handleRoleChange}
-          onPositionChange={handlePositionChange}
-          onLeaderChange={(e) =>
-            setFormData((prev) => ({ ...prev, leader: e.target.checked }))
-          }
-          onContactChange={(e) =>
-            setFormData((prev) => ({ ...prev, contact: e.target.checked }))
-          }
-          onOrcidAutoFill={handleOrcidAutoFill}
-          orcidError={orcidError}
-          isEdit={true}
-        />
+        >
+          {({ onSubmit, isLoading, error }) => (
+            <>
+              <ContributorFormFields
+                formData={formData}
+                onNameChange={handleNameChange}
+                onEmailChange={handleEmailChange}
+                onOrcidIdChange={handleOrcidIdChange}
+                onRoleChange={handleRoleChange}
+                onPositionChange={handlePositionChange}
+                onLeaderChange={(e) =>
+                  setFormData((prev) => ({ ...prev, leader: e.target.checked }))
+                }
+                onContactChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    contact: e.target.checked,
+                  }))
+                }
+                onOrcidAutoFill={handleOrcidAutoFill}
+                orcidError={autoFillError}
+                isEdit={true}
+                isConfluxUser={isConfluxUser}
+              />
 
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => {
-              onOpenChange(false);
-              resetForm();
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={saveEditedContributor}
-            disabled={!formData.name || formData.positions.length === 0}
-          >
-            Save Changes
-          </Button>
-        </DialogFooter>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    onOpenChange(false);
+                    resetForm();
+                  }}
+                >
+                  Cancel
+                </Button>
+                {error && (
+                  <div className="text-destructive text-xs">
+                    {error.message}
+                  </div>
+                )}
+                <Button onClick={onSubmit} disabled={isLoading}>
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </ApiMutation>
       </DialogContent>
     </Dialog>
   );

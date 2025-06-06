@@ -6,6 +6,7 @@
 
 import { Routes, Route } from "react-router";
 import { lazy, Suspense } from "react";
+import { Loader2 } from "lucide-react";
 import ScrollToTop from "./hooks/scrollToTop.tsx";
 
 // Lazy load all page components
@@ -16,6 +17,7 @@ const ProjectPage = lazy(() => import("./pages/projectPage.tsx"));
 const ProjectSearchPage = lazy(() => import("./pages/projectSearchPage.tsx"));
 const SettingsPage = lazy(() => import("./pages/settingsPage.tsx"));
 const ProfilePage = lazy(() => import("./pages/profilePage.tsx"));
+const SysAdminPortal = lazy(() => import("./pages/sysAdminPortal.tsx"));
 
 /**
  * This contains all different routes to the different pages.
@@ -25,7 +27,10 @@ const allRoutes = (
   <Suspense
     fallback={
       <div className="flex h-screen items-center justify-center">
-        Loading...
+        <div className="flex flex-col items-center justify-center space-y-4 rounded-lg bg-white p-6 shadow-md">
+          <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          <span className="text-xl font-semibold">Loading...</span>
+        </div>
       </div>
     }
   >
@@ -40,6 +45,7 @@ const allRoutes = (
           <Route path=":id" element={<ProjectPage />} />
         </Route>
         <Route path="profile" element={<ProfilePage />} />
+        <Route path="admin" element={<SysAdminPortal />} />
       </Route>
     </Routes>
   </Suspense>
