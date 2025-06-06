@@ -132,7 +132,7 @@ export default function ProjectContributors({
                 position={
                   contributor.positions.find((p) => !p.end_date)?.position
                 }
-                isConfluxUser={contributor.person.user_id !== null}
+                isConfluxUser={!!contributor.person.user_id}
                 isLeader={contributor.leader}
                 isContact={contributor.contact}
                 editMode={editMode}
@@ -209,7 +209,7 @@ export default function ProjectContributors({
         contributor={editingContributor}
         projectId={project.id}
         onContributorUpdated={handleContributorUpdated}
-        isConfluxUser={editingContributor?.person.user_id !== null}
+        isConfluxUser={!!editingContributor?.person.user_id}
       />
     </>
   );
