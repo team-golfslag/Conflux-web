@@ -1,5 +1,19 @@
 /**
- * This program has been developed by students from the bachelor Computer Science at Utrecht
+ * This program has been develofunction DialogOverlay({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+  return (
+    <DialogPrimitive.Overlay
+      data-slot="dialog-overlay"
+      className={cn(
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/60",
+        className,
+      )}
+      {...props}
+    />
+  );
+} from the bachelor Computer Science at Utrecht
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
@@ -41,7 +55,7 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50 backdrop-blur-sm",
         className,
       )}
       {...props}
@@ -85,24 +99,28 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 flex max-h-[calc(100vh-2rem)] w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden rounded-lg border shadow-lg duration-200 sm:max-w-lg",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 flex max-h-[calc(100vh-2rem)] w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] flex-col overflow-hidden rounded-xl border-0 bg-white shadow-2xl backdrop-blur-sm duration-300 sm:max-w-lg",
           className,
         )}
         {...props}
       >
         {headerElement && (
-          <div className="flex-shrink-0 px-6 pt-6">{headerElement}</div>
+          <div className="flex-shrink-0 border-b border-gray-100/50 bg-gray-50 px-6 pt-6">
+            {headerElement}
+          </div>
         )}
 
-        <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-6 py-4">
+        <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-6 py-6">
           {bodyElements}
         </div>
 
         {footerElement && (
-          <div className="flex-shrink-0 px-6 pb-6">{footerElement}</div>
+          <div className="flex-shrink-0 border-t border-gray-100/50 bg-gray-50 px-6 pb-6">
+            {footerElement}
+          </div>
         )}
 
-        <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+        <DialogPrimitive.Close className="ring-offset-background absolute top-4 right-4 rounded-lg p-1 opacity-70 transition-all duration-200 hover:scale-110 hover:bg-blue-50 hover:opacity-100 focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-blue-50 data-[state=open]:text-blue-600 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
           <XIcon />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>

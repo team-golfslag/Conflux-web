@@ -96,46 +96,57 @@ export default function SysAdminUsersList({
   };
 
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                System Administrator Users
-              </CardTitle>
-              <CardDescription>
-                Manage system administrator accounts and their permissions
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <ApiWrapper
-            queryFn={(apiClient) =>
-              apiClient.admin_GetUsersByQuery(undefined, true)
-            }
-            dependencies={[refreshTrigger, externalRefreshTrigger]}
-            loadingMessage="Loading system administrators..."
-            mode="component"
-          >
-            {(users) => {
-              return (
-                <div className="space-y-4">
-                  <div className="rounded-md border">
+    <ApiWrapper
+      queryFn={(apiClient) => apiClient.admin_GetUsersByQuery(undefined, true)}
+      dependencies={[refreshTrigger, externalRefreshTrigger]}
+      loadingMessage="Loading system administrators..."
+      mode="component"
+    >
+      {(users) => {
+        return (
+          <>
+            <Card className="border-0 bg-white shadow-lg">
+              <CardHeader className="border-b border-gray-100/50">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-3 text-xl">
+                      <div className="rounded-lg bg-blue-100 p-2">
+                        <Shield className="h-5 w-5 text-gray-600" />
+                      </div>
+                      System Administrator Users
+                    </CardTitle>
+                    <CardDescription className="mt-2 text-gray-600">
+                      Manage system administrator accounts and their permissions
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-6">
+                  <div className="overflow-hidden rounded-xl border border-gray-200/50 bg-white shadow-sm">
                     <Table>
                       <TableHeader>
-                        <TableRow>
-                          <TableHead>User</TableHead>
-                          <TableHead>Role</TableHead>
-                          <TableHead>Assigned Access</TableHead>
-                          <TableHead className="w-[70px]">Actions</TableHead>
+                        <TableRow className="bg-gray-50/50">
+                          <TableHead className="font-semibold text-gray-700">
+                            User
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Role
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700">
+                            Assigned Access
+                          </TableHead>
+                          <TableHead className="w-[70px] font-semibold text-gray-700">
+                            Actions
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {users.map((user) => (
-                          <TableRow key={user.id}>
+                          <TableRow
+                            key={user.id}
+                            className="transition-colors duration-200 hover:bg-blue-50/30"
+                          >
                             <TableCell>
                               <div>
                                 <div className="flex items-center gap-2 font-medium">
@@ -248,68 +259,66 @@ export default function SysAdminUsersList({
                     </div>
                   )}
                 </div>
-              );
-            }}
-          </ApiWrapper>
-        </CardContent>
-      </Card>
-
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={(isOpen) => {
-          if (!isOpen) {
-            setIsDeleteDialogOpen(false);
-            setDeleteUser(null);
-          }
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove Administrator Role</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to remove the administrator role from{" "}
-              <strong>{deleteUser?.person?.name}</strong>? This will downgrade
-              their account to a regular user and remove all administrative
-              privileges. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <ApiMutation
-              mutationFn={(apiClient: ApiClient) =>
-                apiClient.admin_SetUserPermissionLevel(
-                  PermissionLevel.User,
-                  deleteUser!.id,
-                )
-              }
-              data={{}}
-              loadingMessage="Removing administrator role..."
-              mode="component"
-              onSuccess={() => {
-                handleUserUpdated();
-                setIsDeleteDialogOpen(false);
-                setDeleteUser(null);
+              </CardContent>
+            </Card>
+            <AlertDialog
+              open={isDeleteDialogOpen}
+              onOpenChange={(isOpen) => {
+                if (!isOpen) {
+                  setIsDeleteDialogOpen(false);
+                  setDeleteUser(null);
+                }
               }}
             >
-              {({ onSubmit }) => (
-                <AlertDialogAction
-                  className="border-destructive bg-destructive hover:text-destructive border-1 text-white hover:bg-white/10 hover:font-bold"
-                  onClick={onSubmit}
-                >
-                  Remove Role
-                </AlertDialogAction>
-              )}
-            </ApiMutation>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <EditSysAdminModal
-        isOpen={isEditModalOpen}
-        onOpenChange={setIsEditModalOpen}
-        user={selectedUser}
-        onUserUpdated={handleUserUpdated}
-      />
-    </>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Remove Administrator Role</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to remove the administrator role from{" "}
+                    <strong>{deleteUser?.person?.name}</strong>? This will
+                    downgrade their account to a regular user and remove all
+                    administrative privileges. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <ApiMutation
+                    mutationFn={(apiClient: ApiClient) =>
+                      apiClient.admin_SetUserPermissionLevel(
+                        PermissionLevel.User,
+                        deleteUser!.id,
+                      )
+                    }
+                    data={{}}
+                    loadingMessage="Removing administrator role..."
+                    mode="component"
+                    onSuccess={() => {
+                      handleUserUpdated();
+                      setIsDeleteDialogOpen(false);
+                      setDeleteUser(null);
+                    }}
+                  >
+                    {({ onSubmit }) => (
+                      <AlertDialogAction
+                        className="border-destructive bg-destructive hover:text-destructive border-1 text-white hover:bg-white/10 hover:font-bold"
+                        onClick={onSubmit}
+                      >
+                        Remove Role
+                      </AlertDialogAction>
+                    )}
+                  </ApiMutation>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <EditSysAdminModal
+              isOpen={isEditModalOpen}
+              onOpenChange={setIsEditModalOpen}
+              user={selectedUser}
+              onUserUpdated={handleUserUpdated}
+            />
+          </>
+        );
+      }}
+    </ApiWrapper>
   );
 }

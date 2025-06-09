@@ -44,26 +44,37 @@ const Dashboard = () => {
         const projectCards = transformProjects(projects);
 
         return (
-          <div className="min-h-screen pb-12">
-            <div className="mx-auto max-w-7xl space-y-8 p-6">
+          <div className="min-h-screen pb-16">
+            <div className="mx-auto max-w-7xl space-y-10 p-6">
               {/* Welcome Banner with Action Button */}
-              <div className="from-primary/90 to-primary flex items-center justify-between rounded-lg bg-gradient-to-r p-6 shadow-md">
-                <div className="text-primary-foreground">
-                  <h1 className="text-3xl font-bold">
-                    {session?.user?.person?.name || session?.name}
+              <div className="relative overflow-hidden rounded-2xl bg-gray-800 p-8 shadow-2xl">
+                <div className="absolute inset-0 bg-gray-900/20"></div>
+                <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-white/5"></div>
+                <div className="absolute -bottom-12 -left-12 h-32 w-32 rounded-full bg-white/5"></div>
+                <div className="relative text-white">
+                  <h1 className="mb-3 text-4xl font-bold tracking-tight">
+                    Welcome back,{" "}
+                    {session?.user?.person?.name?.split(" ")[0] ||
+                      session?.name}
                   </h1>
-                  <p className="mt-2 opacity-90">
+                  <p className="text-xl font-light opacity-90">
                     Manage and track your research projects in one place
                   </p>
                 </div>
               </div>
 
               {/* Projects Section with Header */}
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-foreground text-2xl font-semibold">
-                    Your Projects
-                  </h2>
+                  <div>
+                    <h2 className="mb-2 text-3xl font-semibold text-gray-900">
+                      Your Projects
+                    </h2>
+                    <p className="text-gray-600">
+                      {projectCards.length} project
+                      {projectCards.length !== 1 ? "s" : ""} found
+                    </p>
+                  </div>
                   <div className="flex gap-2">
                     {/* Additional controls could go here */}
                   </div>

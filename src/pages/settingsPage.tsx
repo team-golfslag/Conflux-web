@@ -14,7 +14,7 @@ It is currently empty.
 function SettingsPage() {
   return (
     <>
-      <h1 className="text-red-500 dark:text-blue-500">
+      <h1 className="text-red-500 dark:text-gray-300">
         Please create the settings page here!
       </h1>
       <Link to="/" className="dark:text-red-800">

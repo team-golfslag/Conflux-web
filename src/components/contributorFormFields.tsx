@@ -64,10 +64,13 @@ export default function ContributorFormFields({
 }: Readonly<ContributorFormFieldsProps>) {
   const idPrefix = isEdit ? "edit-" : "";
   return (
-    <div className="grid gap-4 py-4">
+    <div className="grid gap-6 py-6">
       {onNameChange && (
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor={`${idPrefix}name`} className="text-right">
+          <Label
+            htmlFor={`${idPrefix}name`}
+            className="text-right font-semibold text-gray-700"
+          >
             Name
           </Label>
           <Input
@@ -77,9 +80,10 @@ export default function ContributorFormFields({
             value={formData.name}
             onChange={onNameChange}
             disabled={isConfluxUser}
+            placeholder="Enter full name"
           />
           {isConfluxUser && (
-            <div className="text-muted-foreground col-span-3 col-start-2 -mt-2 ml-1 text-xs">
+            <div className="col-span-3 col-start-2 -mt-2 ml-1 rounded-md bg-amber-50 p-2 text-xs text-amber-600">
               Name cannot be edited for registered Conflux users
             </div>
           )}
@@ -88,7 +92,10 @@ export default function ContributorFormFields({
 
       {onEmailChange && (
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor={`${idPrefix}email`} className="text-right">
+          <Label
+            htmlFor={`${idPrefix}email`}
+            className="text-right font-semibold text-gray-700"
+          >
             Email
           </Label>
           <Input

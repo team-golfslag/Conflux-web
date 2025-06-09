@@ -255,6 +255,8 @@ export default function AddContributorModal({
     }));
     setSearchResults([]);
     setSearchTerm("");
+    setOrcidSearchResults([]);
+    setOrcidSearchTerm("");
   };
 
   // Prepare data for API mutation
@@ -324,10 +326,15 @@ export default function AddContributorModal({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Add Contributor</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-h-[90vh] overflow-y-auto border-0 bg-white/95 shadow-2xl backdrop-blur-md sm:max-w-[700px]">
+        <DialogHeader className="space-y-3 border-b border-gray-100 pb-6">
+          <DialogTitle className="flex items-center gap-3 text-2xl">
+            <div className="rounded-lg bg-gray-100 p-2">
+              <User className="h-6 w-6 text-green-600" />
+            </div>
+            Add Contributor
+          </DialogTitle>
+          <DialogDescription className="text-base text-gray-600">
             Add a new contributor to this project. You can search by ORCID or
             enter details manually.
           </DialogDescription>
@@ -502,18 +509,23 @@ export default function AddContributorModal({
                 />
               </div>
 
-              <DialogFooter>
-                <Button variant="outline" onClick={() => onOpenChange(false)}>
+              <DialogFooter className="flex gap-3 border-t border-gray-100 pt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  className="transition-all duration-200 hover:scale-105 hover:bg-gray-50"
+                >
                   Cancel
                 </Button>
                 {error && (
-                  <div className="text-destructive text-xs">
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
                     {error.message}
                   </div>
                 )}
                 <Button
                   onClick={onSubmit}
                   disabled={isLoading || !formData.name || !formData.position}
+                  className="bg-green-600 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isLoading ? "Adding..." : "Add Contributor"}
                 </Button>

@@ -57,18 +57,20 @@ export default function ProductCard({
   onProjectUpdate,
 }: Readonly<productCardProps>) {
   return (
-    <Card className="flex flex-col gap-1 border border-gray-200 p-3 shadow-sm">
-      <div className="flex items-center justify-between">
-        <p className="font-semibold">{product.title}</p>
+    <Card className="group/productCard border-gray-200/60 bg-white transition-all duration-300">
+      <div className="flex items-center justify-between p-3">
+        <h3 className="text-base font-semibold text-gray-900 transition-colors duration-200 group-hover/productCard:text-gray-800">
+          {product.title}
+        </h3>
         {editMode && (
-          <div>
+          <div className="flex gap-1">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="p-0 text-blue-500 hover:text-blue-700"
+                    className="h-7 w-7 rounded-lg p-0 text-gray-600 transition-all duration-200 hover:scale-110 hover:bg-gray-100 hover:text-gray-800"
                     onClick={() => {
                       setIsEditModalOpen(true);
                       setEditedProduct(product);
@@ -88,7 +90,7 @@ export default function ProductCard({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-destructive hover:text-destructive/80 p-0"
+                        className="h-7 w-7 rounded-lg p-0 text-red-600 transition-all duration-200 hover:scale-110 hover:bg-red-50 hover:text-red-700"
                         onClick={() => {
                           setIsDeleteDialogOpen(true);
                           setDeletedProduct(product);
@@ -98,7 +100,7 @@ export default function ProductCard({
                       </Button>
                     </AlertDialogTrigger>
                   </TooltipTrigger>
-                  <TooltipContent>Delete contributor</TooltipContent>
+                  <TooltipContent>Delete Product</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </AlertDialog>
@@ -136,7 +138,7 @@ export default function ProductCard({
                   >
                     {({ onSubmit }) => (
                       <AlertDialogAction
-                        className="border-destructive bg-destructive hover:text-destructive border-1 text-white hover:bg-white/10 hover:font-bold"
+                        className="border-0 bg-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-red-700"
                         onClick={onSubmit}
                       >
                         Delete
@@ -149,25 +151,41 @@ export default function ProductCard({
           </div>
         )}
       </div>
-      {product.url && <p className="text-sm text-gray-600">{product.url}</p>}
-      <div className="flex flex-wrap gap-1">
-        <Badge variant="secondary" className="h-5 px-2 py-0 text-xs">
-          {product.type}
-        </Badge>
-        {product.schema && (
-          <Badge variant="outline" className="h-5 px-2 py-0 text-xs">
-            {product.schema}
-          </Badge>
+
+      <div className="space-y-2 px-3">
+        {product.url && (
+          <div className="rounded-lg border border-gray-100 bg-gray-50/50 p-2">
+            <p className="font-mono text-xs break-all text-gray-600">
+              {product.url}
+            </p>
+          </div>
         )}
-        {product.categories?.map((category) => (
+
+        <div className="flex flex-wrap gap-2">
           <Badge
-            key={category}
-            variant="default"
-            className="h-5 px-2 py-0 text-xs"
+            variant="secondary"
+            className="border-gray-200/50 bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 transition-transform duration-200 hover:scale-105"
           >
-            {category}
+            {product.type}
           </Badge>
-        ))}
+          {product.schema && (
+            <Badge
+              variant="outline"
+              className="border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700 transition-transform duration-200 hover:scale-105"
+            >
+              {product.schema}
+            </Badge>
+          )}
+          {product.categories?.map((category) => (
+            <Badge
+              key={category}
+              variant="default"
+              className="border-gray-200/50 px-3 py-1 text-xs font-medium transition-transform duration-200 hover:scale-105"
+            >
+              {category}
+            </Badge>
+          ))}
+        </div>
       </div>
     </Card>
   );

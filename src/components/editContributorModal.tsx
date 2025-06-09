@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Pencil } from "lucide-react";
 import ContributorFormFields from "./contributorFormFields";
 import {
   ContributorRoleType,
@@ -209,12 +209,17 @@ export default function EditContributorModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Edit Contributor</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-h-[90vh] overflow-y-auto border-0 bg-white/95 shadow-2xl backdrop-blur-md sm:max-w-[700px]">
+        <DialogHeader className="space-y-3 border-b border-gray-100 pb-6">
+          <DialogTitle className="flex items-center gap-3 text-2xl">
+            <div className="rounded-lg bg-gray-100 p-2">
+              <Pencil className="h-6 w-6 text-gray-600" />
+            </div>
+            Edit Contributor
+          </DialogTitle>
+          <DialogDescription className="text-base text-gray-600">
             {!isConfluxUser && (
-              <p className="text-muted-foreground mb-2 text-sm">
+              <p className="mb-2">
                 Update the contributor and person information for this project.
               </p>
             )}
@@ -271,22 +276,27 @@ export default function EditContributorModal({
                 isConfluxUser={isConfluxUser}
               />
 
-              <DialogFooter>
+              <DialogFooter className="flex gap-3 border-t border-gray-100 pt-6">
                 <Button
                   variant="outline"
                   onClick={() => {
                     onOpenChange(false);
                     resetForm();
                   }}
+                  className="transition-all duration-200 hover:scale-105 hover:bg-gray-50"
                 >
                   Cancel
                 </Button>
                 {error && (
-                  <div className="text-destructive text-xs">
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
                     {error.message}
                   </div>
                 )}
-                <Button onClick={onSubmit} disabled={isLoading}>
+                <Button
+                  onClick={onSubmit}
+                  disabled={isLoading}
+                  className="bg-gray-800 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+                >
                   {isLoading ? "Saving..." : "Save Changes"}
                 </Button>
               </DialogFooter>

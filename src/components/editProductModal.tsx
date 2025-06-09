@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 import {
   ProductCategoryType,
   ProductRequestDTO,
@@ -120,11 +121,16 @@ export default function EditProductModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Edit Product</DialogTitle>
-          <DialogDescription>
-            Edit the product of your project.
+      <DialogContent className="max-h-[90vh] overflow-y-auto border-0 bg-white/95 shadow-2xl backdrop-blur-md sm:max-w-[600px]">
+        <DialogHeader className="space-y-3 border-b border-gray-100 pb-6">
+          <DialogTitle className="flex items-center gap-3 text-2xl">
+            <div className="rounded-lg bg-gray-100 p-2">
+              <Pencil className="h-6 w-6 text-gray-600" />
+            </div>
+            Edit Product
+          </DialogTitle>
+          <DialogDescription className="text-base text-gray-600">
+            Update the product information and categories for your project.
           </DialogDescription>
         </DialogHeader>
         <ProductFormFields
@@ -135,12 +141,13 @@ export default function EditProductModal({
           setSchema={setProductSchema}
           onCategoryChange={handleCategoryChange}
         />
-        <DialogFooter>
+        <DialogFooter className="flex gap-3 border-t border-gray-100 pt-6">
           <Button
             variant="outline"
             onClick={() => {
               onOpenChange(false);
             }}
+            className="transition-all duration-200 hover:scale-105 hover:bg-gray-50"
           >
             Cancel
           </Button>
@@ -152,6 +159,7 @@ export default function EditProductModal({
               !productSchema ||
               categories.length === 0
             }
+            className="bg-gray-800 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Apply Changes
           </Button>

@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx";
 import { ApiMutation } from "@/components/apiMutation.tsx";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Building } from "lucide-react";
 
 interface OrganizationFormData {
   name: string;
@@ -226,15 +226,18 @@ export default function EditOrganizationModal({
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent className="max-h-9/10 overflow-scroll">
-        <DialogHeader>
-          <DialogTitle>
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto border-0 bg-white/95 shadow-2xl backdrop-blur-md">
+        <DialogHeader className="space-y-3 border-b border-gray-100 pb-6">
+          <DialogTitle className="flex items-center gap-3 text-2xl">
+            <div className="rounded-lg bg-gray-100 p-2">
+              <Building className="h-6 w-6 text-gray-600" />
+            </div>
             {isEdit ? "Edit Organization" : "Add Organization"}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-base text-gray-600">
             {isEdit
-              ? "Update the organization information for this project."
-              : "Add a new organization to this project."}
+              ? "Update the organization information and role for this project."
+              : "Add a new organization to this project with their specific role."}
           </DialogDescription>
         </DialogHeader>
 

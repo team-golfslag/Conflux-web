@@ -1,7 +1,19 @@
 /**
  * This program has been developed by students from the bachelor Computer Science at Utrecht
  * University within the Software Project course.
- * © Copyright Utrecht University (Department of Information and Computing Sciences)
+ * © Copyright Utrecht Universit      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-md border-0 shadow-2xl">
+        <DialogHeader className="space-y-3 pb-6 border-b border-gray-100">
+          <DialogTitle className="flex items-center gap-3 text-2xl">
+            <div className="p-2 rounded-lg bg-gray-100">
+              <UserCog className="h-6 w-6 text-gray-600" />
+            </div>
+            Add System Administrator
+          </DialogTitle>
+          <DialogDescription className="text-gray-600 text-base">
+            Create a new system administrator account by linking to an existing
+            user in the system and assigning appropriate permissions.
+          </DialogDescription>
+        </DialogHeader>tment of Information and Computing Sciences)
  */
 
 import { useCallback, useEffect, useState, useContext } from "react";
@@ -23,7 +35,7 @@ import {
   UserResponseDTO,
   PermissionLevel,
 } from "@team-golfslag/conflux-api-client/src/client";
-import { Search, User, AlertCircle } from "lucide-react";
+import { Search, User, AlertCircle, UserCog } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 
 interface AddSysAdminModalProps {
@@ -355,11 +367,12 @@ export default function AddSysAdminModal({
                   </div>
                 )}
 
-                <DialogFooter>
+                <DialogFooter className="flex gap-3 border-t border-gray-100 pt-6">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => onOpenChange(false)}
+                    className="transition-all duration-200 hover:scale-105 hover:bg-gray-50"
                   >
                     Cancel
                   </Button>
@@ -367,6 +380,7 @@ export default function AddSysAdminModal({
                     type="button"
                     onClick={onSubmit}
                     disabled={isLoading || !selectedUser}
+                    className="bg-gray-800 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isLoading ? "Creating..." : "Create Admin User"}
                   </Button>

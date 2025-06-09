@@ -39,7 +39,7 @@ export default function SysAdminPortal() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-12">
+    <div className="min-h-scree pb-12">
       <div className="mx-auto max-w-7xl space-y-6 p-6">
         {/* Header */}
         <div className="flex items-center justify-between">

@@ -92,7 +92,7 @@ export default function ContributorCard({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Contact className="h-4 w-4 text-blue-500" />
+                      <Contact className="h-4 w-4 text-gray-600" />
                     </TooltipTrigger>
                     <TooltipContent>Contact Person</TooltipContent>
                   </Tooltip>
@@ -132,7 +132,7 @@ export default function ContributorCard({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="p-0 text-blue-500 hover:text-blue-700"
+                        className="p-0 text-gray-600 hover:text-gray-800"
                         onClick={onEdit}
                         aria-label="Edit contributor"
                       >

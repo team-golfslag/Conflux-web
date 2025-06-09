@@ -60,9 +60,12 @@ export default function ProductFormFields({
   onCategoryChange,
 }: Readonly<ProductFormFieldsProps>) {
   return (
-    <div className="grid gap-4 py-4">
+    <div className="grid gap-6 py-6">
       <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="title" className="text-right">
+        <Label
+          htmlFor="title"
+          className="text-right font-semibold text-gray-700"
+        >
           Title
         </Label>
         <Input
@@ -70,11 +73,12 @@ export default function ProductFormFields({
           value={formData.title}
           onChange={(e) => setProductTitle(e.target.value)}
           className="col-span-3"
+          placeholder="Enter product title"
         />
       </div>
       <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="url" className="text-right">
-          url
+        <Label htmlFor="url" className="text-right font-semibold text-gray-700">
+          URL
         </Label>
         <Input
           id="url"
@@ -85,7 +89,9 @@ export default function ProductFormFields({
         />
       </div>
       <div className="grid grid-cols-4 items-center gap-4">
-        <Label className="col-span-1 text-right">Type</Label>
+        <Label className="col-span-1 text-right font-semibold text-gray-700">
+          Type
+        </Label>
         <Select
           onValueChange={(e) => {
             setProductType(ProductType[e as keyof typeof ProductType]);
@@ -107,7 +113,10 @@ export default function ProductFormFields({
           </SelectContent>
         </Select>
 
-        <Label htmlFor="schema" className="col-span-1 text-right">
+        <Label
+          htmlFor="schema"
+          className="col-span-1 text-right font-semibold text-gray-700"
+        >
           Schema
         </Label>
         <Select
@@ -133,8 +142,10 @@ export default function ProductFormFields({
       </div>
 
       <div className="grid grid-cols-4 items-start gap-4">
-        <Label className="pt-2 text-right">Categories</Label>
-        <div className="col-span-3 flex flex-wrap gap-2">
+        <Label className="pt-2 text-right font-semibold text-gray-700">
+          Categories
+        </Label>
+        <div className="col-span-3 flex flex-wrap gap-3">
           {Object.values(ProductCategoryType).map((category) => (
             <TooltipProvider key={category}>
               <Tooltip>
@@ -145,7 +156,7 @@ export default function ProductFormFields({
                         ? "default"
                         : "outline"
                     }
-                    className="cursor-pointer"
+                    className="cursor-pointer transition-transform duration-200 hover:scale-105"
                     onClick={() => onCategoryChange(category)}
                   >
                     {category}

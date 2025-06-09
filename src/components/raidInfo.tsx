@@ -333,7 +333,7 @@ export default function RAiDInfo({
         loadingMessage="Checking RAiD compatibility..."
         error={null}
       >
-        <Card className="border-amber-100 bg-gradient-to-br from-amber-50 to-orange-50">
+        <Card className="border-gray-200 bg-gray-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="flex items-center gap-2 text-xl font-semibold text-amber-900">
               <AlertTriangle className="h-5 w-5" />
@@ -453,13 +453,13 @@ export default function RAiDInfo({
       error={error}
     >
       {raidInfo && (
-        <Card className="border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50">
+        <Card className="border-gray-200 bg-gray-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="flex items-center gap-2 text-xl font-semibold text-blue-900">
+            <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
               <Shield className="h-5 w-5" />
               RAiD Information
             </CardTitle>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+            <Badge variant="secondary" className="bg-gray-200 text-gray-700">
               Research Activity Identifier
             </Badge>
           </CardHeader>
@@ -469,12 +469,12 @@ export default function RAiDInfo({
             <div className="rounded-lg border border-blue-100 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Hash className="h-4 w-4 text-blue-600" />
+                  <Hash className="h-4 w-4 text-gray-600" />
                   <Label className="font-semibold text-gray-700">RAiD ID</Label>
                 </div>
                 <ExternalLink className="h-4 w-4 text-gray-400" />
               </div>
-              <p className="overflow-wrap-anywhere mt-1 rounded bg-blue-50 px-2 py-1 font-mono text-sm break-words break-all text-blue-700">
+              <p className="overflow-wrap-anywhere mt-1 rounded bg-gray-100 px-2 py-1 font-mono text-sm break-words break-all text-gray-700">
                 {raidInfo.r_ai_d_id}
               </p>
             </div>
@@ -510,7 +510,7 @@ export default function RAiDInfo({
                     variant={raidInfo.dirty ? "destructive" : "default"}
                     className={
                       raidInfo.dirty
-                        ? "bg-orange-100 text-orange-800"
+                        ? "bg-gray-200 text-gray-700"
                         : "bg-green-100 text-green-800"
                     }
                   >

@@ -4,9 +4,8 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import React from "react";
-import { AlertCircle, Loader2, RefreshCcw } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { SwaggerException } from "@team-golfslag/conflux-api-client/src/client";
-import { Button } from "./ui/button";
 
 /**
  * Props for the LoadingWrapper component
@@ -23,8 +22,6 @@ interface LoadingWrapperProps {
   loadingMessage?: React.ReactNode;
   /** Error object to display, if any */
   error?: SwaggerException | null;
-  /** Function to call when the retry button is clicked */
-  onRetry?: () => void;
   /** Display mode - "page" for full-page loading UI, "component" for inline loading */
   mode?: "page" | "component";
 }
@@ -44,7 +41,6 @@ export function LoadingWrapper({
   isInitialLoad,
   loadingMessage = "Loading...",
   error = null,
-  onRetry,
   mode = "page",
 }: LoadingWrapperProps) {
   // Only show loading UI on initial load if isInitialLoad is provided
@@ -53,15 +49,18 @@ export function LoadingWrapper({
     if (mode === "component") {
       return (
         <div className="relative h-full w-full">
-          <div className="absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-white/70 backdrop-blur-sm">
-            <div className="flex flex-col items-center justify-center space-y-2 rounded-lg bg-white/80 p-4 shadow-md">
-              <Loader2 className="text-primary mx-auto h-6 w-6 animate-spin" />
-              <span className="text-center text-sm font-medium">
+          <div className="absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-white/90 backdrop-blur-md">
+            <div className="flex flex-col items-center justify-center space-y-4 rounded-xl border border-gray-100 bg-white/95 p-6 shadow-xl">
+              <div className="relative">
+                <div className="absolute inset-0 animate-pulse rounded-full bg-gray-300/30"></div>
+                <Loader2 className="text-primary relative h-8 w-8 animate-spin" />
+              </div>
+              <span className="text-center text-sm font-medium text-gray-700">
                 {loadingMessage}
               </span>
             </div>
           </div>
-          <div className="pointer-events-none opacity-60">{children}</div>
+          <div className="pointer-events-none opacity-50">{children}</div>
         </div>
       );
     }
@@ -69,9 +68,16 @@ export function LoadingWrapper({
     return (
       // Adjust min-height to account for the header (assuming 3rem height)
       <div className="flex min-h-screen items-center justify-center p-8 pt-16">
-        <div className="flex flex-col items-center justify-center space-y-4 rounded-lg bg-white p-6 text-xl font-semibold shadow-md">
-          <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
-          <span className="text-center">{loadingMessage}</span>
+        <div className="flex flex-col items-center justify-center space-y-6 rounded-2xl border border-gray-100 bg-white/80 p-8 shadow-2xl backdrop-blur-sm">
+          <div className="relative">
+            <div className="absolute inset-0 animate-pulse rounded-full bg-gray-300/30"></div>
+            <Loader2 className="text-primary relative h-12 w-12 animate-spin" />
+          </div>
+          <div className="space-y-2 text-center">
+            <span className="text-lg font-medium text-gray-800">
+              {loadingMessage}
+            </span>
+          </div>
         </div>
       </div>
     );
@@ -87,17 +93,6 @@ export function LoadingWrapper({
               <span className="text-center text-sm font-medium">
                 Error: {error.message || "An unexpected error occurred"}
               </span>
-              {onRetry && (
-                <Button
-                  onClick={onRetry}
-                  variant="outline"
-                  size="sm"
-                  className="mx-auto mt-1 flex items-center gap-1"
-                >
-                  <RefreshCcw className="h-3 w-3" />
-                  Retry
-                </Button>
-              )}
             </div>
           </div>
           <div className="pointer-events-none opacity-60">{children}</div>
@@ -107,22 +102,20 @@ export function LoadingWrapper({
 
     return (
       <div className="flex min-h-screen items-center justify-center p-8 pt-16">
-        <div className="flex max-w-2xl flex-col items-center justify-center space-y-4 rounded-lg bg-white p-6 text-xl shadow-md">
-          <AlertCircle className="text-destructive mx-auto h-12 w-12" />
-          <h2 className="text-center text-xl font-semibold">Error</h2>
-          <p className="text-center text-base font-normal">
-            {error.message || "An unexpected error occurred"}
-            {error.status ? ` (Status: ${error.status})` : ""}
-          </p>
-          {onRetry && (
-            <Button
-              onClick={onRetry}
-              className="mx-auto mt-2 flex items-center gap-2"
-            >
-              <RefreshCcw className="h-4 w-4" />
-              Retry
-            </Button>
-          )}
+        <div className="flex max-w-2xl flex-col items-center justify-center space-y-6 rounded-2xl border border-red-100 bg-white/90 p-8 shadow-2xl backdrop-blur-sm">
+          <div className="relative">
+            <div className="absolute inset-0 animate-pulse rounded-full bg-red-500/10"></div>
+            <AlertCircle className="text-destructive relative h-16 w-16" />
+          </div>
+          <div className="space-y-3 text-center">
+            <h2 className="text-2xl font-semibold text-gray-800">
+              Something went wrong
+            </h2>
+            <p className="text-base leading-relaxed font-normal text-gray-600">
+              {error.message || "An unexpected error occurred"}
+              {error.status ? ` (Status: ${error.status})` : ""}
+            </p>
+          </div>
         </div>
       </div>
     );

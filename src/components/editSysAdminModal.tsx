@@ -119,15 +119,17 @@ export default function EditSysAdminModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <UserCog className="h-5 w-5" />
+      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto border-0 bg-white/95 shadow-2xl backdrop-blur-md">
+        <DialogHeader className="space-y-3 border-b border-gray-100 pb-6">
+          <DialogTitle className="flex items-center gap-3 text-2xl">
+            <div className="rounded-lg bg-blue-100 p-2">
+              <UserCog className="h-6 w-6 text-gray-600" />
+            </div>
             Edit System Administrator
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-base text-gray-600">
             Select the organizations and lectorates this administrator can
-            manage.
+            manage. These permissions will determine their access scope.
           </DialogDescription>
         </DialogHeader>
 
@@ -143,19 +145,24 @@ export default function EditSysAdminModal({
         >
           {({ isLoading, onSubmit }) => (
             <>
-              <div className="mt-5 space-y-6">
-                <div className="grid gap-2 md:grid-cols-2">
+              <div className="mt-6 space-y-8">
+                <div className="grid gap-6 md:grid-cols-2">
                   {/* Organizations */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-sm">
-                        <Building2 className="h-4 w-4" />
+                  <Card className="border-0 bg-white shadow-md">
+                    <CardHeader className="border-b border-gray-100/50 bg-gray-50">
+                      <CardTitle className="flex items-center gap-3 text-lg">
+                        <div className="rounded-lg bg-blue-100 p-1.5">
+                          <Building2 className="h-4 w-4 text-gray-600" />
+                        </div>
                         Organizations
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-1">
+                    <CardContent className="max-h-60 overflow-y-auto">
                       {organizations.map((org) => (
-                        <div key={org} className="flex items-center space-x-2">
+                        <div
+                          key={org}
+                          className="flex items-center space-x-3 rounded-lg transition-colors duration-200 hover:bg-blue-50/50"
+                        >
                           <Checkbox
                             id={`org-${org}`}
                             checked={formData.assignedOrganizations.includes(
@@ -164,8 +171,12 @@ export default function EditSysAdminModal({
                             onCheckedChange={(checked: boolean) =>
                               handleOrganizationToggle(org, checked)
                             }
+                            className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600"
                           />
-                          <Label htmlFor={`org-${org}`} className="text-sm">
+                          <Label
+                            htmlFor={`org-${org}`}
+                            className="cursor-pointer text-sm font-medium text-gray-700"
+                          >
                             {org}
                           </Label>
                         </div>
@@ -174,18 +185,20 @@ export default function EditSysAdminModal({
                   </Card>
 
                   {/* Lectorates */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-sm">
-                        <GraduationCap className="h-4 w-4" />
+                  <Card className="border-0 bg-white shadow-md">
+                    <CardHeader className="border-b border-gray-100/50 bg-gray-50">
+                      <CardTitle className="flex items-center gap-3 text-lg">
+                        <div className="rounded-lg bg-green-100 p-1.5">
+                          <GraduationCap className="h-4 w-4 text-green-600" />
+                        </div>
                         Lectorates
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-1">
+                    <CardContent className="max-h-60 overflow-y-auto">
                       {lectorates.map((lectorate) => (
                         <div
                           key={lectorate}
-                          className="flex items-center space-x-2"
+                          className="flex items-center space-x-3 rounded-lg transition-colors duration-200 hover:bg-green-50/50"
                         >
                           <Checkbox
                             id={`lect-${lectorate}`}
@@ -195,10 +208,11 @@ export default function EditSysAdminModal({
                             onCheckedChange={(checked: boolean) =>
                               handleLectorateToggle(lectorate, checked)
                             }
+                            className="data-[state=checked]:border-green-600 data-[state=checked]:bg-green-600"
                           />
                           <Label
                             htmlFor={`lect-${lectorate}`}
-                            className="text-sm"
+                            className="cursor-pointer text-sm font-medium text-gray-700"
                           >
                             {lectorate}
                           </Label>

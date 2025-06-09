@@ -13,8 +13,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, AlertCircle } from "lucide-react";
 import {
   ProductCategoryType,
   ProductRequestDTO,
@@ -49,6 +58,10 @@ export default function AddProductModal({
     ProductSchema | undefined
   >();
   const [categories, setCategories] = React.useState<ProductCategoryType[]>([]);
+  
+  // Error modal state
+  const [showErrorModal, setShowErrorModal] = React.useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = React.useState<string>("");
 
   const handleCategoryChange = (category: ProductCategoryType) => {
     setCategories((prev) =>
@@ -64,6 +77,8 @@ export default function AddProductModal({
     setProductType(undefined);
     setProductSchema(undefined);
     setCategories([]);
+    setShowErrorModal(false);
+    setErrorMessage("");
   };
 
   const productData: ProductFormData = {
@@ -97,25 +112,31 @@ export default function AddProductModal({
       onOpenChange(false);
       resetModal();
     } catch (error) {
-      alert(
-        `Failed to add product: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
-      );
+      const message = error instanceof Error ? error.message : "Unknown error";
+      setErrorMessage(`Failed to add product: ${message}`);
+      setShowErrorModal(true);
     }
   };
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Plus className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add Product</DialogTitle>
-          <DialogDescription>Add a product to your project.</DialogDescription>
+      <DialogContent className="max-h-[90vh] overflow-y-auto border-0 bg-white/95 shadow-2xl backdrop-blur-md sm:max-w-[600px]">
+        <DialogHeader className="space-y-3 border-b border-gray-100 pb-6">
+          <DialogTitle className="flex items-center gap-3 text-2xl">
+            <div className="rounded-lg bg-gray-100 p-2">
+              <Plus className="h-6 w-6 text-gray-600" />
+            </div>
+            Add Product
+          </DialogTitle>
+          <DialogDescription className="text-base text-gray-600">
+            Add a new product to showcase the research outputs of your project.
+          </DialogDescription>
         </DialogHeader>
         <ProductFormFields
           formData={productData}
@@ -125,13 +146,14 @@ export default function AddProductModal({
           setSchema={setProductSchema}
           onCategoryChange={handleCategoryChange}
         />
-        <DialogFooter>
+        <DialogFooter className="flex gap-3 border-t border-gray-100 pt-6">
           <Button
             variant="outline"
             onClick={() => {
               onOpenChange(false);
               resetModal();
             }}
+            className="transition-all duration-200 hover:scale-105 hover:bg-gray-50"
           >
             Cancel
           </Button>
@@ -143,11 +165,36 @@ export default function AddProductModal({
               !productSchema ||
               categories.length === 0
             }
+            className="bg-gray-800 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Add Product
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    {/* Error Modal */}
+    <AlertDialog open={showErrorModal} onOpenChange={setShowErrorModal}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+            <AlertCircle className="h-5 w-5" />
+            Error Adding Product
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-left">
+            {errorMessage}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogAction
+            onClick={() => setShowErrorModal(false)}
+            className="bg-destructive hover:bg-destructive/90"
+          >
+            OK
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
