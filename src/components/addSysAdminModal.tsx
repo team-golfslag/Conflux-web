@@ -35,7 +35,7 @@ import {
   UserResponseDTO,
   PermissionLevel,
 } from "@team-golfslag/conflux-api-client/src/client";
-import { Search, User, AlertCircle, UserCog } from "lucide-react";
+import { Search, User, AlertCircle } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 
 interface AddSysAdminModalProps {

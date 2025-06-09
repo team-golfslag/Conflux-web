@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import React, { useState } from "react";
+import React from "react";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { LoadingWrapper } from "./loadingWrapper";
 import { ApiClient } from "@team-golfslag/conflux-api-client/src/client";
@@ -23,23 +23,13 @@ export function ApiWrapper<T>({
   children,
   mode = "page",
 }: ApiWrapperProps<T>) {
-  const [retryCount, setRetryCount] = useState(0);
-
-  const { data, isLoading, error } = useApiQuery(queryFn, [
-    ...dependencies,
-    retryCount,
-  ]);
-
-  const handleRetry = () => {
-    setRetryCount((prev) => prev + 1);
-  };
+  const { data, isLoading, error } = useApiQuery(queryFn, [...dependencies]);
 
   return (
     <LoadingWrapper
       isLoading={isLoading}
       loadingMessage={loadingMessage}
       error={error}
-      onRetry={handleRetry}
       mode={mode}
     >
       {data !== undefined && children(data)}

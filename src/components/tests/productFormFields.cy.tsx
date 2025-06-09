@@ -76,7 +76,7 @@ describe("productFormFields Component", () => {
 
   it("displays proper labels for each field", () => {
     cy.contains("Title").should("exist");
-    cy.contains("url").should("exist");
+    cy.contains("URL").should("exist");
     cy.contains("Type").should("exist");
     cy.contains("Categories").should("exist");
   });

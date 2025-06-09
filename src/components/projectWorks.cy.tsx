@@ -99,8 +99,8 @@ describe("<ProjectWorks />", () => {
   });
 
   it("edit and delete button appear when the edit button is clicked", () => {
-    cy.get("button.text-blue-500").should("not.exist");
-    cy.get("button.text-destructive").should("not.exist");
+    cy.get("button.text-gray-600").should("not.exist");
+    cy.get("button.text-red-600").should("not.exist");
 
     cy.get("button").contains("Edit").click();
 
@@ -111,34 +111,34 @@ describe("<ProjectWorks />", () => {
     cy.contains(mockProducts[0].title)
       .parent()
       .parent()
-      .get("button.text-blue-500")
+      .get("button.text-gray-600")
       .should("exist");
     cy.contains(mockProducts[0].title)
       .parent()
       .parent()
-      .get("button.text-destructive")
+      .get("button.text-red-600")
       .should("exist");
 
     cy.contains(mockProducts[1].title)
       .parent()
       .parent()
-      .get("button.text-blue-500")
+      .get("button.text-gray-600")
       .should("exist");
     cy.contains(mockProducts[1].title)
       .parent()
       .parent()
-      .get("button.text-destructive")
+      .get("button.text-red-600")
       .should("exist");
 
     cy.contains(mockProducts[2].title)
       .parent()
       .parent()
-      .get("button.text-blue-500")
+      .get("button.text-gray-600")
       .should("exist");
     cy.contains(mockProducts[2].title)
       .parent()
       .parent()
-      .get("button.text-destructive")
+      .get("button.text-red-600")
       .should("exist");
   });
 
@@ -148,8 +148,8 @@ describe("<ProjectWorks />", () => {
     cy.get("button").contains("Edit").click();
 
     // The edit and delete button should be gone, as well as the Edit mode message
-    cy.get("button.text-blue-500").should("not.exist");
-    cy.get("button.text-destructive").should("not.exist");
+    cy.get("button.text-gray-600").should("not.exist");
+    cy.get("button.text-red-600").should("not.exist");
     cy.contains(
       "Edit mode active. You can edit or delete products from the project.",
     ).should("not.exist");

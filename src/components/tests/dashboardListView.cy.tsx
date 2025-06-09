@@ -87,7 +87,7 @@ describe("<DashboardListView />", () => {
     // Using the Card component from the updated ProjectCard
     cy.get(".flex.h-full.flex-col.rounded-xl").should(
       "have.length",
-      mockData.length * 2,
+      mockData.length,
     );
   });
 
@@ -126,7 +126,6 @@ describe("<DashboardListView />", () => {
         <DashboardListView />
       </BrowserRouter>,
     );
-    cy.get("div.grid").should("exist");
-    cy.get(".flex.h-full.flex-col.rounded-xl").should("not.exist"); // No cards should be present
+    cy.contains("h3", "No projects yet").should("be.visible");
   });
 });

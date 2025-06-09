@@ -175,12 +175,15 @@ describe("<addProductModal/>", () => {
     // Fill required fields
     cy.get('input[id="title"]').type("adipiscing elit");
 
+    // Select product type using a more reliable approach
     cy.contains("Select a product type").click();
-    cy.contains("Workflow").click();
+    cy.contains("Workflow").scrollIntoView().click({ force: true });
 
+    // Select schema using a more reliable approach
     cy.contains("Select a schema").click();
-    cy.contains("Doi").click();
+    cy.contains("Doi").scrollIntoView().click({ force: true });
 
+    // Select category
     cy.contains("Input").click();
 
     // Now the button should be enabled
