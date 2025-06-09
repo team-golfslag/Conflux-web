@@ -18,39 +18,39 @@ function App() {
       </div>
 
       <div className="relative flex min-h-screen flex-col items-center justify-center p-4">
-        <Card className="w-full max-w-3xl border border-gray-200 bg-white p-8 shadow-lg md:p-16">
-          <div className="mb-10 flex justify-center">
+        <Card className="w-full max-w-lg border border-gray-200 bg-white p-4 shadow-lg md:p-8">
+          <div className="mb-6 flex justify-center">
             <div className="relative">
-              <Logo size="160" />
+              <Logo size="120" />
             </div>
           </div>
 
-          <div className="space-y-8 text-center">
-            <div className="space-y-4">
-              <h1 className="text-5xl leading-tight font-bold text-gray-800 md:text-7xl">
+          <div className="space-y-4 text-center">
+            <div className="space-y-3">
+              <h1 className="text-3xl leading-tight font-bold text-gray-800 md:text-4xl">
                 Welcome to Conflux
               </h1>
-              <p className="text-xl leading-relaxed font-medium text-gray-600 md:text-2xl">
+              <p className="text-lg leading-relaxed font-medium text-gray-600 md:text-xl">
                 The application for streamlined project administration
               </p>
             </div>
 
-            <div className="space-y-6">
-              <p className="mx-auto max-w-2xl text-lg leading-relaxed text-gray-700 md:text-xl">
+            <div className="space-y-4">
+              <p className="mx-auto max-w-2xl text-base leading-relaxed text-gray-700 md:text-lg">
                 Developed for SURF, Conflux helps manage projects and integrates
                 with modern services like RAiD, ORCiD, ROR and more.
               </p>
 
-              <p className="text-lg text-gray-600 md:text-xl">
+              <p className="text-base text-gray-600 md:text-lg">
                 Please log in for a personalized experience
               </p>
             </div>
 
             {/* CTA section */}
-            <div className="pt-6">
+            <div className="pt-4">
               <Button
                 onClick={validation}
-                className="group relative overflow-hidden rounded-xl bg-gray-800 px-10 py-4 text-xl font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-900 hover:shadow-xl active:scale-95"
+                className="group relative overflow-hidden rounded-xl bg-gray-800 px-8 py-3 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-900 hover:shadow-xl active:scale-95"
               >
                 <span className="relative z-10 flex items-center gap-3">
                   Get Started
@@ -73,7 +73,7 @@ function App() {
           </div>
 
           {/* Footer note */}
-          <div className="mt-12 border-t border-gray-200 pt-8">
+          <div className="mt-8 border-t border-gray-200 pt-4">
             <p className="text-sm leading-relaxed text-gray-500">
               Built by Utrecht University students for the Software Project
               course
