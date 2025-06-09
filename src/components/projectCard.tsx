@@ -11,14 +11,18 @@ import {
   UserRoleType,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Link } from "react-router-dom";
-import { JSX } from "react";
-import { CalendarIcon, UsersIcon } from "lucide-react";
+import { JSX, useState } from "react";
+import { CalendarIcon, UsersIcon, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { getStatus } from "@/utils/projectUtils";
+import { useSession } from "@/hooks/SessionContext";
+import { Button } from "@/components/ui/button";
 
 export interface ProjectCardProps {
   project: ProjectResponseDTO;
   roles?: string[];
+  isFavorite?: boolean;
+  onFavoriteToggle?: (projectId: string, isFavorite: boolean) => void;
 }
 
 /**
@@ -26,10 +30,20 @@ export interface ProjectCardProps {
  *
  * @param {ProjectCardProps} props - The properties required to render the project card.
  * @param {string[]} props.roles - The user's roles in the project, if available.
+ * @param {boolean} props.isFavorite - Whether the project is favorited by the current user.
+ * @param {function} props.onFavoriteToggle - Callback function to handle favorite toggle.
  *
  * @returns {JSX.Element} A styled card element showing project details, including title, description, dates, contributors count, and user roles.
  */
-const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
+const ProjectCard = ({
+  project,
+  roles,
+  isFavorite = false,
+  onFavoriteToggle,
+}: ProjectCardProps): JSX.Element => {
+  const { session } = useSession();
+  const [isToggling, setIsToggling] = useState(false);
+
   // Format dates for display
   const startDate = project.start_date
     ? new Date(project.start_date).toLocaleDateString()
@@ -50,6 +64,24 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
   // Count contributors
   const contributorCount = project.contributors?.length ?? 0;
 
+  // Handle favorite toggle
+  const handleFavoriteToggle = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation to project page
+    e.stopPropagation(); // Prevent event bubbling
+
+    if (!session?.user?.scim_id || isToggling) return;
+
+    setIsToggling(true);
+    try {
+      // Only call the parent's callback - the parent handles the API call
+      onFavoriteToggle?.(project.id, !isFavorite);
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
+    } finally {
+      setIsToggling(false);
+    }
+  };
+
   return (
     <Link
       to={`/projects/${project.id}`}
@@ -63,11 +95,27 @@ const ProjectCard = ({ project, roles }: ProjectCardProps): JSX.Element => {
             </h3>
           </div>
           <Badge
-            className={`${status.color} absolute top-4 right-4 font-medium whitespace-nowrap shadow-sm`}
+            className={`${status.color} absolute top-4 right-12 font-medium whitespace-nowrap shadow-sm`}
             data-cy="project-status"
           >
             {status.label}
           </Badge>
+          {/* Favorite Star Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute top-4 right-3 h-8 w-8 p-0 opacity-80 hover:opacity-100"
+            onClick={handleFavoriteToggle}
+            disabled={isToggling}
+          >
+            <Star
+              className={`h-4 w-4 transition-colors duration-200 ${
+                isFavorite
+                  ? "fill-yellow-400 text-yellow-400"
+                  : "text-gray-400 hover:text-yellow-400"
+              }`}
+            />
+          </Button>
         </CardHeader>
 
         <CardContent className="flex flex-grow flex-col pt-6">

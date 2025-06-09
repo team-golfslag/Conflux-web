@@ -5,7 +5,7 @@
  */
 import ProjectCard from "@/components/projectCard";
 import { Input } from "@/components/ui/input.tsx";
-import React, { useState } from "react";
+import React, { useState, useContext, useCallback } from "react";
 import {
   OrderByType,
   ApiClient,
@@ -31,13 +31,15 @@ import { ApiWrapper } from "@/components/apiWrapper";
 import { Button } from "@/components/ui/button";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { Pagination } from "@/components/ui/pagination";
+import { ApiClientContext } from "@/lib/ApiClientContext";
 
 /** Project Search Page component <br>
  * Fetches projects from the backend using a debounced search term and selected sort order.
  * Projects are displayed with client-side pagination for better user experience.
  */
 const ProjectSearchPage = () => {
-  const { session } = useSession();
+  const { session, saveSession } = useSession();
+  const apiClient = useContext(ApiClientContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
@@ -47,6 +49,25 @@ const ProjectSearchPage = () => {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
+
+  // Handle favorite toggle
+  const handleFavoriteToggle = useCallback(
+    async (projectId: string, isFavorite: boolean) => {
+      if (!session?.user) return;
+
+      try {
+        // Call the API to update favorite status in the background
+        await apiClient.projects_FavoriteProject(projectId, isFavorite);
+
+        // Fetch fresh session data from server to get updated favorites
+        const freshSession = await apiClient.userSession_UserSession();
+        saveSession(freshSession);
+      } catch (error) {
+        console.error("Failed to toggle favorite:", error);
+      }
+    },
+    [session, saveSession, apiClient],
+  );
 
   // Debounce the search term to avoid excessive API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 200); // 300ms delay
@@ -267,10 +288,19 @@ const ProjectSearchPage = () => {
                       const roles = currentUser?.roles
                         ? currentUser.roles.map((role: UserRole) => role.type)
                         : [];
+
+                      // Check if project is favorited
+                      const isFavorite =
+                        session?.user?.favourite_project_ids?.includes(
+                          project.id,
+                        ) ?? false;
+
                       return (
                         <ProjectCard
                           project={project}
                           roles={roles}
+                          isFavorite={isFavorite}
+                          onFavoriteToggle={handleFavoriteToggle}
                           key={project.id}
                         />
                       );
