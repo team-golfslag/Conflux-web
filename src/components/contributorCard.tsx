@@ -84,7 +84,7 @@ export default function ContributorCard({
                     <TooltipTrigger asChild>
                       <Crown className="h-4 w-4 text-amber-500" />
                     </TooltipTrigger>
-                    <TooltipContent>Project Leader</TooltipContent>
+                    <TooltipContent>Project Lead</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               )}

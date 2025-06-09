@@ -30,10 +30,11 @@ import { useSession } from "@/hooks/SessionContext";
 import { ApiWrapper } from "@/components/apiWrapper";
 import { Button } from "@/components/ui/button";
 import { useApiQuery } from "@/hooks/useApiQuery";
+import { Pagination } from "@/components/ui/pagination";
 
 /** Project Search Page component <br>
  * Fetches projects from the backend using a debounced search term and selected sort order.
- * The first 15 projects matching the query are displayed.
+ * Projects are displayed with client-side pagination for better user experience.
  */
 const ProjectSearchPage = () => {
   const { session } = useSession();
@@ -42,6 +43,10 @@ const ProjectSearchPage = () => {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [sort, setSort] = useState(""); // Default to relevance
   const [refreshKey, setRefreshKey] = useState(0); // Used to force refresh the query
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(6);
 
   // Debounce the search term to avoid excessive API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 200); // 300ms delay
@@ -71,14 +76,31 @@ const ProjectSearchPage = () => {
 
   const handleStartDateChange = (date: Date | undefined) => {
     setStartDate(date);
+    setCurrentPage(1); // Reset to first page when filters change
     // Force refresh the query when the date changes
     setRefreshKey((prev) => prev + 1);
   };
 
   const handleEndDateChange = (date: Date | undefined) => {
     setEndDate(date);
+    setCurrentPage(1); // Reset to first page when filters change
     // Force refresh the query when the date changes
     setRefreshKey((prev) => prev + 1);
+  };
+
+  // Reset pagination when search term changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchTerm]);
+
+  // Handle pagination changes
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when page size changes
   };
 
   // Define a state variable to track when the API returns no results
@@ -176,6 +198,7 @@ const ProjectSearchPage = () => {
             value={sort}
             onValueChange={(value) => {
               setSort(value);
+              setCurrentPage(1); // Reset to first page when sort changes
               // Force refresh the query when the sort order changes
               setRefreshKey((prev) => prev + 1);
             }}
@@ -219,35 +242,59 @@ const ProjectSearchPage = () => {
         loadingMessage="Searching projects..."
         mode="page"
       >
-        {(projects) => (
-          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
-            {projects.length === 0 ? (
-              <h3 className="col-span-full text-center text-gray-500">
-                No results found
-              </h3>
-            ) : (
-              <>
-                {projects.slice(0, 15).map((project) => {
-                  // Determine current user roles for search results
-                  const currentUser = project.users.find(
-                    (user: UserResponseDTO) =>
-                      user.scim_id === session?.user?.scim_id,
-                  );
-                  const roles = currentUser?.roles
-                    ? currentUser.roles.map((role: UserRole) => role.type)
-                    : [];
-                  return (
-                    <ProjectCard
-                      project={project}
-                      roles={roles}
-                      key={project.id}
-                    />
-                  );
-                })}
-              </>
-            )}
-          </div>
-        )}
+        {(projects) => {
+          // Calculate pagination
+          const totalItems = projects.length;
+          const startIndex = (currentPage - 1) * itemsPerPage;
+          const endIndex = startIndex + itemsPerPage;
+          const paginatedProjects = projects.slice(startIndex, endIndex);
+
+          return (
+            <div className="space-y-6">
+              <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 py-8 sm:grid-cols-2 sm:gap-6 md:grid-cols-3">
+                {projects.length === 0 ? (
+                  <h3 className="col-span-full text-center text-gray-500">
+                    No results found
+                  </h3>
+                ) : (
+                  <>
+                    {paginatedProjects.map((project) => {
+                      // Determine current user roles for search results
+                      const currentUser = project.users.find(
+                        (user: UserResponseDTO) =>
+                          user.scim_id === session?.user?.scim_id,
+                      );
+                      const roles = currentUser?.roles
+                        ? currentUser.roles.map((role: UserRole) => role.type)
+                        : [];
+                      return (
+                        <ProjectCard
+                          project={project}
+                          roles={roles}
+                          key={project.id}
+                        />
+                      );
+                    })}
+                  </>
+                )}
+              </div>
+
+              {/* Pagination Component */}
+              {projects.length > 0 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={handlePageChange}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                  pageSizeOptions={[6, 15, 30, 60, 90]}
+                  showPageSizeSelector={true}
+                  showPageInfo={true}
+                />
+              )}
+            </div>
+          );
+        }}
       </ApiWrapper>
     </search>
   );

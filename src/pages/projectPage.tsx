@@ -47,7 +47,7 @@ export default function ProjectPage() {
 
   const overviewRef = useRef<HTMLDivElement>(null);
   const contributorsRef = useRef<HTMLDivElement>(null);
-  const worksRef = useRef<HTMLDivElement>(null);
+  const productsRef = useRef<HTMLDivElement>(null);
 
   // Function to fetch the project data
   const fetchProject = async () => {
@@ -200,7 +200,6 @@ export default function ProjectPage() {
       isInitialLoad={isInitialLoad}
       loadingMessage="Loading project..."
       error={error}
-      onRetry={fetchProject}
     >
       {project && (
         <>
@@ -209,7 +208,7 @@ export default function ProjectPage() {
             links={[
               { label: "Overview", ref: overviewRef },
               { label: "Contributors", ref: contributorsRef },
-              { label: "Works", ref: worksRef },
+              { label: "Products", ref: productsRef },
             ]}
           />
           <main className="my-6 grid grid-cols-1 gap-8 md:grid-cols-3">
@@ -236,7 +235,7 @@ export default function ProjectPage() {
                   isAdmin={isAdmin}
                 />
               </Card>
-              <Card ref={worksRef} className="scroll-mt-12" title="Works">
+              <Card ref={productsRef} className="scroll-mt-12" title="Products">
                 <ProjectWorks
                   project={project}
                   onProjectUpdate={handleProjectUpdate}

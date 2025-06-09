@@ -735,7 +735,7 @@ export default function ProjectOverview({
                 isExpanded ? "max-h-[1000px]" : "max-h-[280px]"
               }`}
             >
-              <p className="text-start text-sm/6 text-gray-700 sm:px-3 sm:text-base/7">
+              <p className="overflow-wrap-anywhere text-start text-sm/6 break-words break-all text-gray-700 sm:px-3 sm:text-base/7">
                 {!isExpanded &&
                 currentDescription &&
                 currentDescription.length > descriptionTruncateLength

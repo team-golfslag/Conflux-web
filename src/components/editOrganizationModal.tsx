@@ -39,6 +39,49 @@ interface OrganizationFormData {
   role?: OrganisationRoleType;
 }
 
+interface ValidationError {
+  field: string;
+  message: string;
+}
+
+// Validation patterns for form fields
+const validationPatterns = {
+  rorId: {
+    pattern: /^https:\/\/ror\.org\/[a-z0-9]{9}$/,
+    description: "Valid ROR ID URL (e.g., https://ror.org/123456789)",
+  },
+  name: {
+    minLength: 2,
+    description: "Organization name must be at least 2 characters long",
+  },
+};
+
+function validateField(field: string, value: string): ValidationError | null {
+  if (!value || !value.trim()) {
+    // Only validate if field has a value (optional fields)
+    return null;
+  }
+
+  switch (field) {
+    case "name":
+      if (value.length < validationPatterns.name.minLength) {
+        return { field, message: validationPatterns.name.description };
+      }
+      break;
+
+    case "rorId":
+      if (!validationPatterns.rorId.pattern.test(value)) {
+        return {
+          field,
+          message: `Invalid ROR ID format. ${validationPatterns.rorId.description}`,
+        };
+      }
+      break;
+  }
+
+  return null;
+}
+
 export interface EditOrganizationModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
@@ -66,7 +109,43 @@ export default function EditOrganizationModal({
     role: undefined,
   });
 
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    [],
+  );
+  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+
   const apiClient = useContext(ApiClientContext);
+
+  // Validate fields when form data changes
+  useEffect(() => {
+    const errors: ValidationError[] = [];
+
+    if (touched.name && formData.name) {
+      const nameError = validateField("name", formData.name);
+      if (nameError) errors.push(nameError);
+    }
+
+    if (touched.rorId && formData.rorId) {
+      const rorIdError = validateField("rorId", formData.rorId);
+      if (rorIdError) errors.push(rorIdError);
+    }
+
+    setValidationErrors(errors);
+  }, [formData, touched]);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, name: e.target.value }));
+    setTouched((prev) => ({ ...prev, name: true }));
+  };
+
+  const handleRorIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, rorId: e.target.value }));
+    setTouched((prev) => ({ ...prev, rorId: true }));
+  };
+
+  const getFieldError = (field: string) => {
+    return validationErrors.find((error) => error.field === field);
+  };
 
   const resetForm = useCallback(() => {
     if (organization) {
@@ -82,6 +161,9 @@ export default function EditOrganizationModal({
         role: undefined,
       });
     }
+    // Reset validation state
+    setValidationErrors([]);
+    setTouched({});
   }, [organization]);
 
   //update form if organization changes
@@ -203,11 +285,6 @@ export default function EditOrganizationModal({
     return roleType.replace(/([A-Z])/g, " $1").trim();
   };
 
-  // Check if the ROR ID is a valid URL, if there is one
-  const checkRorUrl = (rorId?: string) => {
-    return !rorId || rorId.startsWith("https://ror.org/");
-  };
-
   const removeRole = () => {
     setFormData((prev) => ({
       name: prev.name,
@@ -262,33 +339,46 @@ export default function EditOrganizationModal({
                   <Label htmlFor={`${idPrefix}name`} className="text-right">
                     Name
                   </Label>
-                  <Input
-                    id={`${idPrefix}name`}
-                    name="name"
-                    className="col-span-4 text-sm sm:col-span-3"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, name: e.target.value }))
-                    }
-                  />
+                  <div className="col-span-4 sm:col-span-3">
+                    <Input
+                      id={`${idPrefix}name`}
+                      name="name"
+                      className={`text-sm ${getFieldError("name") ? "border-red-500 focus:border-red-500" : ""}`}
+                      value={formData.name}
+                      onChange={handleNameChange}
+                      placeholder="Enter organization name"
+                    />
+                    {getFieldError("name") && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {getFieldError("name")?.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <div className="grid grid-cols-4 items-center">
                   <Label htmlFor={`${idPrefix}rorId`} className="text-right">
                     ROR ID
                   </Label>
-                  <Input
-                    id={`${idPrefix}rorId`}
-                    name="rorId"
-                    className="col-span-4 text-sm sm:col-span-3"
-                    value={formData.rorId}
-                    placeholder="https://ror.org/example"
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        rorId: e.target.value,
-                      }))
-                    }
-                  />
+                  <div className="col-span-4 sm:col-span-3">
+                    <Input
+                      id={`${idPrefix}rorId`}
+                      name="rorId"
+                      className={`text-sm ${getFieldError("rorId") ? "border-red-500 focus:border-red-500" : ""}`}
+                      value={formData.rorId}
+                      placeholder="https://ror.org/example123"
+                      onChange={handleRorIdChange}
+                    />
+                    {getFieldError("rorId") && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {getFieldError("rorId")?.message}
+                      </p>
+                    )}
+                    {formData.rorId && !getFieldError("rorId") && (
+                      <p className="mt-1 text-xs text-gray-500">
+                        {validationPatterns.rorId.description}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <div className="grid grid-cols-4 items-center">
                   <Label
@@ -354,7 +444,7 @@ export default function EditOrganizationModal({
                     isLoading ||
                     !formData.name ||
                     (!formData.role && !isEdit) ||
-                    !checkRorUrl(formData.rorId)
+                    validationErrors.length > 0
                   }
                 >
                   {isLoading ? (

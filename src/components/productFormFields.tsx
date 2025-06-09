@@ -26,6 +26,7 @@ import {
   ProductType,
   ProductSchema,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
+import { useState, useEffect } from "react";
 
 export interface ProductFormData {
   title: string;
@@ -33,6 +34,11 @@ export interface ProductFormData {
   productType: ProductType;
   productSchema: ProductSchema;
   categories: ProductCategoryType[];
+}
+
+interface ValidationError {
+  field: string;
+  message: string;
 }
 
 interface ProductFormFieldsProps {
@@ -51,6 +57,78 @@ function getEnumKeys<
   return Object.keys(enumVariable) as Array<T>;
 }
 
+// Validation patterns for different schemas
+const urlValidationPatterns = {
+  [ProductSchema.Doi]: {
+    pattern: /^https?:\/\/(?:dx\.)?doi\.org\/10\.\d+\/.+$/,
+    placeholder: "https://doi.org/10.1000/example",
+    description: "DOI URL (e.g., https://doi.org/10.1000/example)",
+  },
+  [ProductSchema.Ark]: {
+    pattern: /^https?:\/\/.+\/ark:\/\d+\/.+$/,
+    placeholder: "https://example.org/ark:/12345/example",
+    description: "ARK URL (e.g., https://example.org/ark:/12345/example)",
+  },
+  [ProductSchema.Handle]: {
+    pattern: /^https?:\/\/hdl\.handle\.net\/\d+(\.\d+)*\/.+$/,
+    placeholder: "https://hdl.handle.net/1234/example",
+    description: "Handle URL (e.g., https://hdl.handle.net/1234/example)",
+  },
+  [ProductSchema.Isbn]: {
+    pattern: /^(978|979)-?\d{1,5}-?\d{1,7}-?\d{1,7}-?[\dX]$|^https?:\/\/.+$/,
+    placeholder: "978-0123456789 or URL",
+    description: "ISBN (978-0123456789) or URL containing ISBN",
+  },
+  [ProductSchema.Rrid]: {
+    pattern: /^RRID:[A-Za-z]+_\d+$|^https?:\/\/.+$/,
+    placeholder: "RRID:AB_123456 or URL",
+    description: "RRID identifier (RRID:AB_123456) or URL",
+  },
+  [ProductSchema.Archive]: {
+    pattern: /^https?:\/\/archive\.org\/.+$/,
+    placeholder: "https://archive.org/details/item",
+    description: "Archive.org URL (e.g., https://archive.org/details/item)",
+  },
+};
+
+function validateField(
+  field: string,
+  value: string,
+  schema?: ProductSchema,
+): ValidationError | null {
+  switch (field) {
+    case "title":
+      if (!value.trim()) {
+        return { field, message: "Title is required" };
+      }
+      if (value.length < 3) {
+        return { field, message: "Title must be at least 3 characters long" };
+      }
+      break;
+
+    case "url":
+      if (!value.trim()) {
+        return { field, message: "URL is required" };
+      }
+
+      if (schema && urlValidationPatterns[schema]) {
+        const { pattern, description } = urlValidationPatterns[schema];
+        if (!pattern.test(value)) {
+          return { field, message: `Invalid format. Expected: ${description}` };
+        }
+      } else {
+        // Fallback to basic URL validation
+        const basicUrlPattern = /^https?:\/\/.+$/;
+        if (!basicUrlPattern.test(value)) {
+          return { field, message: "URL must start with http:// or https://" };
+        }
+      }
+      break;
+  }
+
+  return null;
+}
+
 export default function ProductFormFields({
   formData,
   setProductTitle,
@@ -59,6 +137,64 @@ export default function ProductFormFields({
   setProductType,
   onCategoryChange,
 }: Readonly<ProductFormFieldsProps>) {
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    [],
+  );
+  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+
+  // Validate fields when form data changes
+  useEffect(() => {
+    const errors: ValidationError[] = [];
+
+    if (touched.title) {
+      const titleError = validateField("title", formData.title);
+      if (titleError) errors.push(titleError);
+    }
+
+    if (touched.url) {
+      const urlError = validateField(
+        "url",
+        formData.url,
+        formData.productSchema,
+      );
+      if (urlError) errors.push(urlError);
+    }
+
+    setValidationErrors(errors);
+  }, [formData, touched]);
+
+  const handleTitleChange = (value: string) => {
+    setProductTitle(value);
+    setTouched((prev) => ({ ...prev, title: true }));
+  };
+
+  const handleUrlChange = (value: string) => {
+    setUrl(value);
+    setTouched((prev) => ({ ...prev, url: true }));
+  };
+
+  const handleSchemaChange = (schema: ProductSchema) => {
+    setSchema(schema);
+    // Re-validate URL when schema changes
+    if (touched.url) {
+      setTouched((prev) => ({ ...prev, url: true }));
+    }
+  };
+
+  const getFieldError = (field: string) => {
+    return validationErrors.find((error) => error.field === field);
+  };
+
+  const getUrlPlaceholder = () => {
+    if (
+      formData.productSchema &&
+      urlValidationPatterns[formData.productSchema]
+    ) {
+      return urlValidationPatterns[formData.productSchema].placeholder;
+    }
+    return "https://doi.org/";
+  };
+
   return (
     <div className="grid gap-6 py-6">
       <div className="grid grid-cols-4 items-center gap-4">
@@ -68,25 +204,45 @@ export default function ProductFormFields({
         >
           Title
         </Label>
-        <Input
-          id="title"
-          value={formData.title}
-          onChange={(e) => setProductTitle(e.target.value)}
-          className="col-span-3"
-          placeholder="Enter product title"
-        />
+        <div className="col-span-3">
+          <Input
+            id="title"
+            value={formData.title}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            className={`${getFieldError("title") ? "border-red-500 focus:border-red-500" : ""}`}
+            placeholder="Enter product title"
+          />
+          {getFieldError("title") && (
+            <p className="mt-1 text-sm text-red-500">
+              {getFieldError("title")?.message}
+            </p>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="url" className="text-right font-semibold text-gray-700">
           URL
         </Label>
-        <Input
-          id="url"
-          value={formData.url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://doi.org/"
-          className="col-span-3"
-        />
+        <div className="col-span-3">
+          <Input
+            id="url"
+            value={formData.url}
+            onChange={(e) => handleUrlChange(e.target.value)}
+            placeholder={getUrlPlaceholder()}
+            className={`${getFieldError("url") ? "border-red-500 focus:border-red-500" : ""}`}
+          />
+          {getFieldError("url") && (
+            <p className="mt-1 text-sm text-red-500">
+              {getFieldError("url")?.message}
+            </p>
+          )}
+          {formData.productSchema &&
+            urlValidationPatterns[formData.productSchema] && (
+              <p className="mt-1 text-xs text-gray-500">
+                {urlValidationPatterns[formData.productSchema].description}
+              </p>
+            )}
+        </div>
       </div>
       <div className="grid grid-cols-4 items-center gap-4">
         <Label className="col-span-1 text-right font-semibold text-gray-700">
@@ -121,7 +277,7 @@ export default function ProductFormFields({
         </Label>
         <Select
           onValueChange={(e) => {
-            setSchema(ProductSchema[e as keyof typeof ProductSchema]);
+            handleSchemaChange(ProductSchema[e as keyof typeof ProductSchema]);
           }}
           value={formData.productSchema}
         >

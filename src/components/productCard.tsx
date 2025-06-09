@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, ExternalLink } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,10 +56,17 @@ export default function ProductCard({
   project,
   onProjectUpdate,
 }: Readonly<productCardProps>) {
+  // URL validation regex - checks for http/https URLs
+  const isValidUrl = (url: string): boolean => {
+    const urlRegex =
+      /^https?:\/\/(?:[-\w.])+(?::[0-9]+)?(?:\/(?:[\w/_.])*(?:\?(?:[\w&=%.])*)?(?:#(?:[\w.])*)?)?$/;
+    return urlRegex.test(url);
+  };
+
   return (
     <Card className="group/productCard border-gray-200/60 bg-white transition-all duration-300">
-      <div className="flex items-center justify-between p-3">
-        <h3 className="text-base font-semibold text-gray-900 transition-colors duration-200 group-hover/productCard:text-gray-800">
+      <div className="flex items-center justify-between p-2">
+        <h3 className="mt-2 ml-2 text-base font-semibold text-gray-900 transition-colors duration-200 group-hover/productCard:text-gray-800">
           {product.title}
         </h3>
         {editMode && (
@@ -155,9 +162,23 @@ export default function ProductCard({
       <div className="space-y-2 px-3">
         {product.url && (
           <div className="rounded-lg border border-gray-100 bg-gray-50/50 p-2">
-            <p className="font-mono text-xs break-all text-gray-600">
-              {product.url}
-            </p>
+            {isValidUrl(product.url) ? (
+              <div className="flex items-center gap-2">
+                <a
+                  href={product.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-xs break-all text-blue-600 transition-colors duration-200 hover:text-blue-800 hover:underline"
+                >
+                  {product.url}
+                </a>
+                <ExternalLink className="h-3 w-3 flex-shrink-0 text-blue-500" />
+              </div>
+            ) : (
+              <p className="font-mono text-xs break-all text-gray-600">
+                {product.url}
+              </p>
+            )}
           </div>
         )}
 

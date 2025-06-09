@@ -16,21 +16,21 @@ import {
   ExternalLink,
   Calendar,
   FileText,
-  Shield,
   Hash,
   Building,
   AlertTriangle,
   CheckCircle,
   Zap,
-  RefreshCw,
+  Upload,
   XCircle,
+  Check,
+  Globe,
 } from "lucide-react";
 import {
   RAiDIncompatibilityType,
   ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import RaidIcon from "./icons/raidIcon";
-import { useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -38,7 +38,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ApiClientContext } from "@/lib/ApiClientContext";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 type RAiDInfoProps = {
   projectId: string;
@@ -67,6 +67,7 @@ export default function RAiDInfo({
         descriptions: project.descriptions,
         contributors: project.contributors,
         products: project.products,
+        organisations: project.organisations,
       })
     : null;
 
@@ -515,59 +516,94 @@ export default function RAiDInfo({
               <RaidIcon width={48} height={48} className="text-blue-600" />
               Information
             </CardTitle>
-            {raidInfo?.r_ai_d_id && (
-              <div className="flex items-center gap-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={syncRaidData}
-                        disabled={isSyncing}
-                        className="relative"
-                      >
-                        {syncSuccess ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <>
-                            {syncFailed ? (
-                              <XCircle className="h-4 w-4 text-red-500" />
-                            ) : (
-                              <RefreshCw
-                                className={`h-4 w-4 transition-transform duration-300 ${isSyncing ? "animate-spin" : "hover:rotate-90"}`}
-                              />
-                            )}
-                          </>
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        {isSyncing ? (
-                          "Syncing RAiD data..."
-                        ) : (
-                          <>
-                            {syncSuccess ? (
-                              "Sync complete!"
-                            ) : (
-                              <>
-                                {syncFailed
-                                  ? "Sync failed!"
-                                  : "Sync RAiD data with registry"}
-                              </>
-                            )}
-                          </>
-                        )}
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {incompatibilities && incompatibilities.length > 0 && (
+                <Badge
+                  variant="outline"
+                  className="border-amber-200 bg-amber-100 text-amber-800"
+                >
+                  {incompatibilities.length} Issue
+                  {incompatibilities.length !== 1 ? "s" : ""}
+                </Badge>
+              )}
+              {raidInfo?.r_ai_d_id &&
+                (!incompatibilities || incompatibilities.length === 0) && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={syncRaidData}
+                          disabled={isSyncing}
+                          className="relative"
+                        >
+                          {syncSuccess ? (
+                            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-green-500 text-white">
+                              <Check className="h-3 w-3" />
+                            </div>
+                          ) : (
+                            <>
+                              {syncFailed ? (
+                                <XCircle className="h-4 w-4 text-red-500" />
+                              ) : (
+                                <Upload
+                                  className={`h-4 w-4 transition-transform duration-300 ${isSyncing ? "animate-pulse" : "hover:scale-110"}`}
+                                />
+                              )}
+                            </>
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>
+                          {isSyncing ? (
+                            "Updating RAiD data..."
+                          ) : (
+                            <>
+                              {syncSuccess ? (
+                                "Update complete!"
+                              ) : (
+                                <>
+                                  {syncFailed
+                                    ? "Update failed!"
+                                    : "Sync with RAiD service"}
+                                </>
+                              )}
+                            </>
+                          )}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+            </div>
           </CardHeader>
 
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-1">
+            {/* Current Incompatibilities Section */}
+            {!incompatibilitiesLoading &&
+              incompatibilities &&
+              incompatibilities.length > 0 && (
+                <div className="rounded-lg border border-amber-100 bg-white p-4 shadow-sm">
+                  <div className="mb-3 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    <Label className="font-semibold text-gray-700">
+                      Current Issues ({incompatibilities.length})
+                    </Label>
+                  </div>
+                  <p className="mb-3 text-sm text-gray-600">
+                    The following issues have been detected that may affect RAiD
+                    validity:
+                  </p>
+                  <div className="space-y-2">
+                    {incompatibilities.map((incompatibility, index) =>
+                      renderIncompatibilityItem(incompatibility, index),
+                    )}
+                  </div>
+                </div>
+              )}
+
             {/* Main RAiD ID */}
             <div className="rounded-lg border border-blue-100 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between">
@@ -613,14 +649,14 @@ export default function RAiDInfo({
                   <div className="mb-1 flex items-center gap-2">
                     <FileText className="h-4 w-4 text-gray-500" />
                     <Label className="font-semibold text-gray-700">
-                      Status
+                      Sync Status
                     </Label>
                   </div>
                   <Badge
                     variant={raidInfo.dirty ? "destructive" : "default"}
                     className={
                       raidInfo.dirty
-                        ? "bg-gray-200 text-gray-700"
+                        ? "bg-orange-100 text-orange-800"
                         : "bg-green-100 text-green-800"
                     }
                   >
@@ -637,17 +673,21 @@ export default function RAiDInfo({
                       Version
                     </Label>
                   </div>
-                  <p className="text-sm text-gray-600">v{raidInfo.version}</p>
+                  <p className="text-sm text-gray-600">
+                    {raidInfo.version || "N/A"}
+                  </p>
                 </div>
 
                 <div>
                   <div className="mb-1 flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-gray-500" />
+                    <Globe className="h-4 w-4 text-gray-500" />
                     <Label className="font-semibold text-gray-700">
-                      License
+                      Registry
                     </Label>
                   </div>
-                  <p className="text-sm text-gray-600">{raidInfo.license}</p>
+                  <p className="text-sm text-gray-600">
+                    {raidInfo.registration_agency_id || "Default Registry"}
+                  </p>
                 </div>
               </div>
             </div>

@@ -134,6 +134,15 @@ export default function ProjectDetails({
       : "N/A";
   };
 
+  const getProjectContactsCount = (
+    contributors: Array<{ contact: boolean }>,
+  ) => {
+    return contributors.filter((contributor) => contributor.contact).length;
+  };
+  const getProjectLeadsCount = (contributors: Array<{ leader: boolean }>) => {
+    return contributors.filter((contributor) => contributor.leader).length;
+  };
+
   const status = getStatus(project.start_date, project.end_date);
 
   return (
@@ -232,6 +241,9 @@ export default function ProjectDetails({
                   <div>
                     <Label htmlFor="project-lead" className="font-semibold">
                       Project Lead
+                      {getProjectLeadsCount(project.contributors) > 1
+                        ? "s"
+                        : ""}
                     </Label>
                     <p className="text-gray-700">
                       {getProjectLeads(project.contributors)}
@@ -240,7 +252,10 @@ export default function ProjectDetails({
 
                   <div>
                     <Label htmlFor="project-contacts" className="font-semibold">
-                      Project Contacts
+                      Project Contact
+                      {getProjectContactsCount(project.contributors) > 1
+                        ? "s"
+                        : ""}
                     </Label>
                     <p className="text-gray-700">
                       {getProjectContacts(project.contributors)}
@@ -322,6 +337,7 @@ export default function ProjectDetails({
               <div>
                 <Label htmlFor="project-lead" className="font-semibold">
                   Project Lead
+                  {getProjectLeadsCount(project.contributors) > 1 ? "s" : ""}
                 </Label>
                 <p className="pt-1 pb-2 text-gray-700">
                   {getProjectLeads(project.contributors)}
@@ -330,7 +346,8 @@ export default function ProjectDetails({
 
               <div>
                 <Label htmlFor="project-contacts" className="font-semibold">
-                  Project Contacts
+                  Project Contact
+                  {getProjectContactsCount(project.contributors) > 1 ? "s" : ""}
                 </Label>
                 <p className="pt-1 pb-2 text-gray-700">
                   {getProjectContacts(project.contributors)}
