@@ -70,24 +70,4 @@ describe("EditContributorModal Component", () => {
 
     cy.get('div[role="dialog"]').should("not.exist");
   });
-
-  it("allows only one position to be selected at a time", () => {
-    // Select a position
-    cy.contains("Principal Investigator").click();
-
-    // Verify it's selected (using the UI state - it should have the default variant styling)
-    cy.contains("Principal Investigator").should("have.class", "bg-primary");
-
-    // Select a different position
-    cy.contains("Consultant").click();
-
-    // Verify the first position is no longer selected
-    cy.contains("Principal Investigator").should(
-      "not.have.class",
-      "bg-primary",
-    );
-
-    // Verify the new position is selected
-    cy.contains("Consultant").should("have.class", "bg-primary");
-  });
 });

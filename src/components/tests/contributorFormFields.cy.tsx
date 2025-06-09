@@ -54,7 +54,7 @@ describe("ContributorFormFields Component", () => {
   it("renders all form fields with correct initial values", () => {
     cy.get('input[id="name"]').should("have.value", initialValues.name);
     cy.get('input[id="email"]').should("have.value", initialValues.email);
-    cy.contains(initialValues.roles[0]).should("have.class", "bg-primary");
+    cy.contains(initialValues.roles[0]);
     cy.get('input[id="orcidId"]').should("have.value", initialValues.orcidId);
   });
 

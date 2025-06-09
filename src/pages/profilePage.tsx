@@ -151,10 +151,10 @@ const ProfilePage = () => {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col items-start space-y-4 border-t px-6 py-4">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={logout}
-                className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-colors duration-200"
+                className="border-red-200 text-red-600 transition-colors duration-200 hover:border-red-300 hover:bg-red-50 hover:text-red-700"
               >
                 Log Out
               </Button>

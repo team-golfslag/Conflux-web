@@ -22,11 +22,23 @@ import {
   AlertTriangle,
   CheckCircle,
   Zap,
+  RefreshCw,
+  XCircle,
 } from "lucide-react";
 import {
   RAiDIncompatibilityType,
   ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
+import RaidIcon from "./icons/raidIcon";
+import { useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ApiClientContext } from "@/lib/ApiClientContext";
+import { useContext } from "react";
 
 type RAiDInfoProps = {
   projectId: string;
@@ -58,19 +70,63 @@ export default function RAiDInfo({
       })
     : null;
 
+  // Add API client hook
+  const apiClient = useContext(ApiClientContext);
+
+  // Add sync state management
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
+  const [syncFailed, setSyncFailed] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Method to sync RAiD data with external service
+  const syncRaidData = async () => {
+    if (!raidInfo?.r_ai_d_id) return;
+
+    try {
+      setIsSyncing(true);
+      setSyncSuccess(false);
+      setSyncFailed(false);
+
+      // Call the sync API - the returned data will be fetched via the refresh trigger
+      await apiClient.raidInfo_SyncRaid(projectId);
+
+      // Trigger a refresh of the RAiD data by updating the refresh counter
+      setRefreshTrigger((prev) => prev + 1);
+
+      // Also trigger project update if available (in case project data changed)
+      onProjectUpdate?.();
+
+      setSyncSuccess(true);
+      // Reset success state after 2 seconds
+      setTimeout(() => {
+        setSyncSuccess(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error syncing RAiD data:", error);
+      setSyncFailed(true);
+      // Reset failure state after 2 seconds
+      setTimeout(() => {
+        setSyncFailed(false);
+      }, 2000);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const {
     data: raidInfo,
     isLoading,
     error,
   } = useApiQuery(
     (client) => client.raidInfo_GetRaidInfoByProjectId(projectId),
-    [projectId, projectDataHash],
+    [projectId, projectDataHash, refreshTrigger],
   );
 
   const { data: incompatibilities, isLoading: incompatibilitiesLoading } =
     useApiQuery(
       (client) => client.raidInfo_GetRaidIncompatibilities(projectId),
-      [projectId, projectDataHash],
+      [projectId, projectDataHash, refreshTrigger],
     );
 
   // Helper function to format incompatibility type to readable text
@@ -456,12 +512,59 @@ export default function RAiDInfo({
         <Card className="border-gray-200 bg-gray-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
-              <Shield className="h-5 w-5" />
-              RAiD Information
+              <RaidIcon width={48} height={48} className="text-blue-600" />
+              Information
             </CardTitle>
-            <Badge variant="secondary" className="bg-gray-200 text-gray-700">
-              Research Activity Identifier
-            </Badge>
+            {raidInfo?.r_ai_d_id && (
+              <div className="flex items-center gap-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={syncRaidData}
+                        disabled={isSyncing}
+                        className="relative"
+                      >
+                        {syncSuccess ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <>
+                            {syncFailed ? (
+                              <XCircle className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <RefreshCw
+                                className={`h-4 w-4 transition-transform duration-300 ${isSyncing ? "animate-spin" : "hover:rotate-90"}`}
+                              />
+                            )}
+                          </>
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        {isSyncing ? (
+                          "Syncing RAiD data..."
+                        ) : (
+                          <>
+                            {syncSuccess ? (
+                              "Sync complete!"
+                            ) : (
+                              <>
+                                {syncFailed
+                                  ? "Sync failed!"
+                                  : "Sync RAiD data with registry"}
+                              </>
+                            )}
+                          </>
+                        )}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            )}
           </CardHeader>
 
           <CardContent className="space-y-6">
@@ -472,7 +575,14 @@ export default function RAiDInfo({
                   <Hash className="h-4 w-4 text-gray-600" />
                   <Label className="font-semibold text-gray-700">RAiD ID</Label>
                 </div>
-                <ExternalLink className="h-4 w-4 text-gray-400" />
+                <a
+                  href={raidInfo.r_ai_d_id}
+                  target="_blank"
+                  className="text-blue-600 hover:text-blue-800"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="h-4 w-4 text-gray-400" />
+                </a>
               </div>
               <p className="overflow-wrap-anywhere mt-1 rounded bg-gray-100 px-2 py-1 font-mono text-sm break-words break-all text-gray-700">
                 {raidInfo.r_ai_d_id}
@@ -554,7 +664,7 @@ export default function RAiDInfo({
                   <Label className="font-medium text-gray-600">
                     Registration Agency
                   </Label>
-                  <p className="mt-1 text-gray-800">
+                  <p className="overflow-wrap-anywhere mt-1 rounded bg-gray-50 px-2 py-1 font-mono text-xs break-words break-all text-gray-800">
                     {raidInfo.registration_agency_id}
                   </p>
                 </div>
