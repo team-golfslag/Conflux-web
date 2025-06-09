@@ -447,7 +447,10 @@ export default function RAiDInfo({
                       }
                       data={projectId}
                       onSuccess={() => {
-                        // Update project data to reflect the minted RAiD
+                        // Trigger a refresh of the RAiD data by updating the refresh counter
+                        setRefreshTrigger((prev) => prev + 1);
+                        
+                        // Also update project data to reflect the minted RAiD
                         onProjectUpdate?.();
                       }}
                       onError={(error) => {
