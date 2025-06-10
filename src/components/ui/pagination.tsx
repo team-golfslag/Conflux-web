@@ -52,8 +52,16 @@ export const Pagination: React.FC<PaginationProps> = ({
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
-  // Don't show pagination if there's only one page or no items
-  if (totalItems === 0 || totalPages <= 1) {
+  // Don't show pagination if there are no items
+  if (totalItems === 0) {
+    return null;
+  }
+
+  // If there's only one page, still show the component if page size selector or page info is enabled
+  const shouldShowPagination =
+    totalPages > 1 || showPageSizeSelector || showPageInfo;
+
+  if (!shouldShowPagination) {
     return null;
   }
 
@@ -130,73 +138,75 @@ export const Pagination: React.FC<PaginationProps> = ({
             </Select>
             <span className="text-sm text-gray-600">per page</span>
           </div>
-        )}
+        )}{" "}
       </div>
 
-      {/* Page navigation */}
-      <div className="flex items-center gap-1">
-        {/* First page button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(1)}
-          disabled={!canGoPrevious}
-          className="hidden sm:flex"
-        >
-          <ChevronsLeft className="h-4 w-4" />
-        </Button>
-
-        {/* Previous page button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={!canGoPrevious}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-
-        {/* Page number buttons */}
+      {/* Page navigation - only show if there are multiple pages */}
+      {totalPages > 1 && (
         <div className="flex items-center gap-1">
-          {getVisiblePages().map((page, index) => (
-            <React.Fragment key={index}>
-              {page === "..." ? (
-                <span className="px-3 py-2 text-sm text-gray-500">...</span>
-              ) : (
-                <Button
-                  variant={currentPage === page ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onPageChange(page as number)}
-                  className="min-w-[2.5rem]"
-                >
-                  {page}
-                </Button>
-              )}
-            </React.Fragment>
-          ))}
+          {/* First page button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(1)}
+            disabled={!canGoPrevious}
+            className="hidden sm:flex"
+          >
+            <ChevronsLeft className="h-4 w-4" />
+          </Button>
+
+          {/* Previous page button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={!canGoPrevious}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+
+          {/* Page number buttons */}
+          <div className="flex items-center gap-1">
+            {getVisiblePages().map((page, index) => (
+              <React.Fragment key={index}>
+                {page === "..." ? (
+                  <span className="px-3 py-2 text-sm text-gray-500">...</span>
+                ) : (
+                  <Button
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => onPageChange(page as number)}
+                    className="min-w-[2.5rem]"
+                  >
+                    {page}
+                  </Button>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+
+          {/* Next page button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={!canGoNext}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+
+          {/* Last page button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange(totalPages)}
+            disabled={!canGoNext}
+            className="hidden sm:flex"
+          >
+            <ChevronsRight className="h-4 w-4" />
+          </Button>
         </div>
-
-        {/* Next page button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={!canGoNext}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-
-        {/* Last page button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(totalPages)}
-          disabled={!canGoNext}
-          className="hidden sm:flex"
-        >
-          <ChevronsRight className="h-4 w-4" />
-        </Button>
-      </div>
+      )}
     </div>
   );
 };

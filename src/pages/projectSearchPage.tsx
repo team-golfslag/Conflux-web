@@ -132,7 +132,6 @@ const ProjectSearchPage = () => {
     setCurrentPage(1); // Reset to first page when page size changes
   };
 
-
   // CSV download functionality
   const [triggerDownload, setTriggerDownload] = useState(false);
 
@@ -214,7 +213,10 @@ const ProjectSearchPage = () => {
             <label className="text-sm font-medium text-gray-700">
               Lectorate
             </label>
-            <Select value={lectorate || "all"} onValueChange={handleLectorateChange}>
+            <Select
+              value={lectorate || "all"}
+              onValueChange={handleLectorateChange}
+            >
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="All lectorates" />
               </SelectTrigger>
@@ -231,9 +233,7 @@ const ProjectSearchPage = () => {
         </div>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-700">
-              Sort by
-            </label>
+            <label className="text-sm font-medium text-gray-700">Sort by</label>
             <Select
               value={sort}
               onValueChange={(value) => {
@@ -258,7 +258,9 @@ const ProjectSearchPage = () => {
                   <SelectItem value="start_date_desc">
                     Start date descending
                   </SelectItem>
-                  <SelectItem value="end_date_asc">End date ascending</SelectItem>
+                  <SelectItem value="end_date_asc">
+                    End date ascending
+                  </SelectItem>
                   <SelectItem value="end_date_desc">
                     End date descending
                   </SelectItem>
@@ -290,7 +292,13 @@ const ProjectSearchPage = () => {
             parseOrderBy(sort),
           )
         }
-        dependencies={[debouncedSearchTerm, startDate, endDate, lectorate, refreshKey]}
+        dependencies={[
+          debouncedSearchTerm,
+          startDate,
+          endDate,
+          lectorate,
+          refreshKey,
+        ]}
         loadingMessage="Searching projects..."
         mode="page"
       >
