@@ -47,13 +47,18 @@ export function DatePicker({
   const [currentMonthView, setCurrentMonthView] = React.useState<Date>(
     initialDate || new Date(),
   );
-  
+
   // State for infinite scrolling years - maintain a sliding window
-  const [yearRange, setYearRange] = React.useState<{ start: number; end: number }>(() => {
-    const currentYear = initialDate ? getYear(initialDate) : getYear(new Date());
+  const [yearRange, setYearRange] = React.useState<{
+    start: number;
+    end: number;
+  }>(() => {
+    const currentYear = initialDate
+      ? getYear(initialDate)
+      : getYear(new Date());
     return {
-      start: currentYear - 25,  // Smaller initial range
-      end: currentYear + 25
+      start: currentYear - 25, // Smaller initial range
+      end: currentYear + 25,
     };
   });
 
@@ -81,17 +86,17 @@ export function DatePicker({
   }, [yearRange]);
 
   // Function to extend year range when scrolling - no caps, but keep range manageable
-  const extendYearRange = React.useCallback((direction: 'up' | 'down') => {
-    setYearRange(prev => {
-      if (direction === 'up') {
+  const extendYearRange = React.useCallback((direction: "up" | "down") => {
+    setYearRange((prev) => {
+      if (direction === "up") {
         return {
-          start: prev.start - 25,  // Add 25 years backwards
-          end: prev.end - 10       // Remove some from the end to keep total size reasonable
+          start: prev.start - 25, // Add 25 years backwards
+          end: prev.end - 10, // Remove some from the end to keep total size reasonable
         };
-      } else if (direction === 'down') {
+      } else if (direction === "down") {
         return {
-          start: prev.start + 10,  // Remove some from the start
-          end: prev.end + 25       // Add 25 years forwards
+          start: prev.start + 10, // Remove some from the start
+          end: prev.end + 25, // Add 25 years forwards
         };
       }
       return prev;
@@ -100,37 +105,40 @@ export function DatePicker({
 
   // Throttle scroll events to prevent excessive updates
   const scrollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-  const handleScroll = React.useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
-    }
-    
-    scrollTimeoutRef.current = setTimeout(() => {
-      const target = e.target as HTMLDivElement;
-      const { scrollTop, scrollHeight, clientHeight } = target;
-      
-      // Load more years when scrolling near the top (no lower bound)
-      if (scrollTop < 100) {
-        extendYearRange('up');
+  const handleScroll = React.useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
       }
-      
-      // Load more years when scrolling near the bottom (no upper bound)
-      if (scrollTop + clientHeight > scrollHeight - 100) {
-        extendYearRange('down');
-      }
-    }, 150); // 150ms throttle
-  }, [extendYearRange]);
+
+      scrollTimeoutRef.current = setTimeout(() => {
+        const target = e.target as HTMLDivElement;
+        const { scrollTop, scrollHeight, clientHeight } = target;
+
+        // Load more years when scrolling near the top (no lower bound)
+        if (scrollTop < 100) {
+          extendYearRange("up");
+        }
+
+        // Load more years when scrolling near the bottom (no upper bound)
+        if (scrollTop + clientHeight > scrollHeight - 100) {
+          extendYearRange("down");
+        }
+      }, 150); // 150ms throttle
+    },
+    [extendYearRange],
+  );
 
   // Function to ensure current year is in range
   const ensureYearInRange = React.useCallback((year: number) => {
-    setYearRange(prev => {
+    setYearRange((prev) => {
       const needsExpansion = year < prev.start || year > prev.end;
       if (!needsExpansion) return prev;
-      
+
       // Center the range around the target year
       return {
         start: year - 25,
-        end: year + 25
+        end: year + 25,
       };
     });
   }, []);
@@ -219,7 +227,7 @@ export function DatePicker({
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
               <SelectContent>
-                <div 
+                <div
                   className="max-h-60 overflow-y-auto"
                   onScroll={handleScroll}
                 >

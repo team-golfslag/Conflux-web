@@ -19,7 +19,6 @@ import { LoadingWrapper } from "@/components/loadingWrapper";
 import {
   ProjectResponseDTO,
   SwaggerException,
-  TitleType,
   UserRoleType,
   ITimelineItemResponseDTO,
   PermissionLevel,
@@ -216,9 +215,7 @@ export default function ProjectPage() {
               <Card ref={overviewRef} className="scroll-mt-12" title="Overview">
                 <ProjectOverview
                   projectId={id}
-                  title={project.titles.find(
-                    (title) => title.type === TitleType.Primary,
-                  )}
+                  titles={project.titles}
                   descriptions={project.descriptions}
                   onProjectUpdate={handleProjectUpdate}
                   isAdmin={isAdmin}

@@ -63,7 +63,7 @@ describe("ProjectOverview Component", () => {
       <ApiClientContext.Provider value={mockApiClient}>
         <ProjectOverview
           projectId={projectId}
-          title={mockTitle}
+          titles={[mockTitle]}
           descriptions={[mockDescription]}
           onProjectUpdate={onProjectUpdate}
           isAdmin={true}
@@ -82,7 +82,7 @@ describe("ProjectOverview Component", () => {
       <ApiClientContext.Provider value={mockApiClient}>
         <ProjectOverview
           projectId={projectId}
-          title={mockTitle}
+          titles={[mockTitle]}
           descriptions={[mockLongDescription]}
           onProjectUpdate={onProjectUpdate}
           isAdmin={true}
@@ -97,7 +97,7 @@ describe("ProjectOverview Component", () => {
       <ApiClientContext.Provider value={mockApiClient}>
         <ProjectOverview
           projectId={projectId}
-          title={mockTitle}
+          titles={[mockTitle]}
           descriptions={[mockLongDescription]}
           onProjectUpdate={onProjectUpdate}
           isAdmin={true}
@@ -185,7 +185,7 @@ describe("ProjectOverview Component", () => {
       <ApiClientContext.Provider value={mockApiClient}>
         <ProjectOverview
           projectId={projectId}
-          title={mockTitle}
+          titles={[mockTitle]}
           descriptions={[mockDescription]}
           onProjectUpdate={onProjectUpdate}
           isAdmin={true}
@@ -214,7 +214,7 @@ describe("ProjectOverview Component", () => {
       <ApiClientContext.Provider value={mockApiClient}>
         <ProjectOverview
           projectId={projectId}
-          title={mockTitle}
+          titles={[mockTitle]}
           descriptions={[mockDescription, briefDescription]}
           onProjectUpdate={onProjectUpdate}
           isAdmin={true}
@@ -237,7 +237,7 @@ describe("ProjectOverview Component", () => {
       <ApiClientContext.Provider value={mockApiClient}>
         <ProjectOverview
           projectId={projectId}
-          title={mockTitle}
+          titles={[mockTitle]}
           descriptions={[]}
           onProjectUpdate={onProjectUpdate}
           isAdmin={true}
