@@ -83,7 +83,18 @@ const urlValidationFunctions = {
   [ProductSchema.Isbn]: {
     validate: (url: string): boolean => {
       const isbnWithoutHyphens = url.replace(/-/g, "");
-      const digits = Array(isbnWithoutHyphens).map(Number);
+      const digits: number[] = [];
+      for (let i = 0; i < isbnWithoutHyphens.length; i++) {
+        const char = isbnWithoutHyphens[i];
+        if (char >= "0" && char <= "9") {
+          digits.push(parseInt(char, 10));
+        } else if (char === "X" && i === 9) {
+          digits.push(10);
+        } else if (char !== " ") {
+          return false;
+        }
+      }
+
       if (digits.length !== 10 && digits.length !== 13) {
         return false;
       }
