@@ -43,6 +43,7 @@ const ProjectSearchPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [lectorate, setLectorate] = useState<string | undefined>(undefined);
   const [sort, setSort] = useState(""); // Default to relevance
   const [refreshKey, setRefreshKey] = useState(0); // Used to force refresh the query
 
@@ -72,6 +73,12 @@ const ProjectSearchPage = () => {
   // Debounce the search term to avoid excessive API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 200); // 300ms delay
 
+  // Fetch available lectorates
+  const { data: availableLectorates } = useApiQuery(
+    (client) => client.admin_GetLectorates(),
+    [],
+  );
+
   /*
    * Function to parse the sort value from the select input
    */
@@ -98,21 +105,22 @@ const ProjectSearchPage = () => {
   const handleStartDateChange = (date: Date | undefined) => {
     setStartDate(date);
     setCurrentPage(1); // Reset to first page when filters change
-    // Force refresh the query when the date changes
-    setRefreshKey((prev) => prev + 1);
   };
 
   const handleEndDateChange = (date: Date | undefined) => {
     setEndDate(date);
     setCurrentPage(1); // Reset to first page when filters change
-    // Force refresh the query when the date changes
-    setRefreshKey((prev) => prev + 1);
   };
 
-  // Reset pagination when search term changes
+  const handleLectorateChange = (value: string) => {
+    setLectorate(value === "all" ? undefined : value);
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  // Reset pagination when search term or lectorate changes
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, lectorate]);
 
   // Handle pagination changes
   const handlePageChange = (page: number) => {
@@ -124,8 +132,6 @@ const ProjectSearchPage = () => {
     setCurrentPage(1); // Reset to first page when page size changes
   };
 
-  // Define a state variable to track when the API returns no results
-  // const [hasNoResults, setHasNoResults] = useState(false);
 
   // CSV download functionality
   const [triggerDownload, setTriggerDownload] = useState(false);
@@ -139,10 +145,11 @@ const ProjectSearchPage = () => {
         debouncedSearchTerm,
         startDate,
         endDate,
+        lectorate,
         parseOrderBy(sort),
       );
     },
-    [debouncedSearchTerm, startDate, endDate, sort, triggerDownload],
+    [debouncedSearchTerm, startDate, endDate, lectorate, sort, triggerDownload],
   );
 
   // Effect to handle the actual download when data is received
@@ -189,22 +196,76 @@ const ProjectSearchPage = () => {
         />
         <Search className="text-muted-foreground absolute top-1/2 right-8 -translate-y-1/2" />
       </div>
-      <div className="flex w-full flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-wrap gap-4">
-          <div className="flex items-center">
-            <span className="w-32 pr-2 text-sm font-semibold text-gray-600">
+      <div className="flex w-full flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">
               Start date after
-            </span>
+            </label>
             <DatePicker onDateChange={handleStartDateChange} />
           </div>
-          <div className="flex items-center">
-            <span className="w-32 pr-2 text-sm font-semibold text-gray-600">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">
               End date before
-            </span>
+            </label>
             <DatePicker onDateChange={handleEndDateChange} />
           </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">
+              Lectorate
+            </label>
+            <Select value={lectorate || "all"} onValueChange={handleLectorateChange}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="All lectorates" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All lectorates</SelectItem>
+                {availableLectorates?.map((lectorateName) => (
+                  <SelectItem key={lectorateName} value={lectorateName}>
+                    {lectorateName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-700">
+              Sort by
+            </label>
+            <Select
+              value={sort}
+              onValueChange={(value) => {
+                setSort(value);
+                setCurrentPage(1); // Reset to first page when sort changes
+                // Force refresh the query when the sort order changes
+                setRefreshKey((prev) => prev + 1);
+              }}
+            >
+              <SelectTrigger className="w-52">
+                <SelectValue placeholder="Sort by..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Sort by</SelectLabel>
+                  <SelectItem value="relevance">Relevance</SelectItem>
+                  <SelectItem value="title_asc">Title A-Z</SelectItem>
+                  <SelectItem value="title_desc">Title Z-A</SelectItem>
+                  <SelectItem value="start_date_asc">
+                    Start date ascending
+                  </SelectItem>
+                  <SelectItem value="start_date_desc">
+                    Start date descending
+                  </SelectItem>
+                  <SelectItem value="end_date_asc">End date ascending</SelectItem>
+                  <SelectItem value="end_date_desc">
+                    End date descending
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
           <Button
             onClick={handleDownloadCSV}
             disabled={isDownloading}
@@ -215,37 +276,6 @@ const ProjectSearchPage = () => {
             <Download className="h-4 w-4" />
             {isDownloading ? "Downloading..." : "Download CSV"}
           </Button>
-          <Select
-            value={sort}
-            onValueChange={(value) => {
-              setSort(value);
-              setCurrentPage(1); // Reset to first page when sort changes
-              // Force refresh the query when the sort order changes
-              setRefreshKey((prev) => prev + 1);
-            }}
-          >
-            <SelectTrigger className="w-50">
-              <SelectValue placeholder="Sort by.." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Sort by</SelectLabel>
-                <SelectItem value="relevance">Relevance</SelectItem>
-                <SelectItem value="title_asc">Title A-Z</SelectItem>
-                <SelectItem value="title_desc">Title Z-A</SelectItem>
-                <SelectItem value="start_date_asc">
-                  Start date ascending
-                </SelectItem>
-                <SelectItem value="start_date_desc">
-                  Start date descending
-                </SelectItem>
-                <SelectItem value="end_date_asc">End date ascending</SelectItem>
-                <SelectItem value="end_date_desc">
-                  End date descending
-                </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
         </div>
       </div>
       <Separator className="col-span-full my-4" />
@@ -256,10 +286,11 @@ const ProjectSearchPage = () => {
             debouncedSearchTerm,
             startDate,
             endDate,
+            lectorate,
             parseOrderBy(sort),
           )
         }
-        dependencies={[debouncedSearchTerm, refreshKey]}
+        dependencies={[debouncedSearchTerm, startDate, endDate, lectorate, refreshKey]}
         loadingMessage="Searching projects..."
         mode="page"
       >
