@@ -72,12 +72,10 @@ export default function ProjectOverview({
     useState<DescriptionType>(DescriptionType.Primary);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("default");
 
-  // State for selected title type and language
+  // State for selected title type
   const [selectedTitleType, setSelectedTitleType] = useState<TitleType>(
     TitleType.Primary,
   );
-  const [selectedTitleLanguage, setSelectedTitleLanguage] =
-    useState<string>("default");
 
   // State for creating new description types
   const [isCreatingNew, setIsCreatingNew] = useState(false);
@@ -107,14 +105,9 @@ export default function ProjectOverview({
     );
   };
 
-  // Helper function to find title by type and language (only active titles with null/undefined end_date)
-  const findTitle = (type: TitleType, language?: string) => {
-    return titles?.find(
-      (title) =>
-        title.type === type &&
-        (title.language?.id || "default") === (language || "default") &&
-        !title.end_date,
-    );
+  // Helper function to find title by type (only active titles with null/undefined end_date)
+  const findTitle = (type: TitleType) => {
+    return titles?.find((title) => title.type === type && !title.end_date);
   };
 
   // Get available description types that don't exist yet for the selected language
@@ -126,14 +119,11 @@ export default function ProjectOverview({
     );
   });
 
-  // Get available title types that don't exist yet for the selected language (only for active titles)
+  // Get available title types that don't exist yet (only for active titles)
   const availableNewTitleTypes = Object.values(TitleType).filter((type) => {
-    // Check if there are any active titles of this type and language
+    // Check if there are any active titles of this type
     const hasActiveTitleOfType = titles?.some(
-      (title) =>
-        title.type === type &&
-        (title.language?.id || "default") === (newTitleLanguage || "default") &&
-        !title.end_date,
+      (title) => title.type === type && !title.end_date,
     );
 
     // If no active title of this type exists, it's available for creation
@@ -144,21 +134,14 @@ export default function ProjectOverview({
   const currentDescription =
     findDescription(selectedDescriptionType, selectedLanguage)?.text || "";
 
-  // Get current title based on selected type and language
-  const currentTitle = findTitle(selectedTitleType, selectedTitleLanguage);
+  // Get current title based on selected type
+  const currentTitle = findTitle(selectedTitleType);
 
   // Get available languages for the selected description type
   const availableLanguagesForType = descriptions
     .filter((desc) => desc.type === selectedDescriptionType)
     .map((desc) => desc.language?.id || "default")
     .filter((lang, index, arr) => arr.indexOf(lang) === index); // Remove duplicates
-
-  // Get available languages for the selected title type (only for active titles)
-  const availableLanguagesForTitleType =
-    titles
-      ?.filter((title) => title.type === selectedTitleType && !title.end_date)
-      .map((title) => title.language?.id || "default")
-      .filter((lang, index, arr) => arr.indexOf(lang) === index) || [];
 
   // Effect to update selected language when changing description type
   useEffect(() => {
@@ -174,23 +157,9 @@ export default function ProjectOverview({
     }
   }, [selectedDescriptionType, descriptions, selectedLanguage]);
 
-  // Effect to update selected title language when changing title type (only for active titles)
-  useEffect(() => {
-    const languagesForTitleType =
-      titles
-        ?.filter((title) => title.type === selectedTitleType && !title.end_date)
-        .map((title) => title.language?.id || "default") || [];
-
-    if (
-      languagesForTitleType.length > 0 &&
-      !languagesForTitleType.includes(selectedTitleLanguage || "default")
-    ) {
-      setSelectedTitleLanguage(languagesForTitleType[0]);
-    }
-  }, [selectedTitleType, titles, selectedTitleLanguage]);
-
   // Title editing
   const [editTitleMode, setEditTitleMode] = useState(false);
+  const [editTitleLanguage, setEditTitleLanguage] = useState<string>("");
 
   const {
     editedText: editTitle,
@@ -205,6 +174,13 @@ export default function ProjectOverview({
       // Handle save via button click
     },
   );
+
+  // Update edit language when title changes or edit mode is entered
+  useEffect(() => {
+    if (editTitleMode && currentTitle) {
+      setEditTitleLanguage(currentTitle.language?.id || "default");
+    }
+  }, [editTitleMode, currentTitle]);
 
   // Description editing
   const [editDescriptionMode, setEditDescriptionMode] = useState(false);
@@ -286,9 +262,9 @@ export default function ProjectOverview({
           type: selectedTitleType,
           text: editTitle,
           language:
-            selectedTitleLanguage === "default"
+            editTitleLanguage === "default"
               ? undefined
-              : new Language({ id: selectedTitleLanguage }),
+              : new Language({ id: editTitleLanguage }),
         }),
       );
       setEditTitleMode(false);
@@ -298,30 +274,24 @@ export default function ProjectOverview({
 
   const handleDeleteTitle = async () => {
     await executeApiOperation(async () => {
-      const title = findTitle(selectedTitleType, selectedTitleLanguage);
+      const title = findTitle(selectedTitleType);
       if (!title) {
         throw new Error(
-          `Title type ${selectedTitleType} with language ${selectedTitleLanguage} not found for project ${projectId}`,
+          `Title type ${selectedTitleType} not found for project ${projectId}`,
         );
       }
       await apiClient.projectTitles_DeleteTitle(projectId, title.id);
 
       // After deletion, switch to another available title or reset selection
       const remainingTitles = titles?.filter(
-        (title) =>
-          !(
-            title.type === selectedTitleType &&
-            (title.language?.id || "default") === selectedTitleLanguage
-          ),
+        (title) => !(title.type === selectedTitleType),
       );
 
       if (remainingTitles && remainingTitles.length > 0) {
         const firstRemaining = remainingTitles[0];
         setSelectedTitleType(firstRemaining.type);
-        setSelectedTitleLanguage(firstRemaining.language?.id || "default");
       } else {
         setSelectedTitleType(TitleType.Primary);
-        setSelectedTitleLanguage("default");
       }
 
       setIsDeleteTitleModalOpen(false);
@@ -344,7 +314,6 @@ export default function ProjectOverview({
         }),
       );
       setSelectedTitleType(newTitleType);
-      setSelectedTitleLanguage(newTitleLanguage);
       setNewTitleType(TitleType.Primary);
       setNewTitleLanguage("default");
       setNewTitleText("");
@@ -546,9 +515,10 @@ export default function ProjectOverview({
               </p>
               <p className="text-sm">
                 <span className="font-medium">Language:</span>{" "}
-                {selectedTitleLanguage === "default"
+                {currentTitle?.language?.id === undefined ||
+                currentTitle?.language?.id === "default"
                   ? "Default"
-                  : selectedTitleLanguage.toUpperCase()}
+                  : currentTitle?.language?.id.toUpperCase()}
               </p>
             </div>
           </div>
@@ -736,30 +706,12 @@ export default function ProjectOverview({
                             ))}
                         </SelectContent>
                       </Select>
-                      {availableLanguagesForTitleType.length > 1 && (
-                        <>
-                          <span className="text-sm text-gray-600">Lang:</span>
-                          <Select
-                            value={selectedTitleLanguage}
-                            onValueChange={(value) =>
-                              setSelectedTitleLanguage(value)
-                            }
-                          >
-                            <SelectTrigger className="h-8 w-[80px] border-gray-100 bg-white/70 text-sm shadow-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {availableLanguagesForTitleType.map((lang) => (
-                                <SelectItem key={lang} value={lang}>
-                                  {lang === "default"
-                                    ? "Default"
-                                    : lang.toUpperCase()}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </>
-                      )}
+                      {currentTitle?.language?.id &&
+                        currentTitle?.language?.id !== "default" && (
+                          <span className="rounded bg-gray-100 px-2 py-1 text-sm text-gray-600">
+                            Lang: {currentTitle.language.id.toUpperCase()}
+                          </span>
+                        )}
                     </div>
                   )}
                 </div>
@@ -801,6 +753,17 @@ export default function ProjectOverview({
                 placeholder="Enter project title"
                 onKeyDown={handleTitleKeyDown}
               />
+              <div className="mt-2 flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Language:
+                </label>
+                <Input
+                  value={editTitleLanguage}
+                  onChange={(e) => setEditTitleLanguage(e.target.value)}
+                  placeholder="default, en, nl, de, fr..."
+                  className="h-8 w-32 border-gray-200 bg-gray-50 text-sm"
+                />
+              </div>
               <div className="flex justify-end gap-2 pt-2">
                 <Button
                   variant="outline"
@@ -828,6 +791,9 @@ export default function ProjectOverview({
                   onClick={() => {
                     handleTitleCancel();
                     setEditTitleMode(false);
+                    setEditTitleLanguage(
+                      currentTitle?.language?.id || "default",
+                    );
                   }}
                 >
                   <X size={16} /> Cancel

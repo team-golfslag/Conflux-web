@@ -126,10 +126,12 @@ const urlValidationFunctions = {
   },
   [ProductSchema.Archive]: {
     validate: (url: string): boolean => {
-      return /^https?:\/\/.+$/.test(url);
+      return /^https?:\/\/web.archive.com\/.+$/.test(url);
     },
-    placeholder: "https://example.com/archive/item",
-    description: "Any valid URL",
+    placeholder:
+      "https://web.archive.org/web/20230101000000/https://example.com",
+    description:
+      "Web Archive URL (e.g., https://web.archive.org/web/20230101000000/https://example.com)",
   },
 };
 

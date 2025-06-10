@@ -149,6 +149,8 @@ export default function RAiDInfo({
         return "No contributors";
       case RAiDIncompatibilityType.ContributorWithoutOrcid:
         return "Contributor without ORCID";
+      case RAiDIncompatibilityType.ContributorWithoutPosition:
+        return "Contributor without position";
       case RAiDIncompatibilityType.OverlappingContributorPositions:
         return "Overlapping contributor positions";
       case RAiDIncompatibilityType.NoProjectLeader:
@@ -165,6 +167,10 @@ export default function RAiDInfo({
         return "No product category";
       case RAiDIncompatibilityType.OrganisationWithoutRor:
         return "Organisation without ROR ID";
+      case RAiDIncompatibilityType.InvalidTitleLanguage:
+        return "Invalid title language";
+      case RAiDIncompatibilityType.InvalidDescriptionLanguage:
+        return "Invalid description language";
       default:
         return String(type);
     }
@@ -186,7 +192,10 @@ export default function RAiDInfo({
       incompatibility.type === RAiDIncompatibilityType.NoPrimaryDescription ||
       incompatibility.type ===
         RAiDIncompatibilityType.MultiplePrimaryDescriptions ||
-      incompatibility.type === RAiDIncompatibilityType.ProjectDescriptionTooLong
+      incompatibility.type ===
+        RAiDIncompatibilityType.ProjectDescriptionTooLong ||
+      incompatibility.type ===
+        RAiDIncompatibilityType.InvalidDescriptionLanguage
     ) {
       const description = project.descriptions?.find(
         (desc) => desc.id === objectId,
@@ -207,7 +216,8 @@ export default function RAiDInfo({
       incompatibility.type === RAiDIncompatibilityType.NoActivePrimaryTitle ||
       incompatibility.type ===
         RAiDIncompatibilityType.MultipleActivePrimaryTitle ||
-      incompatibility.type === RAiDIncompatibilityType.ProjectTitleTooLong
+      incompatibility.type === RAiDIncompatibilityType.ProjectTitleTooLong ||
+      incompatibility.type === RAiDIncompatibilityType.InvalidTitleLanguage
     ) {
       const title = project.titles?.find((title) => title.id === objectId);
       if (title) {
@@ -226,7 +236,11 @@ export default function RAiDInfo({
       incompatibility.type ===
         RAiDIncompatibilityType.ContributorWithoutOrcid ||
       incompatibility.type === RAiDIncompatibilityType.NoProjectLeader ||
-      incompatibility.type === RAiDIncompatibilityType.NoProjectContact
+      incompatibility.type === RAiDIncompatibilityType.NoProjectContact ||
+      incompatibility.type ===
+        RAiDIncompatibilityType.ContributorWithoutPosition ||
+      incompatibility.type ===
+        RAiDIncompatibilityType.OverlappingContributorPositions
     ) {
       const contributor = project.contributors?.find(
         (contrib) => contrib.person.id === objectId,
