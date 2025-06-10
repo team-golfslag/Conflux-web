@@ -451,7 +451,7 @@ export default function ProjectOverview({
               <Input
                 value={newTitleLanguage}
                 onChange={(e) => setNewTitleLanguage(e.target.value)}
-                placeholder="default, en, nl, de, fr..."
+                placeholder="default, eng, nld..."
                 className="h-9 border-gray-200 bg-gray-50 text-sm"
               />
             </div>
@@ -581,7 +581,7 @@ export default function ProjectOverview({
               <Input
                 value={newLanguage}
                 onChange={(e) => setNewLanguage(e.target.value)}
-                placeholder="default, en, nl, de, fr..."
+                placeholder="default, eng, nld..."
                 className="h-9 border-gray-200 bg-gray-50 text-sm"
               />
             </div>
@@ -760,7 +760,7 @@ export default function ProjectOverview({
                 <Input
                   value={editTitleLanguage}
                   onChange={(e) => setEditTitleLanguage(e.target.value)}
-                  placeholder="default, en, nl, de, fr..."
+                  placeholder="default, eng, nld..."
                   className="h-8 w-32 border-gray-200 bg-gray-50 text-sm"
                 />
               </div>
@@ -835,7 +835,7 @@ export default function ProjectOverview({
                 <Input
                   value={selectedLanguage}
                   onChange={(e) => setSelectedLanguage(e.target.value)}
-                  placeholder="default, en, nl..."
+                  placeholder="default, eng, nld..."
                   className="h-8 w-28 border-gray-200 bg-gray-50 text-sm"
                 />
               </div>
