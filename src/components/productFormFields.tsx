@@ -108,7 +108,7 @@ const urlValidationFunctions = {
   },
   [ProductSchema.Rrid]: {
     validate: (url: string): boolean => {
-      return /^RRID:[A-Za-z]+_\d+$/.test(url);
+      return /^RRID:.+$/.test(url);
     },
     placeholder: "RRID:AB_123456 or URL",
     description: "RRID identifier (RRID:AB_123456) or URL",
