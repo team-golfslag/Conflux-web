@@ -57,6 +57,9 @@ function getEnumKeys<
   return Object.keys(enumVariable) as Array<T>;
 }
 
+// Currently supported schemas - only DOI and Archive are fully supported
+const supportedSchemas = [ProductSchema.Doi, ProductSchema.Archive];
+
 // Validation functions for different schemas
 const urlValidationFunctions = {
   [ProductSchema.Doi]: {
@@ -168,6 +171,15 @@ function validateField(
         }
       }
       break;
+
+    case "schema":
+      if (schema && !supportedSchemas.includes(schema)) {
+        return { 
+          field, 
+          message: `${schema} schema is not yet supported by the Dutch RAiD implementation. Currently supported: ${supportedSchemas.join(", ")}` 
+        };
+      }
+      break;
   }
 
   return null;
@@ -202,6 +214,12 @@ export default function ProductFormFields({
         formData.productSchema,
       );
       if (urlError) errors.push(urlError);
+    }
+
+    // Always validate schema when it's set (no need for touched state)
+    if (formData.productSchema) {
+      const schemaError = validateField("schema", "", formData.productSchema);
+      if (schemaError) errors.push(schemaError);
     }
 
     setValidationErrors(errors);
@@ -319,26 +337,33 @@ export default function ProductFormFields({
         >
           Schema
         </Label>
-        <Select
-          onValueChange={(e) => {
-            handleSchemaChange(ProductSchema[e as keyof typeof ProductSchema]);
-          }}
-          value={formData.productSchema}
-        >
-          <SelectTrigger className="col-span-3 w-[180px]">
-            <SelectValue placeholder="Select a schema" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Schema</SelectLabel>
-              {getEnumKeys(ProductSchema).map((key, index) => (
-                <SelectItem key={index} value={ProductSchema[key]}>
-                  {key}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <div className="col-span-3">
+          <Select
+            onValueChange={(e) => {
+              handleSchemaChange(ProductSchema[e as keyof typeof ProductSchema]);
+            }}
+            value={formData.productSchema}
+          >
+            <SelectTrigger className={`w-[180px] ${getFieldError("schema") ? "border-red-500 focus:border-red-500" : ""}`}>
+              <SelectValue placeholder="Select a schema" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Schema</SelectLabel>
+                {getEnumKeys(ProductSchema).map((key, index) => (
+                  <SelectItem key={index} value={ProductSchema[key]}>
+                    {key}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          {getFieldError("schema") && (
+            <p className="mt-1 text-sm text-red-500">
+              {getFieldError("schema")?.message}
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-4 items-start gap-4">

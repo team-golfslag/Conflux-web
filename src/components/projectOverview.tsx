@@ -48,6 +48,22 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 
+// Language validation function
+const validateLanguage = (language: string): boolean => {
+  return language === "default" || (language.length === 3 && /^[a-zA-Z]{3}$/.test(language));
+};
+
+// Helper function to get language validation error message
+const getLanguageValidationError = (language: string): string | null => {
+  if (!language.trim()) {
+    return "Language is required";
+  }
+  if (!validateLanguage(language)) {
+    return "Language must be 'default' or exactly 3 letters (e.g., 'eng', 'nld')";
+  }
+  return null;
+};
+
 type ProjectOverviewProps = {
   projectId: string;
   titles?: ProjectTitleResponseDTO[];
@@ -95,6 +111,31 @@ export default function ProjectOverview({
   // State for delete confirmation modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleteTitleModalOpen, setIsDeleteTitleModalOpen] = useState(false);
+
+  // State for language validation
+  const [languageErrors, setLanguageErrors] = useState<{
+    editTitle: string | null;
+    newTitle: string | null;
+    selectedDescription: string | null;
+    newDescription: string | null;
+  }>({
+    editTitle: null,
+    newTitle: null,
+    selectedDescription: null,
+    newDescription: null,
+  });
+
+  const [languageTouched, setLanguageTouched] = useState<{
+    editTitle: boolean;
+    newTitle: boolean;
+    selectedDescription: boolean;
+    newDescription: boolean;
+  }>({
+    editTitle: false,
+    newTitle: false,
+    selectedDescription: false,
+    newDescription: false,
+  });
 
   // Helper function to find description by type and language
   const findDescription = (type: DescriptionType, language?: string) => {
@@ -182,6 +223,49 @@ export default function ProjectOverview({
     }
   }, [editTitleMode, currentTitle]);
 
+  // Validation effect for language fields
+  useEffect(() => {
+    setLanguageErrors(prevErrors => {
+      const errors = { ...prevErrors };
+      
+      if (languageTouched.editTitle) {
+        errors.editTitle = getLanguageValidationError(editTitleLanguage);
+      }
+      if (languageTouched.newTitle) {
+        errors.newTitle = getLanguageValidationError(newTitleLanguage);
+      }
+      if (languageTouched.selectedDescription) {
+        errors.selectedDescription = getLanguageValidationError(selectedLanguage);
+      }
+      if (languageTouched.newDescription) {
+        errors.newDescription = getLanguageValidationError(newLanguage);
+      }
+      
+      return errors;
+    });
+  }, [editTitleLanguage, newTitleLanguage, selectedLanguage, newLanguage, languageTouched]);
+
+  // Helper functions for handling language input changes
+  const handleEditTitleLanguageChange = (value: string) => {
+    setEditTitleLanguage(value);
+    setLanguageTouched(prev => ({ ...prev, editTitle: true }));
+  };
+
+  const handleNewTitleLanguageChange = (value: string) => {
+    setNewTitleLanguage(value);
+    setLanguageTouched(prev => ({ ...prev, newTitle: true }));
+  };
+
+  const handleSelectedLanguageChange = (value: string) => {
+    setSelectedLanguage(value);
+    setLanguageTouched(prev => ({ ...prev, selectedDescription: true }));
+  };
+
+  const handleNewLanguageChange = (value: string) => {
+    setNewLanguage(value);
+    setLanguageTouched(prev => ({ ...prev, newDescription: true }));
+  };
+
   // Description editing
   const [editDescriptionMode, setEditDescriptionMode] = useState(false);
 
@@ -255,6 +339,14 @@ export default function ProjectOverview({
   };
 
   const handleUpdateTitle = async () => {
+    // Validate language before proceeding
+    const langError = getLanguageValidationError(editTitleLanguage);
+    if (langError) {
+      setLanguageErrors(prev => ({ ...prev, editTitle: langError }));
+      setLanguageTouched(prev => ({ ...prev, editTitle: true }));
+      return;
+    }
+
     await executeApiOperation(async () => {
       await apiClient.projectTitles_UpdateTitle(
         projectId,
@@ -301,6 +393,14 @@ export default function ProjectOverview({
   };
 
   const handleCreateTitle = async () => {
+    // Validate language before proceeding
+    const langError = getLanguageValidationError(newTitleLanguage);
+    if (langError) {
+      setLanguageErrors(prev => ({ ...prev, newTitle: langError }));
+      setLanguageTouched(prev => ({ ...prev, newTitle: true }));
+      return;
+    }
+
     await executeApiOperation(async () => {
       await apiClient.projectTitles_UpdateTitle(
         projectId,
@@ -323,6 +423,14 @@ export default function ProjectOverview({
   };
 
   const handleUpdateDescription = async () => {
+    // Validate language before proceeding
+    const langError = getLanguageValidationError(selectedLanguage);
+    if (langError) {
+      setLanguageErrors(prev => ({ ...prev, selectedDescription: langError }));
+      setLanguageTouched(prev => ({ ...prev, selectedDescription: true }));
+      return;
+    }
+
     await executeApiOperation(async () => {
       const description = findDescription(
         selectedDescriptionType,
@@ -390,6 +498,14 @@ export default function ProjectOverview({
   };
 
   const handleCreateDescription = async () => {
+    // Validate language before proceeding
+    const langError = getLanguageValidationError(newLanguage);
+    if (langError) {
+      setLanguageErrors(prev => ({ ...prev, newDescription: langError }));
+      setLanguageTouched(prev => ({ ...prev, newDescription: true }));
+      return;
+    }
+
     await executeApiOperation(async () => {
       await apiClient.projectDescriptions_CreateDescription(
         projectId,
@@ -450,10 +566,17 @@ export default function ProjectOverview({
               </label>
               <Input
                 value={newTitleLanguage}
-                onChange={(e) => setNewTitleLanguage(e.target.value)}
+                onChange={(e) => handleNewTitleLanguageChange(e.target.value)}
                 placeholder="default, eng, nld..."
-                className="h-9 border-gray-200 bg-gray-50 text-sm"
+                className={`h-9 border-gray-200 bg-gray-50 text-sm ${
+                  languageErrors.newTitle ? "border-red-500 focus:border-red-500" : ""
+                }`}
               />
+              {languageErrors.newTitle && (
+                <p className="mt-1 text-sm text-red-500">
+                  {languageErrors.newTitle}
+                </p>
+              )}
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -484,7 +607,8 @@ export default function ProjectOverview({
                 isLoading ||
                 !newTitleType ||
                 !newTitleLanguage.trim() ||
-                !newTitleText.trim()
+                !newTitleText.trim() ||
+                !!languageErrors.newTitle
               }
             >
               <Plus size={16} /> Add Title Type
@@ -580,10 +704,17 @@ export default function ProjectOverview({
               </label>
               <Input
                 value={newLanguage}
-                onChange={(e) => setNewLanguage(e.target.value)}
+                onChange={(e) => handleNewLanguageChange(e.target.value)}
                 placeholder="default, eng, nld..."
-                className="h-9 border-gray-200 bg-gray-50 text-sm"
+                className={`h-9 border-gray-200 bg-gray-50 text-sm ${
+                  languageErrors.newDescription ? "border-red-500 focus:border-red-500" : ""
+                }`}
               />
+              {languageErrors.newDescription && (
+                <p className="mt-1 text-sm text-red-500">
+                  {languageErrors.newDescription}
+                </p>
+              )}
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -614,7 +745,8 @@ export default function ProjectOverview({
                 isLoading ||
                 !editDescription.trim() ||
                 !newDescriptionType ||
-                !newLanguage.trim()
+                !newLanguage.trim() ||
+                !!languageErrors.newDescription
               }
             >
               <Plus size={16} /> Add Description
@@ -757,12 +889,21 @@ export default function ProjectOverview({
                 <label className="text-sm font-medium text-gray-700">
                   Language:
                 </label>
-                <Input
-                  value={editTitleLanguage}
-                  onChange={(e) => setEditTitleLanguage(e.target.value)}
-                  placeholder="default, eng, nld..."
-                  className="h-8 w-32 border-gray-200 bg-gray-50 text-sm"
-                />
+                <div className="flex flex-col">
+                  <Input
+                    value={editTitleLanguage}
+                    onChange={(e) => handleEditTitleLanguageChange(e.target.value)}
+                    placeholder="default, eng, nld..."
+                    className={`h-8 w-32 border-gray-200 bg-gray-50 text-sm ${
+                      languageErrors.editTitle ? "border-red-500 focus:border-red-500" : ""
+                    }`}
+                  />
+                  {languageErrors.editTitle && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {languageErrors.editTitle}
+                    </p>
+                  )}
+                </div>
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <Button
@@ -770,7 +911,7 @@ export default function ProjectOverview({
                   size="sm"
                   className="flex items-center gap-1"
                   onClick={handleUpdateTitle}
-                  disabled={isLoading}
+                  disabled={isLoading || !!languageErrors.editTitle}
                 >
                   <Check size={16} /> Save
                 </Button>
@@ -832,12 +973,21 @@ export default function ProjectOverview({
                 <label className="text-sm font-medium text-gray-700">
                   Lang:
                 </label>
-                <Input
-                  value={selectedLanguage}
-                  onChange={(e) => setSelectedLanguage(e.target.value)}
-                  placeholder="default, eng, nld..."
-                  className="h-8 w-28 border-gray-200 bg-gray-50 text-sm"
-                />
+                <div className="flex flex-col">
+                  <Input
+                    value={selectedLanguage}
+                    onChange={(e) => handleSelectedLanguageChange(e.target.value)}
+                    placeholder="default, eng, nld..."
+                    className={`h-8 w-28 border-gray-200 bg-gray-50 text-sm ${
+                      languageErrors.selectedDescription ? "border-red-500 focus:border-red-500" : ""
+                    }`}
+                  />
+                  {languageErrors.selectedDescription && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {languageErrors.selectedDescription}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
             <Textarea
@@ -856,7 +1006,7 @@ export default function ProjectOverview({
                 size="sm"
                 className="flex items-center gap-1"
                 onClick={handleUpdateDescription}
-                disabled={isLoading}
+                disabled={isLoading || !!languageErrors.selectedDescription}
               >
                 <Check size={16} /> Save
               </Button>
