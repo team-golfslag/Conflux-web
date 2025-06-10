@@ -40,6 +40,7 @@ type AddWorkModalProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   project: ProjectResponseDTO;
+  onProjectUpdate: () => void;
 };
 
 export default function AddProductModal({
