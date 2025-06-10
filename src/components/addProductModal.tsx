@@ -166,7 +166,7 @@ export default function AddProductModal({
                 !productSchema ||
                 categories.length === 0
               }
-              className="bg-gray-800 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+              className="bg-gray-800 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-900 disabled:opacity-50"
             >
               Add Product
             </Button>
