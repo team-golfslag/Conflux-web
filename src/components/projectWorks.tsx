@@ -61,6 +61,7 @@ export default function ProjectWorks({
               isOpen={isModalOpen}
               onOpenChange={setIsModalOpen}
               project={project}
+              onProjectUpdate={onProjectUpdate}
             />
           </div>
         )}
