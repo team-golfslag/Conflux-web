@@ -25,8 +25,6 @@ import {
 } from "./select";
 
 export interface DatePickerProps {
-  startYear?: number;
-  endYear?: number;
   onDateChange?: (date: Date | undefined) => void;
   initialDate?: Date;
   className?: string;
@@ -35,14 +33,11 @@ export interface DatePickerProps {
 
 /**
  * DatePicker component with added month and year selection.
- * @param startYear The starting year for the year selection
- * @param endYear The ending year for the year selection
+ * Years are infinitely scrollable with dynamic loading to prevent large lists.
  * @param onDateChange Callback function to handle date changes
  * @param initialDate The initial date to be displayed in the date picker
  */
 export function DatePicker({
-  startYear = getYear(new Date()) - 20,
-  endYear = getYear(new Date()) + 20,
   onDateChange,
   initialDate,
   className = "",
@@ -52,6 +47,15 @@ export function DatePicker({
   const [currentMonthView, setCurrentMonthView] = React.useState<Date>(
     initialDate || new Date(),
   );
+  
+  // State for infinite scrolling years - maintain a sliding window
+  const [yearRange, setYearRange] = React.useState<{ start: number; end: number }>(() => {
+    const currentYear = initialDate ? getYear(initialDate) : getYear(new Date());
+    return {
+      start: currentYear - 25,  // Smaller initial range
+      end: currentYear + 25
+    };
+  });
 
   const months = [
     "January",
@@ -68,10 +72,68 @@ export function DatePicker({
     "December",
   ];
 
-  const years = Array.from(
-    { length: endYear - startYear + 1 },
-    (_, i) => startYear + i,
-  );
+  // Generate years dynamically based on current range
+  const years = React.useMemo(() => {
+    return Array.from(
+      { length: yearRange.end - yearRange.start + 1 },
+      (_, i) => yearRange.start + i,
+    );
+  }, [yearRange]);
+
+  // Function to extend year range when scrolling - no caps, but keep range manageable
+  const extendYearRange = React.useCallback((direction: 'up' | 'down') => {
+    setYearRange(prev => {
+      if (direction === 'up') {
+        return {
+          start: prev.start - 25,  // Add 25 years backwards
+          end: prev.end - 10       // Remove some from the end to keep total size reasonable
+        };
+      } else if (direction === 'down') {
+        return {
+          start: prev.start + 10,  // Remove some from the start
+          end: prev.end + 25       // Add 25 years forwards
+        };
+      }
+      return prev;
+    });
+  }, []);
+
+  // Throttle scroll events to prevent excessive updates
+  const scrollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const handleScroll = React.useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    
+    scrollTimeoutRef.current = setTimeout(() => {
+      const target = e.target as HTMLDivElement;
+      const { scrollTop, scrollHeight, clientHeight } = target;
+      
+      // Load more years when scrolling near the top (no lower bound)
+      if (scrollTop < 100) {
+        extendYearRange('up');
+      }
+      
+      // Load more years when scrolling near the bottom (no upper bound)
+      if (scrollTop + clientHeight > scrollHeight - 100) {
+        extendYearRange('down');
+      }
+    }, 150); // 150ms throttle
+  }, [extendYearRange]);
+
+  // Function to ensure current year is in range
+  const ensureYearInRange = React.useCallback((year: number) => {
+    setYearRange(prev => {
+      const needsExpansion = year < prev.start || year > prev.end;
+      if (!needsExpansion) return prev;
+      
+      // Center the range around the target year
+      return {
+        start: year - 25,
+        end: year + 25
+      };
+    });
+  }, []);
 
   const handleMonthChange = (month: string) => {
     const newMonthView = setMonth(currentMonthView, months.indexOf(month));
@@ -99,6 +161,15 @@ export function DatePicker({
     setDate(initialDate);
     setCurrentMonthView(initialDate || new Date());
   }, [initialDate]);
+
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className={cn(className)}>
@@ -136,16 +207,28 @@ export function DatePicker({
             <Select
               onValueChange={handleYearChange}
               value={getYear(currentMonthView).toString()}
+              onOpenChange={(open) => {
+                if (open) {
+                  // Ensure current year is visible when opening
+                  const currentYear = getYear(currentMonthView);
+                  ensureYearInRange(currentYear);
+                }
+              }}
             >
               <SelectTrigger className="w-[110px] cursor-pointer transition-colors duration-200 hover:bg-slate-100">
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
               <SelectContent>
-                {years.map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year}
-                  </SelectItem>
-                ))}
+                <div 
+                  className="max-h-60 overflow-y-auto"
+                  onScroll={handleScroll}
+                >
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </div>
               </SelectContent>
             </Select>
           </div>
