@@ -57,37 +57,68 @@ function getEnumKeys<
   return Object.keys(enumVariable) as Array<T>;
 }
 
-// Validation patterns for different schemas
-const urlValidationPatterns = {
+// Validation functions for different schemas
+const urlValidationFunctions = {
   [ProductSchema.Doi]: {
-    pattern: /^https?:\/\/(?:dx\.)?doi\.org\/10\.\d+\/.+$/,
+    validate: (url: string): boolean => {
+      return /^https?:\/\/(?:dx\.)?doi\.org\/10\.\d+\/.+$/.test(url);
+    },
     placeholder: "https://doi.org/10.1000/example",
     description: "DOI URL (e.g., https://doi.org/10.1000/example)",
   },
   [ProductSchema.Ark]: {
-    pattern: /^https?:\/\/.+\/ark:\/\d+\/.+$/,
+    validate: (url: string): boolean => {
+      return /^https?:\/\/.+\/ark:\/\d+\/.+$/.test(url);
+    },
     placeholder: "https://example.org/ark:/12345/example",
     description: "ARK URL (e.g., https://example.org/ark:/12345/example)",
   },
   [ProductSchema.Handle]: {
-    pattern: /^https?:\/\/hdl\.handle\.net\/\d+(\.\d+)*\/.+$/,
-    placeholder: "https://hdl.handle.net/1234/example",
-    description: "Handle URL (e.g., https://hdl.handle.net/1234/example)",
+    validate: (url: string): boolean => {
+      return /^([^/]+(?:\.[^/]+)*)\/([^/]+)$/.test(url);
+    },
+    placeholder: "12345/hdl1",
+    description: "Handle URL (e.g., 12345/hdl1)",
   },
   [ProductSchema.Isbn]: {
-    pattern: /^(978|979)-?\d{1,5}-?\d{1,7}-?\d{1,7}-?[\dX]$|^https?:\/\/.+$/,
+    validate: (url: string): boolean => {
+      const isbnWithoutHyphens = url.replace(/-/g, "");
+      const digits = Array(isbnWithoutHyphens).map(Number);
+      if (digits.length !== 10 && digits.length !== 13) {
+        return false;
+      }
+      let t = 0,
+        s = 0;
+
+      if (digits.length === 10) {
+        for (let i = 0; i < 10; ++i) {
+          t += digits[i];
+          s += t;
+        }
+        return s % 11 === 0;
+      }
+
+      for (let i = 0; i < 12; ++i) {
+        t += digits[i] * (i % 2 === 0 ? 1 : 3);
+      }
+      return (10 - (t % 10)) % 10 === digits[12];
+    },
     placeholder: "978-0123456789 or URL",
     description: "ISBN (978-0123456789) or URL containing ISBN",
   },
   [ProductSchema.Rrid]: {
-    pattern: /^RRID:[A-Za-z]+_\d+$|^https?:\/\/.+$/,
+    validate: (url: string): boolean => {
+      return /^RRID:[A-Za-z]+_\d+$/.test(url);
+    },
     placeholder: "RRID:AB_123456 or URL",
     description: "RRID identifier (RRID:AB_123456) or URL",
   },
   [ProductSchema.Archive]: {
-    pattern: /^https?:\/\/archive\.org\/.+$/,
-    placeholder: "https://archive.org/details/item",
-    description: "Archive.org URL (e.g., https://archive.org/details/item)",
+    validate: (url: string): boolean => {
+      return /^https?:\/\/.+$/.test(url);
+    },
+    placeholder: "https://example.com/archive/item",
+    description: "Any valid URL",
   },
 };
 
@@ -111,9 +142,9 @@ function validateField(
         return { field, message: "URL is required" };
       }
 
-      if (schema && urlValidationPatterns[schema]) {
-        const { pattern, description } = urlValidationPatterns[schema];
-        if (!pattern.test(value)) {
+      if (schema && urlValidationFunctions[schema]) {
+        const { validate, description } = urlValidationFunctions[schema];
+        if (!validate(value)) {
           return { field, message: `Invalid format. Expected: ${description}` };
         }
       } else {
@@ -188,9 +219,9 @@ export default function ProductFormFields({
   const getUrlPlaceholder = () => {
     if (
       formData.productSchema &&
-      urlValidationPatterns[formData.productSchema]
+      urlValidationFunctions[formData.productSchema]
     ) {
-      return urlValidationPatterns[formData.productSchema].placeholder;
+      return urlValidationFunctions[formData.productSchema].placeholder;
     }
     return "https://doi.org/";
   };
@@ -237,9 +268,9 @@ export default function ProductFormFields({
             </p>
           )}
           {formData.productSchema &&
-            urlValidationPatterns[formData.productSchema] && (
+            urlValidationFunctions[formData.productSchema] && (
               <p className="mt-1 text-xs text-gray-500">
-                {urlValidationPatterns[formData.productSchema].description}
+                {urlValidationFunctions[formData.productSchema].description}
               </p>
             )}
         </div>
