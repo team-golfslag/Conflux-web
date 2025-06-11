@@ -544,7 +544,7 @@ export default function ProjectOverview({
   };
 
   return (
-    <LoadingWrapper isLoading={isLoading} error={error}>
+    <LoadingWrapper isLoading={isLoading} error={error} mode="component">
       {/* Add Title Type Dialog */}
       <Dialog open={isCreatingNewTitle} onOpenChange={setIsCreatingNewTitle}>
         <DialogContent>

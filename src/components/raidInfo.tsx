@@ -403,6 +403,7 @@ export default function RAiDInfo({
         isInitialLoad={incompatibilitiesLoading}
         loadingMessage="Checking RAiD compatibility..."
         error={null}
+        mode="component"
       >
         <Card className="border-gray-200 bg-gray-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -513,6 +514,7 @@ export default function RAiDInfo({
         isInitialLoad={isLoading}
         loadingMessage="Loading RAiD information..."
         error={error}
+        mode="component"
       >
         {null}
       </LoadingWrapper>
@@ -525,8 +527,9 @@ export default function RAiDInfo({
       isInitialLoad={isLoading}
       loadingMessage="Loading RAiD information..."
       error={error}
+      mode="component"
     >
-      {raidInfo && (
+      {raidInfo ? (
         <Card className="border-gray-200 bg-gray-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
@@ -745,6 +748,19 @@ export default function RAiDInfo({
                 )}
               </div>
             </div>
+          </CardContent>
+        </Card>
+      ) : (
+        // Placeholder structure for consistent dimensions during loading
+        <Card className="border-gray-200 bg-gray-100">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
+              <RaidIcon width={48} height={48} className="text-blue-600" />
+              Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            <div className="h-32"></div>
           </CardContent>
         </Card>
       )}
