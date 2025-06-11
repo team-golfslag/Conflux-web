@@ -47,24 +47,110 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { iso6392, type Language as ISO639Language } from "iso-639-2";
 
-// Language validation function
+// Language validation function using ISO 639-2
 const validateLanguage = (language: string): boolean => {
-  return (
-    language === "default" ||
-    (language.length === 3 && /^[a-zA-Z]{3}$/.test(language))
+  // Allow empty string (no language specified)
+  if (!language.trim()) {
+    return true;
+  }
+
+  // Check if it's a valid ISO 639-2 code (3-letter code)
+  const languageData = iso6392.find(
+    (lang: ISO639Language) =>
+      lang.iso6392B === language.toLowerCase() ||
+      (lang.iso6392T && lang.iso6392T === language.toLowerCase()),
   );
+
+  return languageData !== undefined;
+};
+
+// Helper function to get language name from ISO code
+const getLanguageName = (language: string): string | null => {
+  if (language === "") {
+    return "Default (no specific language)";
+  }
+
+  const languageData = iso6392.find(
+    (lang: ISO639Language) =>
+      lang.iso6392B === language.toLowerCase() ||
+      (lang.iso6392T && lang.iso6392T === language.toLowerCase()),
+  );
+
+  return languageData ? languageData.name : null;
 };
 
 // Helper function to get language validation error message
 const getLanguageValidationError = (language: string): string | null => {
+  // Allow empty strings (no validation error for empty language)
   if (!language.trim()) {
-    return "Language is required";
+    return null;
   }
   if (!validateLanguage(language)) {
-    return "Language must be 'default' or exactly 3 letters (e.g., 'eng', 'nld')";
+    return "Language must be a valid ISO 639-2 code (e.g., 'eng', 'nld', 'fra')";
   }
   return null;
+};
+
+// Language Input Component with Preview
+interface LanguageInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+  error?: string | null;
+  onBlur?: () => void;
+}
+
+const LanguageInput: React.FC<LanguageInputProps> = ({
+  value,
+  onChange,
+  placeholder = "eng, nld, fra...",
+  className = "",
+  error,
+  onBlur,
+}) => {
+  const languageName = getLanguageName(value);
+  const isValid = validateLanguage(value);
+
+  return (
+    <div className="flex flex-col">
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+        placeholder={placeholder}
+        className={`${className} ${error ? "border-red-500 focus:border-red-500" : ""}`}
+      />
+      {/* Language preview - constant height to prevent jumping */}
+      <div className="mt-1 flex h-4 items-center gap-2">
+        {value && value.trim() && (
+          <>
+            {isValid && languageName ? (
+              <div className="flex min-w-0 items-center gap-1">
+                <span className="h-2 w-2 flex-shrink-0 rounded-full bg-green-500"></span>
+                <p className="truncate text-xs text-green-600">
+                  {languageName}
+                </p>
+              </div>
+            ) : (
+              value !== "" && (
+                <div className="flex items-center gap-1">
+                  <span className="h-2 w-2 flex-shrink-0 rounded-full bg-red-500"></span>
+                  <p className="text-xs text-red-600">Invalid language code</p>
+                </div>
+              )
+            )}
+          </>
+        )}
+      </div>
+      {/* Error message - constant height to prevent jumping */}
+      <div className="flex h-4 items-start">
+        {error && <p className="text-xs text-red-500">{error}</p>}
+      </div>
+    </div>
+  );
 };
 
 type ProjectOverviewProps = {
@@ -89,7 +175,7 @@ export default function ProjectOverview({
   // State for selected description type and language
   const [selectedDescriptionType, setSelectedDescriptionType] =
     useState<DescriptionType>(DescriptionType.Primary);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("default");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
 
   // State for selected title type
   const [selectedTitleType, setSelectedTitleType] = useState<TitleType>(
@@ -101,14 +187,14 @@ export default function ProjectOverview({
   const [newDescriptionType, setNewDescriptionType] = useState<DescriptionType>(
     DescriptionType.Primary,
   );
-  const [newLanguage, setNewLanguage] = useState<string>("default");
+  const [newLanguage, setNewLanguage] = useState<string>("");
 
   // State for creating new title types
   const [isCreatingNewTitle, setIsCreatingNewTitle] = useState(false);
   const [newTitleType, setNewTitleType] = useState<TitleType>(
     TitleType.Primary,
   );
-  const [newTitleLanguage, setNewTitleLanguage] = useState<string>("default");
+  const [newTitleLanguage, setNewTitleLanguage] = useState<string>("");
   const [newTitleText, setNewTitleText] = useState<string>("");
 
   // State for delete confirmation modal
@@ -128,6 +214,13 @@ export default function ProjectOverview({
     newDescription: null,
   });
 
+  // State for description validation errors
+  const [descriptionErrors, setDescriptionErrors] = useState<{
+    newDescription: string | null;
+  }>({
+    newDescription: null,
+  });
+
   const [languageTouched, setLanguageTouched] = useState<{
     editTitle: boolean;
     newTitle: boolean;
@@ -144,8 +237,7 @@ export default function ProjectOverview({
   const findDescription = (type: DescriptionType, language?: string) => {
     return descriptions.find(
       (desc) =>
-        desc.type === type &&
-        (desc.language?.id || "default") === (language || "default"),
+        desc.type === type && (desc.language?.id || "") === (language || ""),
     );
   };
 
@@ -155,13 +247,7 @@ export default function ProjectOverview({
   };
 
   // Get available description types that don't exist yet for the selected language
-  const availableNewTypes = Object.values(DescriptionType).filter((type) => {
-    return !descriptions.some(
-      (desc) =>
-        desc.type === type &&
-        (desc.language?.id || "default") === (newLanguage || "default"),
-    );
-  });
+  const availableNewTypes = Object.values(DescriptionType);
 
   // Get available title types that don't exist yet (only for active titles)
   const availableNewTitleTypes = Object.values(TitleType).filter((type) => {
@@ -184,18 +270,18 @@ export default function ProjectOverview({
   // Get available languages for the selected description type
   const availableLanguagesForType = descriptions
     .filter((desc) => desc.type === selectedDescriptionType)
-    .map((desc) => desc.language?.id || "default")
+    .map((desc) => desc.language?.id || "")
     .filter((lang, index, arr) => arr.indexOf(lang) === index); // Remove duplicates
 
   // Effect to update selected language when changing description type
   useEffect(() => {
     const languagesForType = descriptions
       .filter((desc) => desc.type === selectedDescriptionType)
-      .map((desc) => desc.language?.id || "default");
+      .map((desc) => desc.language?.id || "");
 
     if (
       languagesForType.length > 0 &&
-      !languagesForType.includes(selectedLanguage || "default")
+      !languagesForType.includes(selectedLanguage || "")
     ) {
       setSelectedLanguage(languagesForType[0]);
     }
@@ -222,7 +308,7 @@ export default function ProjectOverview({
   // Update edit language when title changes or edit mode is entered
   useEffect(() => {
     if (editTitleMode && currentTitle) {
-      setEditTitleLanguage(currentTitle.language?.id || "default");
+      setEditTitleLanguage(currentTitle.language?.id || "");
     }
   }, [editTitleMode, currentTitle]);
 
@@ -254,6 +340,30 @@ export default function ProjectOverview({
     newLanguage,
     languageTouched,
   ]);
+
+  // Validation effect for description existence
+  useEffect(() => {
+    setDescriptionErrors((prevErrors) => {
+      const errors = { ...prevErrors };
+
+      // Check if new description type and language combination already exists
+      const exists = descriptions.some(
+        (desc) =>
+          desc.type === newDescriptionType &&
+          (desc.language?.id || "") === (newLanguage || ""),
+      );
+
+      if (exists) {
+        const langDisplay =
+          newLanguage === "" ? "Default" : newLanguage.toUpperCase();
+        errors.newDescription = `A ${newDescriptionType.toLowerCase()} description already exists for language: ${langDisplay}`;
+      } else {
+        errors.newDescription = null;
+      }
+
+      return errors;
+    });
+  }, [newDescriptionType, newLanguage, descriptions]);
 
   // Helper functions for handling language input changes
   const handleEditTitleLanguageChange = (value: string) => {
@@ -364,7 +474,7 @@ export default function ProjectOverview({
           type: selectedTitleType,
           text: editTitle,
           language:
-            editTitleLanguage === "default"
+            editTitleLanguage === ""
               ? undefined
               : new Language({ id: editTitleLanguage }),
         }),
@@ -418,14 +528,14 @@ export default function ProjectOverview({
           type: newTitleType,
           text: newTitleText,
           language:
-            newTitleLanguage === "default"
+            newTitleLanguage === ""
               ? undefined
               : new Language({ id: newTitleLanguage }),
         }),
       );
       setSelectedTitleType(newTitleType);
       setNewTitleType(TitleType.Primary);
-      setNewTitleLanguage("default");
+      setNewTitleLanguage("");
       setNewTitleText("");
       setIsCreatingNewTitle(false);
       onProjectUpdate();
@@ -461,7 +571,7 @@ export default function ProjectOverview({
           type: selectedDescriptionType,
           text: editDescription,
           language:
-            selectedLanguage === "default"
+            selectedLanguage === ""
               ? undefined
               : new Language({ id: selectedLanguage }),
         }),
@@ -491,17 +601,17 @@ export default function ProjectOverview({
         (desc) =>
           !(
             desc.type === selectedDescriptionType &&
-            (desc.language?.id || "default") === selectedLanguage
+            (desc.language?.id || "") === selectedLanguage
           ),
       );
 
       if (remainingDescriptions.length > 0) {
         const firstRemaining = remainingDescriptions[0];
         setSelectedDescriptionType(firstRemaining.type);
-        setSelectedLanguage(firstRemaining.language?.id || "default");
+        setSelectedLanguage(firstRemaining.language?.id || "");
       } else {
         setSelectedDescriptionType(DescriptionType.Primary);
-        setSelectedLanguage("default");
+        setSelectedLanguage("");
       }
 
       setIsDeleteModalOpen(false);
@@ -519,6 +629,11 @@ export default function ProjectOverview({
       return;
     }
 
+    // Check if description already exists
+    if (descriptionErrors.newDescription) {
+      return;
+    }
+
     await executeApiOperation(async () => {
       await apiClient.projectDescriptions_CreateDescription(
         projectId,
@@ -526,15 +641,13 @@ export default function ProjectOverview({
           type: newDescriptionType,
           text: editDescription,
           language:
-            newLanguage === "default"
-              ? undefined
-              : new Language({ id: newLanguage }),
+            newLanguage === "" ? undefined : new Language({ id: newLanguage }),
         }),
       );
       setSelectedDescriptionType(newDescriptionType);
       setSelectedLanguage(newLanguage);
       setNewDescriptionType(DescriptionType.Primary);
-      setNewLanguage("default");
+      setNewLanguage("");
       handleDescriptionChange({
         target: { value: "" },
       } as React.ChangeEvent<HTMLTextAreaElement>);
@@ -575,23 +688,13 @@ export default function ProjectOverview({
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
-                Language (leave "default" for no specific language)
+                Language (leave "" for no specific language)
               </label>
-              <Input
+              <LanguageInput
                 value={newTitleLanguage}
-                onChange={(e) => handleNewTitleLanguageChange(e.target.value)}
-                placeholder="default, eng, nld..."
-                className={`h-9 border-gray-200 bg-gray-50 text-sm ${
-                  languageErrors.newTitle
-                    ? "border-red-500 focus:border-red-500"
-                    : ""
-                }`}
+                onChange={handleNewTitleLanguageChange}
+                error={languageErrors.newTitle}
               />
-              {languageErrors.newTitle && (
-                <p className="mt-1 text-sm text-red-500">
-                  {languageErrors.newTitle}
-                </p>
-              )}
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -655,7 +758,7 @@ export default function ProjectOverview({
               <p className="text-sm">
                 <span className="font-medium">Language:</span>{" "}
                 {currentTitle?.language?.id === undefined ||
-                currentTitle?.language?.id === "default"
+                currentTitle?.language?.id === ""
                   ? "Default"
                   : currentTitle?.language?.id.toUpperCase()}
               </p>
@@ -700,7 +803,11 @@ export default function ProjectOverview({
                   setNewDescriptionType(value as DescriptionType)
                 }
               >
-                <SelectTrigger className="h-9 w-full border-gray-200 bg-gray-50 text-sm hover:bg-gray-100">
+                <SelectTrigger
+                  className={`h-9 w-full border-gray-200 bg-gray-50 text-sm hover:bg-gray-100 ${
+                    descriptionErrors.newDescription ? "border-red-500" : ""
+                  }`}
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -712,26 +819,21 @@ export default function ProjectOverview({
                   ))}
                 </SelectContent>
               </Select>
+              {descriptionErrors.newDescription && (
+                <p className="mt-1 text-xs text-red-500">
+                  {descriptionErrors.newDescription}
+                </p>
+              )}
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
-                Language (leave "default" for no specific language)
+                Language (leave "" for no specific language)
               </label>
-              <Input
+              <LanguageInput
                 value={newLanguage}
-                onChange={(e) => handleNewLanguageChange(e.target.value)}
-                placeholder="default, eng, nld..."
-                className={`h-9 border-gray-200 bg-gray-50 text-sm ${
-                  languageErrors.newDescription
-                    ? "border-red-500 focus:border-red-500"
-                    : ""
-                }`}
+                onChange={handleNewLanguageChange}
+                error={languageErrors.newDescription}
               />
-              {languageErrors.newDescription && (
-                <p className="mt-1 text-sm text-red-500">
-                  {languageErrors.newDescription}
-                </p>
-              )}
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
@@ -763,7 +865,8 @@ export default function ProjectOverview({
                 !editDescription.trim() ||
                 !newDescriptionType ||
                 !newLanguage.trim() ||
-                !!languageErrors.newDescription
+                !!languageErrors.newDescription ||
+                !!descriptionErrors.newDescription
               }
             >
               <Plus size={16} /> Add Description
@@ -791,7 +894,7 @@ export default function ProjectOverview({
               </p>
               <p className="text-sm">
                 <span className="font-medium">Language:</span>{" "}
-                {selectedLanguage === "default"
+                {selectedLanguage === ""
                   ? "Default"
                   : selectedLanguage.toUpperCase()}
               </p>
@@ -856,9 +959,12 @@ export default function ProjectOverview({
                         </SelectContent>
                       </Select>
                       {currentTitle?.language?.id &&
-                        currentTitle?.language?.id !== "default" && (
-                          <span className="rounded bg-gray-100 px-2 py-1 text-sm text-gray-600">
-                            Lang: {currentTitle.language.id.toUpperCase()}
+                        currentTitle?.language?.id !== "" && (
+                          <span className="inline-block max-w-[200px] truncate rounded bg-gray-100 px-2 py-1 text-sm text-gray-600">
+                            Lang:{" "}
+                            {getLanguageName(
+                              currentTitle.language.id.toLowerCase(),
+                            ) || currentTitle.language.id.toUpperCase()}
                           </span>
                         )}
                     </div>
@@ -874,7 +980,7 @@ export default function ProjectOverview({
                         onClick={() => setIsCreatingNewTitle(true)}
                       >
                         <Plus className="mr-1 h-4 w-4" />
-                        Add Type
+                        Add New
                       </Button>
                     )}
                     <Button
@@ -902,28 +1008,17 @@ export default function ProjectOverview({
                 placeholder="Enter project title"
                 onKeyDown={handleTitleKeyDown}
               />
-              <div className="mt-2 flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700">
+              <div className="mt-2 flex items-start gap-2">
+                <label className="min-w-fit pt-2 text-sm font-medium text-gray-700">
                   Language:
                 </label>
-                <div className="flex flex-col">
-                  <Input
+                <div className="max-w-xs flex-1">
+                  <LanguageInput
                     value={editTitleLanguage}
-                    onChange={(e) =>
-                      handleEditTitleLanguageChange(e.target.value)
-                    }
-                    placeholder="default, eng, nld..."
-                    className={`h-8 w-32 border-gray-200 bg-gray-50 text-sm ${
-                      languageErrors.editTitle
-                        ? "border-red-500 focus:border-red-500"
-                        : ""
-                    }`}
+                    onChange={handleEditTitleLanguageChange}
+                    error={languageErrors.editTitle}
+                    className="h-8 w-full"
                   />
-                  {languageErrors.editTitle && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {languageErrors.editTitle}
-                    </p>
-                  )}
                 </div>
               </div>
               <div className="flex justify-end gap-2 pt-2">
@@ -953,9 +1048,7 @@ export default function ProjectOverview({
                   onClick={() => {
                     handleTitleCancel();
                     setEditTitleMode(false);
-                    setEditTitleLanguage(
-                      currentTitle?.language?.id || "default",
-                    );
+                    setEditTitleLanguage(currentTitle?.language?.id || "");
                   }}
                 >
                   <X size={16} /> Cancel
@@ -968,50 +1061,43 @@ export default function ProjectOverview({
       <CardContent className="group" data-cy="description-section">
         {editDescriptionMode && isAdmin ? (
           <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-3 pt-1 sm:px-3">
-              <h3 className="font-semibold text-gray-700">Description:</h3>
-              <Select
-                value={selectedDescriptionType}
-                onValueChange={(value) =>
-                  setSelectedDescriptionType(value as DescriptionType)
-                }
-              >
-                <SelectTrigger className="h-8 w-[180px] border-gray-200 bg-gray-50 text-sm hover:bg-gray-100">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(DescriptionType).map(
-                    (type: DescriptionType) => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() +
-                          type.slice(1).toLowerCase()}
-                      </SelectItem>
-                    ),
-                  )}
-                </SelectContent>
-              </Select>
-              <div className="flex items-center gap-2">
+            <div className="pt-1 sm:px-3">
+              <div className="mb-3 flex flex-wrap items-center gap-3">
                 <label className="text-sm font-medium text-gray-700">
-                  Lang:
+                  Description:
                 </label>
-                <div className="flex flex-col">
-                  <Input
+                <Select
+                  value={selectedDescriptionType}
+                  onValueChange={(value) =>
+                    setSelectedDescriptionType(value as DescriptionType)
+                  }
+                >
+                  <SelectTrigger className="h-8 w-[180px] border-gray-200 bg-gray-50 text-sm hover:bg-gray-100">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(DescriptionType).map(
+                      (type: DescriptionType) => (
+                        <SelectItem key={type} value={type}>
+                          {type.charAt(0).toUpperCase() +
+                            type.slice(1).toLowerCase()}
+                        </SelectItem>
+                      ),
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-start gap-2">
+                <label className="min-w-fit pt-2 text-sm font-medium text-gray-700">
+                  Language:
+                </label>
+                <div className="max-w-xs flex-1">
+                  <LanguageInput
                     value={selectedLanguage}
-                    onChange={(e) =>
-                      handleSelectedLanguageChange(e.target.value)
-                    }
-                    placeholder="default, eng, nld..."
-                    className={`h-8 w-28 border-gray-200 bg-gray-50 text-sm ${
-                      languageErrors.selectedDescription
-                        ? "border-red-500 focus:border-red-500"
-                        : ""
-                    }`}
+                    onChange={handleSelectedLanguageChange}
+                    error={languageErrors.selectedDescription}
+                    className="h-8 w-full"
                   />
-                  {languageErrors.selectedDescription && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {languageErrors.selectedDescription}
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
@@ -1092,15 +1178,28 @@ export default function ProjectOverview({
                       value={selectedLanguage}
                       onValueChange={(value) => setSelectedLanguage(value)}
                     >
-                      <SelectTrigger className="h-8 w-[100px] border-gray-100 bg-white/70 text-sm shadow-sm">
-                        <SelectValue />
+                      <SelectTrigger className="h-8 w-[140px] border-gray-100 bg-white/70 text-sm shadow-sm">
+                        <SelectValue>
+                          {selectedLanguage === ""
+                            ? "Default"
+                            : (() => {
+                                const langName =
+                                  getLanguageName(
+                                    selectedLanguage.toLowerCase(),
+                                  ) || selectedLanguage.toUpperCase();
+                                return langName.length > 9
+                                  ? langName.substring(0, 9) + "..."
+                                  : langName;
+                              })()}
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
                         {availableLanguagesForType.map((lang) => (
                           <SelectItem key={lang} value={lang}>
-                            {lang === "default"
+                            {lang === ""
                               ? "Default"
-                              : lang.toUpperCase()}
+                              : getLanguageName(lang.toLowerCase()) ||
+                                lang.toUpperCase()}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -1110,18 +1209,16 @@ export default function ProjectOverview({
               </div>
               {isAdmin && (
                 <div className="flex gap-2">
-                  {availableNewTypes.length > 0 && (
-                    <Button
-                      className="invisible group-hover:visible"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsCreatingNew(true)}
-                      data-cy="add-description-type-btn"
-                    >
-                      <Plus className="mr-1 h-4 w-4" />
-                      Add Type
-                    </Button>
-                  )}
+                  <Button
+                    className="invisible group-hover:visible"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsCreatingNew(true)}
+                    data-cy="add-description-type-btn"
+                  >
+                    <Plus className="mr-1 h-4 w-4" />
+                    Add New
+                  </Button>
                   <Button
                     className="invisible group-hover:visible"
                     variant="outline"
