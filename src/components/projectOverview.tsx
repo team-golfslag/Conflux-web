@@ -50,7 +50,10 @@ import { Input } from "@/components/ui/input";
 
 // Language validation function
 const validateLanguage = (language: string): boolean => {
-  return language === "default" || (language.length === 3 && /^[a-zA-Z]{3}$/.test(language));
+  return (
+    language === "default" ||
+    (language.length === 3 && /^[a-zA-Z]{3}$/.test(language))
+  );
 };
 
 // Helper function to get language validation error message
@@ -225,9 +228,9 @@ export default function ProjectOverview({
 
   // Validation effect for language fields
   useEffect(() => {
-    setLanguageErrors(prevErrors => {
+    setLanguageErrors((prevErrors) => {
       const errors = { ...prevErrors };
-      
+
       if (languageTouched.editTitle) {
         errors.editTitle = getLanguageValidationError(editTitleLanguage);
       }
@@ -235,35 +238,42 @@ export default function ProjectOverview({
         errors.newTitle = getLanguageValidationError(newTitleLanguage);
       }
       if (languageTouched.selectedDescription) {
-        errors.selectedDescription = getLanguageValidationError(selectedLanguage);
+        errors.selectedDescription =
+          getLanguageValidationError(selectedLanguage);
       }
       if (languageTouched.newDescription) {
         errors.newDescription = getLanguageValidationError(newLanguage);
       }
-      
+
       return errors;
     });
-  }, [editTitleLanguage, newTitleLanguage, selectedLanguage, newLanguage, languageTouched]);
+  }, [
+    editTitleLanguage,
+    newTitleLanguage,
+    selectedLanguage,
+    newLanguage,
+    languageTouched,
+  ]);
 
   // Helper functions for handling language input changes
   const handleEditTitleLanguageChange = (value: string) => {
     setEditTitleLanguage(value);
-    setLanguageTouched(prev => ({ ...prev, editTitle: true }));
+    setLanguageTouched((prev) => ({ ...prev, editTitle: true }));
   };
 
   const handleNewTitleLanguageChange = (value: string) => {
     setNewTitleLanguage(value);
-    setLanguageTouched(prev => ({ ...prev, newTitle: true }));
+    setLanguageTouched((prev) => ({ ...prev, newTitle: true }));
   };
 
   const handleSelectedLanguageChange = (value: string) => {
     setSelectedLanguage(value);
-    setLanguageTouched(prev => ({ ...prev, selectedDescription: true }));
+    setLanguageTouched((prev) => ({ ...prev, selectedDescription: true }));
   };
 
   const handleNewLanguageChange = (value: string) => {
     setNewLanguage(value);
-    setLanguageTouched(prev => ({ ...prev, newDescription: true }));
+    setLanguageTouched((prev) => ({ ...prev, newDescription: true }));
   };
 
   // Description editing
@@ -342,8 +352,8 @@ export default function ProjectOverview({
     // Validate language before proceeding
     const langError = getLanguageValidationError(editTitleLanguage);
     if (langError) {
-      setLanguageErrors(prev => ({ ...prev, editTitle: langError }));
-      setLanguageTouched(prev => ({ ...prev, editTitle: true }));
+      setLanguageErrors((prev) => ({ ...prev, editTitle: langError }));
+      setLanguageTouched((prev) => ({ ...prev, editTitle: true }));
       return;
     }
 
@@ -396,8 +406,8 @@ export default function ProjectOverview({
     // Validate language before proceeding
     const langError = getLanguageValidationError(newTitleLanguage);
     if (langError) {
-      setLanguageErrors(prev => ({ ...prev, newTitle: langError }));
-      setLanguageTouched(prev => ({ ...prev, newTitle: true }));
+      setLanguageErrors((prev) => ({ ...prev, newTitle: langError }));
+      setLanguageTouched((prev) => ({ ...prev, newTitle: true }));
       return;
     }
 
@@ -426,8 +436,11 @@ export default function ProjectOverview({
     // Validate language before proceeding
     const langError = getLanguageValidationError(selectedLanguage);
     if (langError) {
-      setLanguageErrors(prev => ({ ...prev, selectedDescription: langError }));
-      setLanguageTouched(prev => ({ ...prev, selectedDescription: true }));
+      setLanguageErrors((prev) => ({
+        ...prev,
+        selectedDescription: langError,
+      }));
+      setLanguageTouched((prev) => ({ ...prev, selectedDescription: true }));
       return;
     }
 
@@ -501,8 +514,8 @@ export default function ProjectOverview({
     // Validate language before proceeding
     const langError = getLanguageValidationError(newLanguage);
     if (langError) {
-      setLanguageErrors(prev => ({ ...prev, newDescription: langError }));
-      setLanguageTouched(prev => ({ ...prev, newDescription: true }));
+      setLanguageErrors((prev) => ({ ...prev, newDescription: langError }));
+      setLanguageTouched((prev) => ({ ...prev, newDescription: true }));
       return;
     }
 
@@ -569,7 +582,9 @@ export default function ProjectOverview({
                 onChange={(e) => handleNewTitleLanguageChange(e.target.value)}
                 placeholder="default, eng, nld..."
                 className={`h-9 border-gray-200 bg-gray-50 text-sm ${
-                  languageErrors.newTitle ? "border-red-500 focus:border-red-500" : ""
+                  languageErrors.newTitle
+                    ? "border-red-500 focus:border-red-500"
+                    : ""
                 }`}
               />
               {languageErrors.newTitle && (
@@ -707,7 +722,9 @@ export default function ProjectOverview({
                 onChange={(e) => handleNewLanguageChange(e.target.value)}
                 placeholder="default, eng, nld..."
                 className={`h-9 border-gray-200 bg-gray-50 text-sm ${
-                  languageErrors.newDescription ? "border-red-500 focus:border-red-500" : ""
+                  languageErrors.newDescription
+                    ? "border-red-500 focus:border-red-500"
+                    : ""
                 }`}
               />
               {languageErrors.newDescription && (
@@ -892,10 +909,14 @@ export default function ProjectOverview({
                 <div className="flex flex-col">
                   <Input
                     value={editTitleLanguage}
-                    onChange={(e) => handleEditTitleLanguageChange(e.target.value)}
+                    onChange={(e) =>
+                      handleEditTitleLanguageChange(e.target.value)
+                    }
                     placeholder="default, eng, nld..."
                     className={`h-8 w-32 border-gray-200 bg-gray-50 text-sm ${
-                      languageErrors.editTitle ? "border-red-500 focus:border-red-500" : ""
+                      languageErrors.editTitle
+                        ? "border-red-500 focus:border-red-500"
+                        : ""
                     }`}
                   />
                   {languageErrors.editTitle && (
@@ -976,10 +997,14 @@ export default function ProjectOverview({
                 <div className="flex flex-col">
                   <Input
                     value={selectedLanguage}
-                    onChange={(e) => handleSelectedLanguageChange(e.target.value)}
+                    onChange={(e) =>
+                      handleSelectedLanguageChange(e.target.value)
+                    }
                     placeholder="default, eng, nld..."
                     className={`h-8 w-28 border-gray-200 bg-gray-50 text-sm ${
-                      languageErrors.selectedDescription ? "border-red-500 focus:border-red-500" : ""
+                      languageErrors.selectedDescription
+                        ? "border-red-500 focus:border-red-500"
+                        : ""
                     }`}
                   />
                   {languageErrors.selectedDescription && (

@@ -174,9 +174,9 @@ function validateField(
 
     case "schema":
       if (schema && !supportedSchemas.includes(schema)) {
-        return { 
-          field, 
-          message: `${schema} schema is not yet supported by the Dutch RAiD implementation. Currently supported: ${supportedSchemas.join(", ")}` 
+        return {
+          field,
+          message: `${schema} schema is not yet supported by the Dutch RAiD implementation. Currently supported: ${supportedSchemas.join(", ")}`,
         };
       }
       break;
@@ -340,11 +340,15 @@ export default function ProductFormFields({
         <div className="col-span-3">
           <Select
             onValueChange={(e) => {
-              handleSchemaChange(ProductSchema[e as keyof typeof ProductSchema]);
+              handleSchemaChange(
+                ProductSchema[e as keyof typeof ProductSchema],
+              );
             }}
             value={formData.productSchema}
           >
-            <SelectTrigger className={`w-[180px] ${getFieldError("schema") ? "border-red-500 focus:border-red-500" : ""}`}>
+            <SelectTrigger
+              className={`w-[180px] ${getFieldError("schema") ? "border-red-500 focus:border-red-500" : ""}`}
+            >
               <SelectValue placeholder="Select a schema" />
             </SelectTrigger>
             <SelectContent>
