@@ -125,8 +125,12 @@ export default function ProjectDescriptionSection({
     );
 
     // 3. Check for multiple primary descriptions (only one primary description is allowed)
-    const primaryExists = selectedType === DescriptionType.Primary && 
-      descriptions.some((d) => d.type === DescriptionType.Primary && d.id !== currentDescription?.id);
+    const primaryExists =
+      selectedType === DescriptionType.Primary &&
+      descriptions.some(
+        (d) =>
+          d.type === DescriptionType.Primary && d.id !== currentDescription?.id,
+      );
 
     if (comboExists) {
       setEditComboError("This type and language combination already exists.");
@@ -429,15 +433,17 @@ function CreateDescriptionDialog({
   // Filter out Primary type if it already exists
   const availableTypes = Object.values(DescriptionType).filter((t) => {
     if (t === DescriptionType.Primary) {
-      return !existingDescriptions.some((d) => d.type === DescriptionType.Primary);
+      return !existingDescriptions.some(
+        (d) => d.type === DescriptionType.Primary,
+      );
     }
     return true;
   });
 
   const [type, setType] = useState<DescriptionType>(
-    availableTypes.includes(DescriptionType.Primary) 
-      ? DescriptionType.Primary 
-      : availableTypes[0] || DescriptionType.Brief
+    availableTypes.includes(DescriptionType.Primary)
+      ? DescriptionType.Primary
+      : availableTypes[0] || DescriptionType.Brief,
   );
   const [language, setLanguage] = useState("");
   const [text, setText] = useState("");
@@ -465,7 +471,7 @@ function CreateDescriptionDialog({
     const comboExists = existingDescriptions.some(
       (d) => d.type === type && (d.language?.id ?? "") === language,
     );
-    
+
     if (comboExists) {
       setComboError("This type and language combination already exists.");
     } else {

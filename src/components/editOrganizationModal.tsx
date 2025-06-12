@@ -165,10 +165,10 @@ export default function EditOrganizationModal({
       }
       const result =
         await apiClient.projectOrganisations_GetOrganisationNameByRor(id);
-      if (result && result.organisation) {
+      if (result && result) {
         setFormData((prev) => ({
           ...prev,
-          name: result.organisation.name,
+          name: result.name,
         }));
         return true;
       } else {
