@@ -9,17 +9,13 @@ import {
   ProductCategoryType,
   ProductSchema,
   ProductType,
-  Project,
   ProjectOrganisationResponseDTO,
   ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import {
-  Organisation,
   OrganisationResponseDTO,
-  OrganisationRole,
   OrganisationRoleResponseDTO,
   Product,
-  ProjectOrganisation,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { mount } from "cypress/react";
 import FundingView from "@/components/fundingView.tsx";
