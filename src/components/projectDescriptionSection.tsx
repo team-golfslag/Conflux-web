@@ -21,11 +21,8 @@ import {
   useEditableText,
   useTruncatableText,
 } from "@/hooks/useEditableContent";
-import {
-  LanguageInput,
-  getLanguageName,
-  getLanguageValidationError,
-} from "@/components/languageInput";
+import { LanguageInput } from "@/components/languageInput";
+import { useLanguage } from "@/lib/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -76,6 +73,9 @@ export default function ProjectDescriptionSection({
   isAdmin = false,
   onProjectUpdate,
 }: Readonly<ProjectDescriptionSectionProps>) {
+  // Language context for validation and name lookup
+  const { getLanguageName, getLanguageValidationError } = useLanguage();
+
   const [selectedType, setSelectedType] = useState<DescriptionType>(
     DescriptionType.Primary,
   );
@@ -139,7 +139,14 @@ export default function ProjectDescriptionSection({
     } else {
       setEditComboError(null);
     }
-  }, [editLanguage, selectedType, descriptions, currentDescription, editMode]);
+  }, [
+    editLanguage,
+    selectedType,
+    descriptions,
+    currentDescription,
+    editMode,
+    getLanguageValidationError,
+  ]);
 
   const {
     editedText: editText,
@@ -430,6 +437,9 @@ function CreateDescriptionDialog({
   onProjectUpdate: () => void;
   onSuccess: (newType: DescriptionType, newLang: string) => void;
 }) {
+  // Language context for validation
+  const { getLanguageValidationError } = useLanguage();
+
   // Filter out Primary type if it already exists
   const availableTypes = Object.values(DescriptionType).filter((t) => {
     if (t === DescriptionType.Primary) {
@@ -477,7 +487,7 @@ function CreateDescriptionDialog({
     } else {
       setComboError(null);
     }
-  }, [type, language, existingDescriptions]);
+  }, [type, language, existingDescriptions, getLanguageValidationError]);
 
   // Update selected type if current type is no longer available
   useEffect(() => {
@@ -577,6 +587,8 @@ function DeleteDescriptionDialog({
   onConfirm: () => void;
   isLoading: boolean;
 }) {
+  const { getLanguageName } = useLanguage();
+
   if (!description) return null;
 
   return (

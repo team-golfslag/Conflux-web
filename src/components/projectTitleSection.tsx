@@ -8,11 +8,8 @@ import {
 } from "@team-golfslag/conflux-api-client/src/client";
 import { useApiMutation } from "@/hooks/useApiMutation";
 import { useEditableText } from "@/hooks/useEditableContent";
-import {
-  LanguageInput,
-  getLanguageName,
-  getLanguageValidationError,
-} from "@/components/languageInput";
+import { LanguageInput } from "@/components/languageInput";
+import { useLanguage } from "@/lib/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,6 +42,9 @@ export default function ProjectTitleSection({
   isAdmin = false,
   onProjectUpdate,
 }: Readonly<ProjectTitleSectionProps>) {
+  // Language context for validation and name lookup
+  const { getLanguageName, getLanguageValidationError } = useLanguage();
+
   // State for selection and editing
   const [selectedType, setSelectedType] = useState<TitleType>(
     TitleType.Primary,
@@ -132,7 +132,7 @@ export default function ProjectTitleSection({
 
   useEffect(() => {
     setLangError(getLanguageValidationError(editLanguage));
-  }, [editLanguage]);
+  }, [editLanguage, getLanguageValidationError]);
 
   // Auto-resize textarea
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -299,6 +299,9 @@ function CreateTitleDialog({
   onProjectUpdate: () => void;
   onSuccess: (newType: TitleType) => void;
 }) {
+  // Language context for validation
+  const { getLanguageValidationError } = useLanguage();
+
   const [type, setType] = useState<TitleType>(TitleType.Primary);
   const [language, setLanguage] = useState("");
   const [text, setText] = useState("");
@@ -340,7 +343,7 @@ function CreateTitleDialog({
 
   useEffect(() => {
     setLangError(getLanguageValidationError(language));
-  }, [language]);
+  }, [language, getLanguageValidationError]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>

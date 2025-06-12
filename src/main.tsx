@@ -13,6 +13,7 @@ import { ApiClient } from "@team-golfslag/conflux-api-client/src/client";
 import config from "@/config.ts";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { SessionProvider } from "@/lib/SessionContext";
+import { LanguageProvider } from "@/lib/LanguageContext";
 
 /*
 This is the main entry point into the program
@@ -30,7 +31,9 @@ createRoot(root!).render(
   <StrictMode>
     <ApiClientContext.Provider value={apiClient}>
       <BrowserRouter>
-        <SessionProvider>{allRoutes}</SessionProvider>
+        <SessionProvider>
+          <LanguageProvider>{allRoutes}</LanguageProvider>
+        </SessionProvider>
       </BrowserRouter>
     </ApiClientContext.Provider>
   </StrictMode>,

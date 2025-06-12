@@ -1,35 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { iso6392 } from "iso-639-2";
-
-// Language validation function using ISO 639-2
-const validateLanguage = (language: string): boolean => {
-  if (!language.trim()) return true; // Allow empty string
-  return iso6392.some(
-    (lang) =>
-      lang.iso6392B === language.toLowerCase() ||
-      (lang.iso6392T && lang.iso6392T === language.toLowerCase()),
-  );
-};
-
-// Helper function to get language name from ISO code
-export const getLanguageName = (language: string): string | null => {
-  if (language === "") return "Default";
-  const langData = iso6392.find(
-    (lang) =>
-      lang.iso6392B === language.toLowerCase() ||
-      (lang.iso6392T && lang.iso6392T === language.toLowerCase()),
-  );
-  return langData ? langData.name : null;
-};
-
-// Helper function to get language validation error message
-export const getLanguageValidationError = (language: string): string | null => {
-  if (!language.trim()) return null;
-  if (!validateLanguage(language)) {
-    return "Must be a valid ISO 639-2 code (e.g., 'eng', 'nld').";
-  }
-  return null;
-};
+import { useLanguage } from "@/lib/LanguageContext";
 
 interface LanguageInputProps {
   value: string;
@@ -44,6 +14,8 @@ export const LanguageInput: React.FC<LanguageInputProps> = ({
   className = "",
   error,
 }) => {
+  const { validateLanguage, getLanguageName, isLoading } = useLanguage();
+
   const languageName = getLanguageName(value);
   const isValid = validateLanguage(value);
 
@@ -54,9 +26,18 @@ export const LanguageInput: React.FC<LanguageInputProps> = ({
         onChange={(e) => onChange(e.target.value)}
         placeholder="eng, nld, fra..."
         className={`${className} ${error ? "border-red-500 focus:border-red-500" : ""}`}
+        disabled={isLoading}
       />
       <div className="mt-1 flex h-4 items-center gap-2">
-        {value && value.trim() && (
+        {isLoading && (
+          <div className="flex min-w-0 items-center gap-1">
+            <span className="h-2 w-2 flex-shrink-0 animate-pulse rounded-full bg-gray-400"></span>
+            <p className="truncate text-xs text-gray-500">
+              Loading languages...
+            </p>
+          </div>
+        )}
+        {!isLoading && value && value.trim() && (
           <div className="flex min-w-0 items-center gap-1">
             <span
               className={`h-2 w-2 flex-shrink-0 rounded-full ${isValid ? "bg-green-500" : "bg-red-500"}`}
