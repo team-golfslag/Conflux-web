@@ -10,7 +10,6 @@ import {
   ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import FundingCard from "@/components/fundingCard.tsx";
-import FunderCard from "@/components/funderCard.tsx";
 
 type ProjectFundingViewProps = { project: ProjectResponseDTO };
 
@@ -35,7 +34,7 @@ export default function FundingView({
             ),
           )
           .map((o) => (
-            <FunderCard organisation={o} />
+            <FundingCard organisation={o} />
           ))}
       </CardContent>
     </Card>
