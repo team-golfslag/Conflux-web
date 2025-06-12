@@ -89,13 +89,13 @@ const ProjectCard = ({
     >
       <Card className="border-border/60 flex h-full flex-col overflow-hidden rounded-xl border shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:border-blue-700 hover:shadow-[0_4px_18px_rgba(0,0,0,0.08)] [&>*]:rounded-xl">
         <CardHeader className="relative bg-white px-4 pt-4 pb-2">
-          <div className="h-14 pr-28">
-            <h3 className="line-clamp-2 text-xl font-semibold tracking-tight text-gray-900 group-hover:text-blue-800">
+          <div className="h-16 overflow-hidden pr-32 transition-all duration-150 ease-in-out group-hover:pr-12">
+            <h3 className="line-clamp-2 text-xl leading-relaxed font-semibold tracking-tight break-words text-gray-900 group-hover:line-clamp-none group-hover:text-blue-800">
               {primaryTitle?.text ?? "No title available"}
             </h3>
           </div>
           <Badge
-            className={`${status.color} absolute top-4 right-12 font-medium whitespace-nowrap shadow-sm`}
+            className={`${status.color} absolute top-4 right-12 z-10 font-medium whitespace-nowrap shadow-sm transition-opacity duration-150 group-hover:opacity-0`}
             data-cy="project-status"
           >
             {status.label}
@@ -104,7 +104,7 @@ const ProjectCard = ({
           <Button
             variant="ghost"
             size="sm"
-            className="absolute top-4 right-3 h-8 w-8 p-0 opacity-80 hover:opacity-100"
+            className="absolute top-4 right-3 z-10 h-8 w-8 p-0 opacity-80 hover:opacity-100"
             onClick={handleFavoriteToggle}
             disabled={isToggling}
           >

@@ -14,6 +14,8 @@ import config from "@/config.ts";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { SessionProvider } from "@/lib/SessionContext";
 import { LanguageProvider } from "@/lib/LanguageContext";
+import { BackendStatusProvider } from "@/lib/BackendStatusContext";
+import { BackendStatusWrapper } from "@/components/BackendStatusWrapper";
 
 /*
 This is the main entry point into the program
@@ -31,9 +33,13 @@ createRoot(root!).render(
   <StrictMode>
     <ApiClientContext.Provider value={apiClient}>
       <BrowserRouter>
-        <SessionProvider>
-          <LanguageProvider>{allRoutes}</LanguageProvider>
-        </SessionProvider>
+        <BackendStatusProvider>
+          <SessionProvider>
+            <LanguageProvider>
+              <BackendStatusWrapper>{allRoutes}</BackendStatusWrapper>
+            </LanguageProvider>
+          </SessionProvider>
+        </BackendStatusProvider>
       </BrowserRouter>
     </ApiClientContext.Provider>
   </StrictMode>,
