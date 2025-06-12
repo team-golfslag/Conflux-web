@@ -124,9 +124,17 @@ export default function ProjectDescriptionSection({
         d.id !== currentDescription?.id,
     );
 
-    setEditComboError(
-      comboExists ? "This type and language combination already exists." : null,
-    );
+    // 3. Check for multiple primary descriptions (only one primary description is allowed)
+    const primaryExists = selectedType === DescriptionType.Primary && 
+      descriptions.some((d) => d.type === DescriptionType.Primary && d.id !== currentDescription?.id);
+
+    if (comboExists) {
+      setEditComboError("This type and language combination already exists.");
+    } else if (primaryExists) {
+      setEditComboError("Only one primary description is allowed per project.");
+    } else {
+      setEditComboError(null);
+    }
   }, [editLanguage, selectedType, descriptions, currentDescription, editMode]);
 
   const {
@@ -418,7 +426,19 @@ function CreateDescriptionDialog({
   onProjectUpdate: () => void;
   onSuccess: (newType: DescriptionType, newLang: string) => void;
 }) {
-  const [type, setType] = useState<DescriptionType>(DescriptionType.Primary);
+  // Filter out Primary type if it already exists
+  const availableTypes = Object.values(DescriptionType).filter((t) => {
+    if (t === DescriptionType.Primary) {
+      return !existingDescriptions.some((d) => d.type === DescriptionType.Primary);
+    }
+    return true;
+  });
+
+  const [type, setType] = useState<DescriptionType>(
+    availableTypes.includes(DescriptionType.Primary) 
+      ? DescriptionType.Primary 
+      : availableTypes[0] || DescriptionType.Brief
+  );
   const [language, setLanguage] = useState("");
   const [text, setText] = useState("");
   const [langError, setLangError] = useState<string | null>(null);
@@ -441,15 +461,24 @@ function CreateDescriptionDialog({
     const langErr = getLanguageValidationError(language);
     setLangError(langErr);
 
+    // Check for exact type/language combination
     const comboExists = existingDescriptions.some(
       (d) => d.type === type && (d.language?.id ?? "") === language,
     );
+    
     if (comboExists) {
       setComboError("This type and language combination already exists.");
     } else {
       setComboError(null);
     }
   }, [type, language, existingDescriptions]);
+
+  // Update selected type if current type is no longer available
+  useEffect(() => {
+    if (!availableTypes.includes(type)) {
+      setType(availableTypes[0] || DescriptionType.Brief);
+    }
+  }, [availableTypes, type]);
 
   const handleCreate = () => {
     if (langError || comboError) return;
@@ -482,7 +511,7 @@ function CreateDescriptionDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {Object.values(DescriptionType).map((t) => (
+                {availableTypes.map((t) => (
                   <SelectItem key={t} value={t}>
                     {t.charAt(0).toUpperCase() + t.slice(1).toLowerCase()}
                   </SelectItem>
