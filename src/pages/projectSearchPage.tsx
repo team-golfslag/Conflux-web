@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { Pagination } from "@/components/ui/pagination";
 import { ApiClientContext } from "@/lib/ApiClientContext";
+import CsvExportDialog from "@/components/csvExportDialog";
 
 /** Project Search Page component <br>
  * Fetches projects from the backend using a debounced search term and selected sort order.
@@ -133,14 +134,37 @@ const ProjectSearchPage = () => {
   };
 
   // CSV download functionality
+  const [showExportDialog, setShowExportDialog] = useState(false);
   const [triggerDownload, setTriggerDownload] = useState(false);
+  const [exportOptions, setExportOptions] = useState<{
+    include_start_date?: boolean;
+    include_end_date?: boolean;
+    include_users?: boolean;
+    include_contributors?: boolean;
+    include_products?: boolean;
+    include_organisations?: boolean;
+    include_title?: boolean;
+    include_description?: boolean;
+    include_lectorate?: boolean;
+    include_owner_organisation?: boolean;
+  } | null>(null);
 
   const { data: csvData, isLoading: isDownloading } = useApiQuery(
     (apiClient: ApiClient) => {
-      if (!triggerDownload) {
+      if (!triggerDownload || !exportOptions) {
         return Promise.resolve(null);
       }
       return apiClient.projects_ExportToCsv(
+        exportOptions.include_start_date,
+        exportOptions.include_end_date,
+        exportOptions.include_users,
+        exportOptions.include_contributors,
+        exportOptions.include_products,
+        exportOptions.include_organisations,
+        exportOptions.include_title,
+        exportOptions.include_description,
+        exportOptions.include_lectorate,
+        exportOptions.include_owner_organisation,
         debouncedSearchTerm,
         startDate,
         endDate,
@@ -148,7 +172,15 @@ const ProjectSearchPage = () => {
         parseOrderBy(sort),
       );
     },
-    [debouncedSearchTerm, startDate, endDate, lectorate, sort, triggerDownload],
+    [
+      debouncedSearchTerm,
+      startDate,
+      endDate,
+      lectorate,
+      sort,
+      triggerDownload,
+      exportOptions,
+    ],
   );
 
   // Effect to handle the actual download when data is received
@@ -180,7 +212,13 @@ const ProjectSearchPage = () => {
   }, [csvData, triggerDownload]);
 
   const handleDownloadCSV = () => {
+    setShowExportDialog(true);
+  };
+
+  const handleExport = (options: typeof exportOptions) => {
+    setExportOptions(options);
     setTriggerDownload(true);
+    setShowExportDialog(false);
   };
 
   return (
@@ -365,6 +403,14 @@ const ProjectSearchPage = () => {
           );
         }}
       </ApiWrapper>
+
+      {/* CSV Export Dialog */}
+      <CsvExportDialog
+        isOpen={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        onExport={handleExport}
+        isDownloading={isDownloading}
+      />
     </search>
   );
 };
