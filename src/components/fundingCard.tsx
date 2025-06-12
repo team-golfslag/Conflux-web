@@ -11,12 +11,17 @@ import { ProjectOrganisationResponseDTO } from "@team-golfslag/conflux-api-clien
 import { isValidUrl } from "@/utils/urlUtils.ts";
 
 type CardProps = {
-  product?: ProductResponseDTO;
-  organisation?: ProjectOrganisationResponseDTO;
+  object: ProductResponseDTO | ProjectOrganisationResponseDTO;
 };
 
-export default function ({ product, organisation }: Readonly<CardProps>) {
-  // URL validation regex - checks for http/https URLs
+export default function ({ object }: Readonly<CardProps>) {
+  let product;
+  let organisation;
+  if ("title" in object) {
+    product = object as ProductResponseDTO;
+  } else if ("organisation" in object) {
+    organisation = object as ProjectOrganisationResponseDTO;
+  }
   return (
     <>
       <Card className="flex flex-col gap-1 border border-gray-200 p-3 shadow-sm">

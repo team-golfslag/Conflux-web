@@ -25,7 +25,7 @@ export default function FundingView({
         {project.products
           .filter((p) => p.type === ProductType.Funding)
           .map((p) => (
-            <FundingCard product={p} />
+            <FundingCard object={p} />
           ))}
         {project.organisations
           .filter((o) =>
@@ -34,7 +34,7 @@ export default function FundingView({
             ),
           )
           .map((o) => (
-            <FundingCard organisation={o} />
+            <FundingCard object={o} />
           ))}
       </CardContent>
     </Card>
