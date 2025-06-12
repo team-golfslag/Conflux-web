@@ -149,6 +149,8 @@ export default function RAiDInfo({
         return "No contributors";
       case RAiDIncompatibilityType.ContributorWithoutOrcid:
         return "Contributor without ORCID";
+      case RAiDIncompatibilityType.ContributorWithoutPosition:
+        return "Contributor without position";
       case RAiDIncompatibilityType.OverlappingContributorPositions:
         return "Overlapping contributor positions";
       case RAiDIncompatibilityType.NoProjectLeader:
@@ -165,6 +167,10 @@ export default function RAiDInfo({
         return "No product category";
       case RAiDIncompatibilityType.OrganisationWithoutRor:
         return "Organisation without ROR ID";
+      case RAiDIncompatibilityType.InvalidTitleLanguage:
+        return "Invalid title language";
+      case RAiDIncompatibilityType.InvalidDescriptionLanguage:
+        return "Invalid description language";
       default:
         return String(type);
     }
@@ -186,7 +192,10 @@ export default function RAiDInfo({
       incompatibility.type === RAiDIncompatibilityType.NoPrimaryDescription ||
       incompatibility.type ===
         RAiDIncompatibilityType.MultiplePrimaryDescriptions ||
-      incompatibility.type === RAiDIncompatibilityType.ProjectDescriptionTooLong
+      incompatibility.type ===
+        RAiDIncompatibilityType.ProjectDescriptionTooLong ||
+      incompatibility.type ===
+        RAiDIncompatibilityType.InvalidDescriptionLanguage
     ) {
       const description = project.descriptions?.find(
         (desc) => desc.id === objectId,
@@ -207,7 +216,8 @@ export default function RAiDInfo({
       incompatibility.type === RAiDIncompatibilityType.NoActivePrimaryTitle ||
       incompatibility.type ===
         RAiDIncompatibilityType.MultipleActivePrimaryTitle ||
-      incompatibility.type === RAiDIncompatibilityType.ProjectTitleTooLong
+      incompatibility.type === RAiDIncompatibilityType.ProjectTitleTooLong ||
+      incompatibility.type === RAiDIncompatibilityType.InvalidTitleLanguage
     ) {
       const title = project.titles?.find((title) => title.id === objectId);
       if (title) {
@@ -226,7 +236,11 @@ export default function RAiDInfo({
       incompatibility.type ===
         RAiDIncompatibilityType.ContributorWithoutOrcid ||
       incompatibility.type === RAiDIncompatibilityType.NoProjectLeader ||
-      incompatibility.type === RAiDIncompatibilityType.NoProjectContact
+      incompatibility.type === RAiDIncompatibilityType.NoProjectContact ||
+      incompatibility.type ===
+        RAiDIncompatibilityType.ContributorWithoutPosition ||
+      incompatibility.type ===
+        RAiDIncompatibilityType.OverlappingContributorPositions
     ) {
       const contributor = project.contributors?.find(
         (contrib) => contrib.person.id === objectId,
@@ -389,6 +403,7 @@ export default function RAiDInfo({
         isInitialLoad={incompatibilitiesLoading}
         loadingMessage="Checking RAiD compatibility..."
         error={null}
+        mode="component"
       >
         <Card className="border-gray-200 bg-gray-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -499,6 +514,7 @@ export default function RAiDInfo({
         isInitialLoad={isLoading}
         loadingMessage="Loading RAiD information..."
         error={error}
+        mode="component"
       >
         {null}
       </LoadingWrapper>
@@ -511,8 +527,9 @@ export default function RAiDInfo({
       isInitialLoad={isLoading}
       loadingMessage="Loading RAiD information..."
       error={error}
+      mode="component"
     >
-      {raidInfo && (
+      {raidInfo ? (
         <Card className="border-gray-200 bg-gray-100">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
@@ -731,6 +748,19 @@ export default function RAiDInfo({
                 )}
               </div>
             </div>
+          </CardContent>
+        </Card>
+      ) : (
+        // Placeholder structure for consistent dimensions during loading
+        <Card className="border-gray-200 bg-gray-100">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
+              <RaidIcon width={48} height={48} className="text-blue-600" />
+              Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1">
+            <div className="h-32"></div>
           </CardContent>
         </Card>
       )}

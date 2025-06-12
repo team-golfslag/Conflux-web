@@ -147,6 +147,7 @@ describe("<addProductModal/>", () => {
           isOpen={true}
           onOpenChange={cy.stub().as("openChangeHandler")}
           project={mockData.project}
+          onProjectUpdate={cy.stub().as("onProjectUpdate")}
         />
       </ApiClientContext>,
     );
@@ -202,6 +203,7 @@ describe("<addProductModal/>", () => {
         isOpen={false}
         onOpenChange={cy.stub().as("openChangeHandler")}
         project={mockData.project}
+        onProjectUpdate={cy.stub().as("onProjectUpdate")}
       />,
     );
 

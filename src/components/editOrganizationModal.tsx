@@ -31,7 +31,13 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx";
 import { ApiMutation } from "@/components/apiMutation.tsx";
-import { Plus, X, Building } from "lucide-react";
+import { Plus, X, Building, ArrowRight } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip.tsx";
 
 interface OrganizationFormData {
   name: string;
@@ -113,6 +119,7 @@ export default function EditOrganizationModal({
     [],
   );
   const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+  const [autoFillError, setAutoFillError] = useState<string | null>(null);
 
   const apiClient = useContext(ApiClientContext);
 
@@ -141,6 +148,38 @@ export default function EditOrganizationModal({
   const handleRorIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, rorId: e.target.value }));
     setTouched((prev) => ({ ...prev, rorId: true }));
+    // Clear error when input changes
+    if (autoFillError) setAutoFillError(null);
+  };
+
+  const handleRorAutoFill = async (): Promise<boolean> => {
+    if (!formData.rorId) return false;
+
+    setAutoFillError(null);
+
+    try {
+      const id = formData.rorId.trim().split("/").pop();
+      if (!id) {
+        setAutoFillError("Invalid ROR ID format.");
+        return false;
+      }
+      const result =
+        await apiClient.projectOrganisations_GetOrganisationNameByRor(id);
+      if (result && result) {
+        setFormData((prev) => ({
+          ...prev,
+          name: result.name,
+        }));
+        return true;
+      } else {
+        setAutoFillError("No organization found with this ROR ID.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error searching ROR:", error);
+      setAutoFillError("Failed to search ROR. Please try again.");
+      return false;
+    }
   };
 
   const getFieldError = (field: string) => {
@@ -164,6 +203,7 @@ export default function EditOrganizationModal({
     // Reset validation state
     setValidationErrors([]);
     setTouched({});
+    setAutoFillError(null);
   }, [organization]);
 
   //update form if organization changes
@@ -360,24 +400,49 @@ export default function EditOrganizationModal({
                     ROR ID
                   </Label>
                   <div className="col-span-4 sm:col-span-3">
-                    <Input
-                      id={`${idPrefix}rorId`}
-                      name="rorId"
-                      className={`text-sm ${getFieldError("rorId") ? "border-red-500 focus:border-red-500" : ""}`}
-                      value={formData.rorId}
-                      placeholder="https://ror.org/example123"
-                      onChange={handleRorIdChange}
-                    />
-                    {getFieldError("rorId") && (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        id={`${idPrefix}rorId`}
+                        name="rorId"
+                        className={`flex-1 text-sm ${getFieldError("rorId") || autoFillError ? "border-red-500 focus:border-red-500" : ""}`}
+                        value={formData.rorId}
+                        placeholder="https://ror.org/example123"
+                        onChange={handleRorIdChange}
+                        aria-invalid={
+                          !!(getFieldError("rorId") || autoFillError)
+                        }
+                      />
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={handleRorAutoFill}
+                              disabled={!formData.rorId}
+                            >
+                              <ArrowRight className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Autofill organization name from ROR</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    {(getFieldError("rorId") || autoFillError) && (
                       <p className="mt-1 text-sm text-red-500">
-                        {getFieldError("rorId")?.message}
+                        {autoFillError || getFieldError("rorId")?.message}
                       </p>
                     )}
-                    {formData.rorId && !getFieldError("rorId") && (
-                      <p className="mt-1 text-xs text-gray-500">
-                        {validationPatterns.rorId.description}
-                      </p>
-                    )}
+                    {formData.rorId &&
+                      !getFieldError("rorId") &&
+                      !autoFillError && (
+                        <p className="mt-1 text-xs text-gray-500">
+                          {validationPatterns.rorId.description}
+                        </p>
+                      )}
                   </div>
                 </div>
                 <div className="grid grid-cols-4 items-center">

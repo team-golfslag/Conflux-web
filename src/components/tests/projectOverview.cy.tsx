@@ -6,6 +6,7 @@
 import ProjectOverview from "@/components/projectOverview.tsx";
 import { mount } from "cypress/react";
 import { ApiClientContext } from "@/lib/ApiClientContext";
+import { LanguageProvider } from "@/lib/LanguageContext";
 import { createApiClientMock } from "./mocks";
 import {
   ProjectTitleResponseDTO,
@@ -61,13 +62,15 @@ describe("ProjectOverview Component", () => {
 
     mount(
       <ApiClientContext.Provider value={mockApiClient}>
-        <ProjectOverview
-          projectId={projectId}
-          title={mockTitle}
-          descriptions={[mockDescription]}
-          onProjectUpdate={onProjectUpdate}
-          isAdmin={true}
-        />
+        <LanguageProvider>
+          <ProjectOverview
+            projectId={projectId}
+            titles={[mockTitle]}
+            descriptions={[mockDescription]}
+            onProjectUpdate={onProjectUpdate}
+            isAdmin={true}
+          />
+        </LanguageProvider>
       </ApiClientContext.Provider>,
     );
   });
@@ -80,13 +83,15 @@ describe("ProjectOverview Component", () => {
   it("renders the project description in a truncated form", () => {
     mount(
       <ApiClientContext.Provider value={mockApiClient}>
-        <ProjectOverview
-          projectId={projectId}
-          title={mockTitle}
-          descriptions={[mockLongDescription]}
-          onProjectUpdate={onProjectUpdate}
-          isAdmin={true}
-        />
+        <LanguageProvider>
+          <ProjectOverview
+            projectId={projectId}
+            titles={[mockTitle]}
+            descriptions={[mockLongDescription]}
+            onProjectUpdate={onProjectUpdate}
+            isAdmin={true}
+          />
+        </LanguageProvider>
       </ApiClientContext.Provider>,
     );
     cy.contains("Show more").should("exist");
@@ -95,13 +100,15 @@ describe("ProjectOverview Component", () => {
   it("renders the project description in full form when the show more button is clicked", () => {
     mount(
       <ApiClientContext.Provider value={mockApiClient}>
-        <ProjectOverview
-          projectId={projectId}
-          title={mockTitle}
-          descriptions={[mockLongDescription]}
-          onProjectUpdate={onProjectUpdate}
-          isAdmin={true}
-        />
+        <LanguageProvider>
+          <ProjectOverview
+            projectId={projectId}
+            titles={[mockTitle]}
+            descriptions={[mockLongDescription]}
+            onProjectUpdate={onProjectUpdate}
+            isAdmin={true}
+          />
+        </LanguageProvider>
       </ApiClientContext.Provider>,
     );
     cy.contains("Show more").click();
@@ -110,7 +117,12 @@ describe("ProjectOverview Component", () => {
   });
 
   it("enters edit mode for title when edit button is clicked", () => {
-    // Title section
+    // Hover over the title section to make the edit button visible - be more specific
+    cy.get("[data-slot='card-header'] .group\\/cardHeader")
+      .first()
+      .trigger("mouseover");
+
+    // Title section - look for the edit button and click it
     cy.contains("button", "Edit").first().click();
     cy.get("textarea").should("be.visible");
     cy.get("textarea").should("have.value", mockTitle.text);
@@ -119,35 +131,38 @@ describe("ProjectOverview Component", () => {
   it("updates title when saving changes", () => {
     const newTitle = "Updated Title";
 
-    // Title section
+    // Hover over the title section and enter edit mode - be more specific
+    cy.get("[data-slot='card-header'] .group\\/cardHeader")
+      .first()
+      .trigger("mouseover");
     cy.contains("button", "Edit").first().click();
     cy.get("textarea").clear().type(newTitle);
     cy.contains("button", "Save").click();
 
-    // Check API was called with correct arguments
-    // cy.wrap(mockApiClient.projects_PatchProject).should(
-    //   "have.been.calledWith",
-    //   projectId,
-    //   Cypress.sinon.match({ title: newTitle }),
-    // );
-
-    // Check update callback was triggered
-    // cy.get("@updateFn").should("have.been.called");
+    // Check that update callback was triggered (API calls are mocked)
+    cy.get("@updateFn").should("have.been.called");
   });
 
   it("enters edit mode for description when edit button is clicked", () => {
     // Trigger hover on the description section to make the edit button visible
     cy.get('[data-cy="description-section"]').trigger("mouseover");
 
-    // Click the Edit button using its data-cy attribute
-    cy.get('[data-cy="edit-description-btn"]').should("be.visible").click();
+    // Click the Edit button - it should be visible after hover
+    cy.get('[data-cy="description-section"] .group')
+      .trigger("mouseover")
+      .within(() => {
+        cy.contains("button", "Edit").should("be.visible").click();
+      });
 
     cy.get("textarea").should("be.visible");
     cy.get("textarea").should("have.value", mockDescription.text);
   });
 
   it("cancels edit mode without saving when cancel button is clicked", () => {
-    // Title section
+    // Title section - be more specific
+    cy.get("[data-slot='card-header'] .group\\/cardHeader")
+      .first()
+      .trigger("mouseover");
     cy.contains("button", "Edit").first().click();
     cy.get("textarea").clear().type("This should not be saved");
     cy.contains("button", "Cancel").click();
@@ -155,16 +170,22 @@ describe("ProjectOverview Component", () => {
     // Original text should still be displayed
     cy.contains(mockTitle.text).should("be.visible");
 
-    // API should not have been called
-    cy.wrap(mockApiClient.projects_PutProject).should("not.have.been.called");
+    // API should not have been called for updating
+    cy.wrap(mockApiClient.projectTitles_UpdateTitle).should(
+      "not.have.been.called",
+    );
   });
 
   it("cancels description edit mode without saving when cancel button is clicked", () => {
     // Trigger hover on the description section to make the edit button visible
     cy.get('[data-cy="description-section"]').trigger("mouseover");
 
-    // Click the Edit button using its data-cy attribute
-    cy.get('[data-cy="edit-description-btn"]').should("be.visible").click();
+    // Click the Edit button
+    cy.get('[data-cy="description-section"] .group')
+      .trigger("mouseover")
+      .within(() => {
+        cy.contains("button", "Edit").should("be.visible").click();
+      });
 
     // Modify the description text
     cy.get("textarea").clear().type("This should not be saved");
@@ -183,13 +204,15 @@ describe("ProjectOverview Component", () => {
   it("has a responsive layout that adapts to different screen sizes", () => {
     mount(
       <ApiClientContext.Provider value={mockApiClient}>
-        <ProjectOverview
-          projectId={projectId}
-          title={mockTitle}
-          descriptions={[mockDescription]}
-          onProjectUpdate={onProjectUpdate}
-          isAdmin={true}
-        />
+        <LanguageProvider>
+          <ProjectOverview
+            projectId={projectId}
+            titles={[mockTitle]}
+            descriptions={[mockDescription]}
+            onProjectUpdate={onProjectUpdate}
+            isAdmin={true}
+          />
+        </LanguageProvider>
       </ApiClientContext.Provider>,
     );
 
@@ -212,13 +235,15 @@ describe("ProjectOverview Component", () => {
 
     mount(
       <ApiClientContext.Provider value={mockApiClient}>
-        <ProjectOverview
-          projectId={projectId}
-          title={mockTitle}
-          descriptions={[mockDescription, briefDescription]}
-          onProjectUpdate={onProjectUpdate}
-          isAdmin={true}
-        />
+        <LanguageProvider>
+          <ProjectOverview
+            projectId={projectId}
+            titles={[mockTitle]}
+            descriptions={[mockDescription, briefDescription]}
+            onProjectUpdate={onProjectUpdate}
+            isAdmin={true}
+          />
+        </LanguageProvider>
       </ApiClientContext.Provider>,
     );
 
@@ -226,26 +251,109 @@ describe("ProjectOverview Component", () => {
     cy.contains("Description:").should("exist");
 
     // Should be able to find the description type selector by looking for SelectTrigger
-    cy.get('[role="combobox"]').first().should("exist");
+    cy.get('[data-cy="description-section"] [role="combobox"]').should("exist");
 
     // Should show the current description type (Primary by default)
-    cy.get('[role="combobox"]').first().should("contain", "Primary");
+    cy.get('[data-cy="description-section"] [role="combobox"]').should(
+      "contain",
+      "Primary",
+    );
   });
 
   it("handles empty descriptions array", () => {
     mount(
       <ApiClientContext.Provider value={mockApiClient}>
-        <ProjectOverview
-          projectId={projectId}
-          title={mockTitle}
-          descriptions={[]}
-          onProjectUpdate={onProjectUpdate}
-          isAdmin={true}
-        />
+        <LanguageProvider>
+          <ProjectOverview
+            projectId={projectId}
+            titles={[mockTitle]}
+            descriptions={[]}
+            onProjectUpdate={onProjectUpdate}
+            isAdmin={true}
+          />
+        </LanguageProvider>
       </ApiClientContext.Provider>,
     );
 
     // Should still render without errors
     cy.contains(mockTitle.text).should("exist");
+  });
+
+  it("shows title type selector when multiple title types exist", () => {
+    const alternativeTitle = new ProjectTitleResponseDTO({
+      id: "title-2",
+      project_id: projectId,
+      type: TitleType.Alternative,
+      text: "Alternative Title",
+      start_date: new Date(),
+    });
+
+    mount(
+      <ApiClientContext.Provider value={mockApiClient}>
+        <LanguageProvider>
+          <ProjectOverview
+            projectId={projectId}
+            titles={[mockTitle, alternativeTitle]}
+            descriptions={[mockDescription]}
+            onProjectUpdate={onProjectUpdate}
+            isAdmin={true}
+          />
+        </LanguageProvider>
+      </ApiClientContext.Provider>,
+    );
+
+    // Should show title type selector
+    cy.get("select, [role='combobox']").should("exist");
+  });
+
+  it("displays add new buttons for admin users", () => {
+    mount(
+      <ApiClientContext.Provider value={mockApiClient}>
+        <LanguageProvider>
+          <ProjectOverview
+            projectId={projectId}
+            titles={[mockTitle]}
+            descriptions={[mockDescription]}
+            onProjectUpdate={onProjectUpdate}
+            isAdmin={true}
+          />
+        </LanguageProvider>
+      </ApiClientContext.Provider>,
+    );
+
+    // Hover over title section to reveal add button - be more specific
+    cy.get("[data-slot='card-header'] .group\\/cardHeader")
+      .first()
+      .trigger("mouseover");
+    cy.contains("button", "Add New").should("exist");
+
+    // Hover over description section to reveal add button
+    cy.get('[data-cy="description-section"] .group').trigger("mouseover");
+    cy.contains("button", "Add New").should("exist");
+  });
+
+  it("does not show edit buttons for non-admin users", () => {
+    mount(
+      <ApiClientContext.Provider value={mockApiClient}>
+        <LanguageProvider>
+          <ProjectOverview
+            projectId={projectId}
+            titles={[mockTitle]}
+            descriptions={[mockDescription]}
+            onProjectUpdate={onProjectUpdate}
+            isAdmin={false}
+          />
+        </LanguageProvider>
+      </ApiClientContext.Provider>,
+    );
+
+    // Edit buttons should not be visible even on hover - be more specific
+    cy.get("[data-slot='card-header'] .group\\/cardHeader")
+      .first()
+      .trigger("mouseover");
+    cy.contains("button", "Edit").should("not.exist");
+
+    cy.get('[data-cy="description-section"] .group').trigger("mouseover");
+    cy.contains("button", "Edit").should("not.exist");
   });
 });

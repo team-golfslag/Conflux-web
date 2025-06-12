@@ -40,12 +40,14 @@ type AddWorkModalProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   project: ProjectResponseDTO;
+  onProjectUpdate: () => void;
 };
 
 export default function AddProductModal({
   isOpen,
   onOpenChange,
   project,
+  onProjectUpdate,
 }: Readonly<AddWorkModalProps>) {
   const apiClient = useContext(ApiClientContext);
 
@@ -111,6 +113,7 @@ export default function AddProductModal({
       }
       onOpenChange(false);
       resetModal();
+      onProjectUpdate(); // Call this to refresh the project data
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";
       setErrorMessage(`Failed to add product: ${message}`);

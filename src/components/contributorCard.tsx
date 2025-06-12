@@ -94,7 +94,7 @@ export default function ContributorCard({
                     <TooltipTrigger asChild>
                       <Contact className="h-4 w-4 text-blue-500" />
                     </TooltipTrigger>
-                    <TooltipContent>Contact Person</TooltipContent>
+                    <TooltipContent>Project Contact</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               )}

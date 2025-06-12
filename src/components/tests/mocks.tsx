@@ -66,6 +66,13 @@ export function createApiClientMock() {
     contributors_DeleteContributor: () => ({}),
     people_GetPersonsByQuery: () => [],
     people_CreatePerson: () => ({}),
+    language_GetAvailableLanguageCodes: () =>
+      Promise.resolve({
+        eng: "English",
+        nld: "Dutch",
+        deu: "German",
+        fra: "French",
+      }),
   } as unknown as ApiClient;
 }
 

@@ -48,7 +48,7 @@ export function LoadingWrapper({
   if (isLoading && (isInitialLoad === undefined || isInitialLoad === true)) {
     if (mode === "component") {
       return (
-        <div className="relative h-full w-full">
+        <div className="relative">
           <div className="absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-white/90 backdrop-blur-md">
             <div className="flex flex-col items-center justify-center space-y-4 rounded-xl border border-gray-100 bg-white/95 p-6 shadow-xl">
               <div className="relative">

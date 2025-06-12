@@ -393,7 +393,7 @@ export default function ContributorFormFields({
             htmlFor={`${idPrefix}contact`}
             className="text-muted-foreground text-sm"
           >
-            Mark as contact person
+            Mark as project contact
           </Label>
         </div>
       </div>
