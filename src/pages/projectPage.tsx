@@ -25,6 +25,7 @@ import {
 } from "@team-golfslag/conflux-api-client/src/client";
 import { useSession } from "@/hooks/SessionContext";
 import ProjectOrganizations from "@/components/projectOrganizations";
+import FundingView from "@/components/fundingView.tsx";
 
 // Initially empty, will be populated from API
 
@@ -260,6 +261,7 @@ export default function ProjectPage() {
                 onProjectUpdate={handleProjectUpdate}
               />
               <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
+              <FundingView project={project}></FundingView>
             </div>
           </main>
         </>
