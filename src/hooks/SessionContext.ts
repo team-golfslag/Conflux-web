@@ -4,15 +4,15 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import { createContext, useContext } from "react";
-import { UserSession } from "@team-golfslag/conflux-api-client/src/client";
+import { UserSessionResponseDTO } from "@team-golfslag/conflux-api-client/src/client";
 
 // Define the context type
 export type SessionContextType = {
-  session: UserSession | null;
+  session: UserSessionResponseDTO | null;
   loading: boolean;
   error: Error | null;
   logout: () => void;
-  saveSession: (session: UserSession) => void;
+  saveSession: (session: UserSessionResponseDTO) => void;
 };
 
 // Create the context with a default value

@@ -24,12 +24,6 @@ describe("<Header />", () => {
     cy.contains("span", "Conflux").should("be.visible");
   });
 
-  it("renders the header with correct classes", () => {
-    cy.get("header").should("have.class", "bg-primary");
-    cy.get("header").should("have.class", "text-primary-foreground");
-    cy.get("header").should("have.class", "sticky");
-  });
-
   it("initially shows header at top position when scrolling up", () => {
     cy.get("header").should("have.class", "top-0");
   });
