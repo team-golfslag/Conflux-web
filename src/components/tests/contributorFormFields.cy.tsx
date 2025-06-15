@@ -7,8 +7,8 @@ import {
   ContributorPositionType,
   ContributorRoleType,
 } from "@team-golfslag/conflux-api-client/src/client";
-import ContributorFormFields from "../contributorFormFields";
-import type { ContributorFormData } from "../contributorFormFields";
+import ContributorFormFields from "../contributor/contributorFormFields";
+import type { ContributorFormData } from "../contributor/contributorFormFields";
 import { mount } from "cypress/react";
 
 describe("ContributorFormFields Component", () => {

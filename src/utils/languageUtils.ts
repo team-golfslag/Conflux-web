@@ -4,7 +4,7 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { useLanguage } from "@/lib/LanguageContext";
+import { useLanguage } from "@/lib/languageContext";
 
 // Hook to get language utility functions
 export const useLanguageHelpers = () => {

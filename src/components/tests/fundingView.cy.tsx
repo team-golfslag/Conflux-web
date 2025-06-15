@@ -18,7 +18,7 @@ import {
   Product,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { mount } from "cypress/react";
-import FundingView from "@/components/fundingView.tsx";
+import FundingView from "@/components/funding/fundingView";
 
 describe("Project Funding View", () => {
   const mockOrganisationRole = new OrganisationRoleResponseDTO({
@@ -54,18 +54,6 @@ describe("Project Funding View", () => {
     end_date: undefined,
     users: [],
     products: [mockProduct],
-    organisations: [],
-  });
-
-  const mockProjectEmpty = new ProjectResponseDTO({
-    id: "123",
-    contributors: [],
-    titles: [],
-    descriptions: [],
-    start_date: new Date(),
-    end_date: undefined,
-    users: [],
-    products: [],
     organisations: [],
   });
 

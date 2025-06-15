@@ -5,15 +5,15 @@
  */
 
 import { Card } from "@/components/ui/card";
-import ProjectOverview from "@/components/projectOverview.tsx";
-import ProjectContributors from "@/components/projectContributors";
-import ProjectWorks from "@/components/projectWorks";
+import ProjectOverview from "@/components/overview/projectOverview";
+import ProjectContributors from "@/components/contributor/projectContributors";
+import ProjectWorks from "@/components/product/projectProducts";
 import { useParams } from "react-router";
 import { useContext, useEffect, useRef, useState } from "react";
 import ProjectDetails from "@/components/projectDetails.tsx";
 import ProjectTimeline from "@/components/projectTimeline.tsx";
 import RAiDInfo from "@/components/raidInfo.tsx";
-import PageLinks from "@/components/pageLinks";
+import PageLinks from "@/components/ui/pageLinks";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import {
@@ -24,8 +24,8 @@ import {
   PermissionLevel,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { useSession } from "@/hooks/SessionContext";
-import ProjectOrganizations from "@/components/projectOrganizations";
-import FundingView from "@/components/fundingView.tsx";
+import ProjectOrganizations from "@/components/organization/projectOrganizations";
+import FundingView from "@/components/funding/fundingView";
 
 // Initially empty, will be populated from API
 

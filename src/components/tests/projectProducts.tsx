@@ -18,7 +18,7 @@ import {
   ProductSchema,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { mount } from "cypress/react";
-import ProjectWorks from "@/components/projectWorks.tsx";
+import ProjectWorks from "@/components/product/projectProducts";
 
 describe("<ProjectWorks />", () => {
   const mockProducts = [

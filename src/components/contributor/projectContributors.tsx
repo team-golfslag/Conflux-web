@@ -23,9 +23,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import AddContributorModal from "@/components/addContributorModal";
-import EditContributorModal from "@/components/editContributorModal";
-import ContributorCard from "@/components/contributorCard";
+import AddContributorModal from "@/components/contributor/addContributorModal";
+import EditContributorModal from "@/components/contributor/editContributorModal";
+import ContributorCard from "@/components/contributor/contributorCard";
 import { ApiMutation } from "@/components/apiMutation";
 
 type ProjectContributorsProps = {

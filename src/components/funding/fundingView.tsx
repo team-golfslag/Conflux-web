@@ -9,7 +9,7 @@ import {
   ProductType,
   ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
-import FundingCard from "@/components/fundingCard.tsx";
+import FundingCard from "@/components/funding/fundingCard";
 
 type ProjectFundingViewProps = { project: ProjectResponseDTO };
 

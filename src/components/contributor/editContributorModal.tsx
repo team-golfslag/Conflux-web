@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AlertTriangle, Pencil } from "lucide-react";
-import ContributorFormFields from "./contributorFormFields";
+import ContributorFormFields from "@/components/contributor/contributorFormFields";
 import {
   ContributorRoleType,
   ContributorPositionType,

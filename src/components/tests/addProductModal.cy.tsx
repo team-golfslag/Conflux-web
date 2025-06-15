@@ -25,7 +25,7 @@ import {
   TitleType,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import { mount } from "cypress/react";
-import AddProductModal from "@/components/addProductModal.tsx";
+import AddProductModal from "@/components/product/addProductModal";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import { ApiClient } from "@team-golfslag/conflux-api-client/src/client";
 

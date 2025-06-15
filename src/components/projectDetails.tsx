@@ -30,7 +30,7 @@ import { Label } from "./ui/label";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { getStatus } from "@/utils/projectUtils";
 import { Badge } from "@/components/ui/badge.tsx";
-import ProjectDates from "@/components/projectDates.tsx";
+import ProjectDates from "@/components/ui/projectDates";
 import { useApiQuery } from "@/hooks/useApiQuery";
 
 type ProjectDetailsProps = {

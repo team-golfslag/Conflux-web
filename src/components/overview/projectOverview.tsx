@@ -3,8 +3,8 @@ import {
   ProjectDescriptionResponseDTO,
   ProjectTitleResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
-import ProjectTitleSection from "@/components/projectTitleSection";
-import ProjectDescriptionSection from "@/components/projectDescriptionSection";
+import ProjectTitleSection from "@/components/overview/projectTitleSection";
+import ProjectDescriptionSection from "@/components/overview/projectDescriptionSection";
 
 type ProjectOverviewProps = {
   projectId: string;

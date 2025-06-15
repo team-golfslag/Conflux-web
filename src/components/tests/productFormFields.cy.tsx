@@ -8,8 +8,8 @@ import {
   ProductType,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import { ProductCategoryType } from "@team-golfslag/conflux-api-client/src/client";
-import ProductFormFields from "@/components/productFormFields.tsx";
-import { ProductFormData } from "@/components/productFormFields.tsx";
+import ProductFormFields from "@/components/product/productFormFields";
+import { ProductFormData } from "@/components/product/productFormFields";
 import { mount } from "cypress/react";
 
 describe("productFormFields Component", () => {

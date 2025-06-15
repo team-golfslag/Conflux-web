@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import AddContributorModal from "../addContributorModal";
+import AddContributorModal from "../contributor/addContributorModal";
 import { mount } from "cypress/react";
 
 describe("AddContributorModal Component", () => {

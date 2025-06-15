@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import EditContributorModal from "../editContributorModal";
+import EditContributorModal from "@/components/contributor/editContributorModal";
 import { mount } from "cypress/react";
 import { mockContributor } from "./mocks";
 import { ContributorResponseDTO } from "@team-golfslag/conflux-api-client/src/client";

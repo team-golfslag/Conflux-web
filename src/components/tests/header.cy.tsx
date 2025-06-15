@@ -5,7 +5,7 @@
  */
 import { BrowserRouter } from "react-router-dom"; // Import BrowserRouter for Link component
 import { mount } from "cypress/react";
-import Header from "@/components/header.tsx";
+import Header from "@/components/layout/header";
 
 /// <reference types="cypress" />
 

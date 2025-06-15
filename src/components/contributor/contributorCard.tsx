@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/tooltip";
 import { getRoleDisplay } from "@/lib/formatters/roleFormatter";
 import { getPositionDisplay } from "@/lib/formatters/positionFormatter";
-import { AlertDialog, AlertDialogTrigger } from "./ui/alert-dialog";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 
 type ContributorCardProps = {

@@ -33,8 +33,8 @@ import {
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import { useContext } from "react";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
-import ProductFormFields from "@/components/productFormFields.tsx";
-import { ProductFormData } from "@/components/productFormFields.tsx";
+import ProductFormFields from "@/components/product/productFormFields";
+import { ProductFormData } from "@/components/product/productFormFields";
 
 type AddWorkModalProps = {
   isOpen: boolean;

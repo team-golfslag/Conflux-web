@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import ProjectContributors from "@/components/projectContributors.tsx";
+import ProjectContributors from "@/components/contributor/projectContributors";
 import { mount } from "cypress/react";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { createApiClientMock, mockContributor } from "./mocks";

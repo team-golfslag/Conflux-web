@@ -21,7 +21,7 @@ import {
 import { getRoleDisplay } from "@/lib/formatters/roleFormatter";
 import { getPositionDisplay } from "@/lib/formatters/positionFormatter";
 import { ArrowRight } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useState, useEffect } from "react";
 
 export interface ContributorFormData {

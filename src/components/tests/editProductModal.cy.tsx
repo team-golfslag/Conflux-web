@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import EditProductModal from "@/components/editProductModal.tsx";
+import EditProductModal from "@/components/product/editProductModal";
 import {
   DescriptionType,
   ProductCategoryType,

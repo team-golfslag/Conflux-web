@@ -8,8 +8,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Shield, UserPlus } from "lucide-react";
-import SysAdminUsersList from "@/components/sysAdminUsersList";
-import AddSysAdminModal from "@/components/addSysAdminModal";
+import SysAdminUsersList from "@/components/admin/sysAdminUsersList";
+import AddSysAdminModal from "@/components/admin/addSysAdminModal";
 import { useSession } from "@/hooks/SessionContext";
 import { PermissionLevel } from "@team-golfslag/conflux-api-client/src/client";
 

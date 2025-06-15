@@ -26,7 +26,7 @@ import { useContext, useEffect } from "react";
 import { ApiClientContext } from "@/lib/ApiClientContext.ts";
 import ProductFormFields, {
   ProductFormData,
-} from "@/components/productFormFields.tsx";
+} from "@/components/product/productFormFields";
 
 type EditProductModalProps = {
   isOpen: boolean;

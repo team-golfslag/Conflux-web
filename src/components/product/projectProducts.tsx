@@ -5,15 +5,15 @@
  */
 import * as React from "react";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import AddProductModal from "@/components/addProductModal.tsx";
-import EditProductModal from "@/components/editProductModal.tsx";
+import AddProductModal from "@/components/product/addProductModal";
+import EditProductModal from "@/components/product/editProductModal";
 import {
   ProductResponseDTO,
   ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Button } from "@/components/ui/button";
 import { Edit, X } from "lucide-react";
-import ProductCard from "@/components/productCard.tsx";
+import ProductCard from "@/components/product/productCard";
 
 type ProjectWorksProps = {
   project: ProjectResponseDTO;

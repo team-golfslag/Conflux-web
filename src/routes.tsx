@@ -12,7 +12,7 @@ import ScrollToTop from "./hooks/scrollToTop.tsx";
 // Lazy load all page components
 const App = lazy(() => import("./pages/app.tsx"));
 const Dashboard = lazy(() => import("./pages/dashboard.tsx"));
-const Layout = lazy(() => import("./components/layout.tsx"));
+const Layout = lazy(() => import("./components/layout/layout.tsx"));
 const ProjectPage = lazy(() => import("./pages/projectPage.tsx"));
 const ProjectSearchPage = lazy(() => import("./pages/projectSearchPage.tsx"));
 const ProfilePage = lazy(() => import("./pages/profilePage.tsx"));

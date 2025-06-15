@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import Footer from "../footer";
+import Footer from "../layout/footer";
 import { mount } from "cypress/react";
 
 describe("Footer component", () => {

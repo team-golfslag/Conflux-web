@@ -3,10 +3,10 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import ProjectOverview from "@/components/projectOverview.tsx";
+import ProjectOverview from "@/components/overview/projectOverview";
 import { mount } from "cypress/react";
 import { ApiClientContext } from "@/lib/ApiClientContext";
-import { LanguageProvider } from "@/lib/LanguageContext";
+import { LanguageProvider } from "@/lib/languageContext";
 import { createApiClientMock } from "./mocks";
 import {
   ProjectTitleResponseDTO,

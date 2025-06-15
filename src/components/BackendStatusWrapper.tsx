@@ -5,7 +5,7 @@
  */
 import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { useBackendStatus } from "@/lib/BackendStatusContext";
+import { useBackendStatus } from "@/lib/backendStatusContext";
 
 interface BackendStatusWrapperProps {
   children: React.ReactNode;

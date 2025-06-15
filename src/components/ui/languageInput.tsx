@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { useLanguage } from "@/lib/LanguageContext";
+import { useLanguage } from "@/lib/languageContext";
 
 interface LanguageInputProps {
   value: string;

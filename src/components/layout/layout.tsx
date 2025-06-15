@@ -4,8 +4,8 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import Header from "@/components/header.tsx";
-import Footer from "@/components/footer.tsx";
+import Header from "@/components/layout/header";
+import Footer from "@/components/layout/footer";
 import { ReactElement } from "react";
 import { Outlet } from "react-router-dom";
 
