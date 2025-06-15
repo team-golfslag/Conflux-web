@@ -3,42 +3,47 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import ProjectContributors from "@/components/projectContributors.tsx";
+import ProjectContributors from "@/components/contributor/projectContributors";
 import { mount } from "cypress/react";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { createApiClientMock, mockContributor } from "./mocks";
 import {
-  ProjectDTO,
+  Project,
   Person,
-  ContributorDTO,
+  Contributor,
+  ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 
 describe("ProjectContributors Component", () => {
-  const mockProject = new ProjectDTO({
+  const mockProject = new Project({
     id: "123",
     contributors: [
-      new ContributorDTO({
+      new Contributor({
         person: new Person({
           id: "1",
           schema_uri: "",
           name: "John Doe",
           email: "john.doe@example.com",
           orcid_id: "0000-0001-2345-6789",
+          user_id: undefined,
         }),
+        person_id: "1",
         leader: true,
         contact: true,
         roles: [],
         positions: [],
         project_id: "123",
       }),
-      new ContributorDTO({
+      new Contributor({
         person: new Person({
           id: "2",
           schema_uri: "",
           name: "Jane Smith",
           email: "jane.smith@example.com",
           orcid_id: "0000-0002-3456-7890",
+          user_id: undefined,
         }),
+        person_id: "2",
         leader: false,
         contact: false,
         roles: [],
@@ -53,6 +58,7 @@ describe("ProjectContributors Component", () => {
     users: [],
     products: [],
     organisations: [],
+    lastest_edit: new Date(),
   });
 
   // Define onProjectUpdate as a function type
@@ -73,8 +79,9 @@ describe("ProjectContributors Component", () => {
     mount(
       <ApiClientContext.Provider value={mockApiClient}>
         <ProjectContributors
-          project={mockProject}
+          project={mockProject as unknown as ProjectResponseDTO}
           onProjectUpdate={onProjectUpdate}
+          isAdmin={true}
         />
       </ApiClientContext.Provider>,
     );

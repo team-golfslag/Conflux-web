@@ -12,7 +12,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card"
       className={cn(
-        "group/card bg-card text-card-foreground flex flex-col gap-4 rounded-xl border pb-6 shadow-sm",
+        "group/card flex flex-col gap-4 rounded-xl border border-gray-200 bg-white pb-6 text-gray-900 shadow-md transition-all duration-300",
         className,
       )}
       {...props}
@@ -25,7 +25,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-header"
       className={cn(
-        "group/cardHeader flex gap-1.5 rounded-t-xl border-b bg-gray-50 px-6 py-4",
+        "group/cardHeader flex gap-1.5 rounded-t-xl border-b border-gray-100 bg-gray-50 px-6 py-5",
         className,
       )}
       {...props}
@@ -37,10 +37,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-title"
-      className={cn(
-        "text-primary text-xl leading-none font-semibold",
-        className,
-      )}
+      className={cn("text-xl leading-none font-bold text-gray-900", className)}
       {...props}
     />
   );
