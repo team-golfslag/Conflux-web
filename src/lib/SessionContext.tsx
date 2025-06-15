@@ -54,7 +54,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
 
         // Return valid non-expired session
         return storedSession.userData;
-      } catch (e) {
+      } catch {
         localStorage.removeItem(SESSION_STORAGE_KEY);
         return null;
       }

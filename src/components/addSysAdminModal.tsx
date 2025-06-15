@@ -1,19 +1,7 @@
 /**
  * This program has been developed by students from the bachelor Computer Science at Utrecht
  * University within the Software Project course.
- * © Copyright Utrecht Universit      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-md border-0 shadow-2xl">
-        <DialogHeader className="space-y-3 pb-6 border-b border-gray-100">
-          <DialogTitle className="flex items-center gap-3 text-2xl">
-            <div className="p-2 rounded-lg bg-gray-100">
-              <UserCog className="h-6 w-6 text-gray-600" />
-            </div>
-            Add System Administrator
-          </DialogTitle>
-          <DialogDescription className="text-gray-600 text-base">
-            Create a new system administrator account by linking to an existing
-            user in the system and assigning appropriate permissions.
-          </DialogDescription>
-        </DialogHeader>tment of Information and Computing Sciences)
+ * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
 import { useCallback, useEffect, useState, useContext } from "react";

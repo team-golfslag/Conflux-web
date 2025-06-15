@@ -65,6 +65,9 @@ export default function AddProductModal({
   const [showErrorModal, setShowErrorModal] = React.useState<boolean>(false);
   const [errorMessage, setErrorMessage] = React.useState<string>("");
 
+  // DOI autofill state
+  const [doiError, setDoiError] = React.useState<string | null>(null);
+
   const handleCategoryChange = (category: ProductCategoryType) => {
     setCategories((prev) =>
       prev.includes(category)
@@ -81,6 +84,47 @@ export default function AddProductModal({
     setCategories([]);
     setShowErrorModal(false);
     setErrorMessage("");
+    setDoiError(null);
+  };
+
+  // Handle URL change to clear DOI error
+  const handleUrlChange = (newUrl: string) => {
+    setUrl(newUrl);
+    if (doiError) setDoiError(null);
+  };
+
+  // DOI autofill function
+  const handleDoiAutoFill = async (): Promise<boolean> => {
+    if (!url || productSchema !== ProductSchema.Doi) return false;
+
+    setDoiError(null);
+
+    try {
+      // Extract DOI from URL if it's a full DOI URL
+      let doi = url;
+      const doiMatch = url.match(/(?:doi\.org\/|DOI:)?(10\.\d+\/.+)$/);
+      if (doiMatch) {
+        doi = doiMatch[1];
+      }
+
+      const result = await apiClient.products_GetInfoFromDoi(doi);
+      if (result) {
+        if (result.title) {
+          setProductTitle(result.title);
+        }
+        if (result.type) {
+          setProductType(result.type);
+        }
+        return true;
+      } else {
+        setDoiError("No information found for this DOI.");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error fetching DOI info:", error);
+      setDoiError("Failed to fetch DOI information. Please try again.");
+      return false;
+    }
   };
 
   const productData: ProductFormData = {
@@ -145,10 +189,12 @@ export default function AddProductModal({
           <ProductFormFields
             formData={productData}
             setProductTitle={setProductTitle}
-            setUrl={setUrl}
+            setUrl={handleUrlChange}
             setProductType={setProductType}
             setSchema={setProductSchema}
             onCategoryChange={handleCategoryChange}
+            onDoiAutoFill={handleDoiAutoFill}
+            doiError={doiError}
           />
           <DialogFooter className="flex gap-3 border-t border-gray-100 pt-6">
             <Button

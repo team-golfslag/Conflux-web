@@ -6,6 +6,7 @@
 import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import {
   Tooltip,
   TooltipContent,
@@ -27,6 +28,7 @@ import {
   ProductSchema,
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import { useState, useEffect } from "react";
+import { ArrowRight } from "lucide-react";
 
 export interface ProductFormData {
   title: string;
@@ -48,6 +50,8 @@ interface ProductFormFieldsProps {
   setProductType: (productType: ProductType) => void;
   setSchema: (schema: ProductSchema) => void;
   onCategoryChange: (category: ProductCategoryType) => void;
+  onDoiAutoFill?: () => Promise<boolean>;
+  doiError?: string | null;
 }
 
 function getEnumKeys<
@@ -59,6 +63,20 @@ function getEnumKeys<
 
 // Currently supported schemas - only DOI and Archive are fully supported
 const supportedSchemas = [ProductSchema.Doi, ProductSchema.Archive];
+
+// Function to detect schema type from URL
+const detectSchemaFromUrl = (url: string): ProductSchema | null => {
+  // Check each schema's validation pattern to see if the URL matches
+  for (const [schema, config] of Object.entries(urlValidationFunctions)) {
+    if (
+      config.validate(url) &&
+      supportedSchemas.includes(schema as ProductSchema)
+    ) {
+      return schema as ProductSchema;
+    }
+  }
+  return null;
+};
 
 // Validation functions for different schemas
 const urlValidationFunctions = {
@@ -192,6 +210,8 @@ export default function ProductFormFields({
   setSchema,
   setProductType,
   onCategoryChange,
+  onDoiAutoFill,
+  doiError,
 }: Readonly<ProductFormFieldsProps>) {
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
     [],
@@ -233,6 +253,14 @@ export default function ProductFormFields({
   const handleUrlChange = (value: string) => {
     setUrl(value);
     setTouched((prev) => ({ ...prev, url: true }));
+
+    // Auto-detect and set schema if no schema is currently selected
+    if (!formData.productSchema && value.trim()) {
+      const detectedSchema = detectSchemaFromUrl(value.trim());
+      if (detectedSchema) {
+        setSchema(detectedSchema);
+      }
+    }
   };
 
   const handleSchemaChange = (schema: ProductSchema) => {
@@ -286,16 +314,38 @@ export default function ProductFormFields({
           URL
         </Label>
         <div className="col-span-3">
-          <Input
-            id="url"
-            value={formData.url}
-            onChange={(e) => handleUrlChange(e.target.value)}
-            placeholder={getUrlPlaceholder()}
-            className={`${getFieldError("url") ? "border-red-500 focus:border-red-500" : ""}`}
-          />
-          {getFieldError("url") && (
+          <div className="flex items-center gap-2">
+            <Input
+              id="url"
+              value={formData.url}
+              onChange={(e) => handleUrlChange(e.target.value)}
+              placeholder={getUrlPlaceholder()}
+              className={`flex-1 ${getFieldError("url") || doiError ? "border-red-500 focus:border-red-500" : ""}`}
+            />
+            {formData.productSchema === ProductSchema.Doi && onDoiAutoFill && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={onDoiAutoFill}
+                      disabled={!formData.url}
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Autofill title and type using DOI</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+          {(getFieldError("url") || doiError) && (
             <p className="mt-1 text-sm text-red-500">
-              {getFieldError("url")?.message}
+              {doiError || getFieldError("url")?.message}
             </p>
           )}
           {formData.productSchema &&

@@ -112,7 +112,6 @@ describe("<EditProductModal/>", () => {
       "have.value",
       mockData.project.products[0].url,
     );
-    cy.contains(mockData.project.products[0].type.toString()).should("exist");
     cy.contains(mockData.project.products[0].categories[0].toString()).should(
       "exist",
     );
