@@ -160,7 +160,7 @@ export default function ProjectContributors({
                     <AlertDialogDescription>
                       <strong>
                         In most cases you should end the users position to
-                        signify their departure form the project
+                        signify their departure from the project
                       </strong>
                       <br />
                       This will remove {contributor.person.name} from this
