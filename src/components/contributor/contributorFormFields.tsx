@@ -196,7 +196,7 @@ export default function ContributorFormFields({
               </p>
             )}
             {isConfluxUser && (
-              <div className="mt-1 rounded-md bg-amber-50 p-2 text-xs text-amber-600">
+              <div className="text-muted-foreground mt-1 text-xs">
                 Name cannot be edited for registered Conflux users
               </div>
             )}
