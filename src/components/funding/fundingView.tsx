@@ -34,10 +34,10 @@ export default function FundingView({
       </CardHeader>
       <CardContent>
         {productFunding.map((p) => (
-          <FundingCard object={p} />
+          <FundingCard key={p.id} object={p} />
         ))}
         {organisationFunding.map((o) => (
-          <FundingCard object={o} />
+          <FundingCard key={o.organisation.id} object={o} />
         ))}
       </CardContent>
     </Card>
