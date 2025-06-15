@@ -14,7 +14,7 @@ type CardProps = {
   object: ProductResponseDTO | ProjectOrganisationResponseDTO;
 };
 
-export default function ({ object }: Readonly<CardProps>) {
+export default function FundingCard({ object }: Readonly<CardProps>) {
   let product;
   let organisation;
   if ("title" in object) {

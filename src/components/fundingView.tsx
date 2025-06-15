@@ -16,26 +16,29 @@ type ProjectFundingViewProps = { project: ProjectResponseDTO };
 export default function FundingView({
   project,
 }: Readonly<ProjectFundingViewProps>) {
+  const productFunding = project.products.filter(
+    (p) => p.type === ProductType.Funding,
+  );
+  const organisationFunding = project.organisations.filter((o) =>
+    o.organisation.roles.some((e) => e.role === OrganisationRoleType.Funder),
+  );
+
+  if (productFunding.length === 0 && organisationFunding.length === 0) {
+    return <></>;
+  }
+
   return (
     <Card>
       <CardHeader className="relative flex justify-between">
         <CardTitle className="text-xl font-semibold">Funding</CardTitle>
       </CardHeader>
       <CardContent>
-        {project.products
-          .filter((p) => p.type === ProductType.Funding)
-          .map((p) => (
-            <FundingCard object={p} />
-          ))}
-        {project.organisations
-          .filter((o) =>
-            o.organisation.roles.some(
-              (e) => e.role === OrganisationRoleType.Funder,
-            ),
-          )
-          .map((o) => (
-            <FundingCard object={o} />
-          ))}
+        {productFunding.map((p) => (
+          <FundingCard object={p} />
+        ))}
+        {organisationFunding.map((o) => (
+          <FundingCard object={o} />
+        ))}
       </CardContent>
     </Card>
   );

@@ -260,8 +260,8 @@ export default function ProjectPage() {
                 isAdmin={isAdmin}
                 onProjectUpdate={handleProjectUpdate}
               />
-              <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
               <FundingView project={project}></FundingView>
+              <ProjectTimeline timelineData={timelineData}></ProjectTimeline>
             </div>
           </main>
         </>
