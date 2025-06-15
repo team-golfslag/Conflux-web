@@ -64,6 +64,20 @@ function getEnumKeys<
 // Currently supported schemas - only DOI and Archive are fully supported
 const supportedSchemas = [ProductSchema.Doi, ProductSchema.Archive];
 
+// Function to detect schema type from URL
+const detectSchemaFromUrl = (url: string): ProductSchema | null => {
+  // Check each schema's validation pattern to see if the URL matches
+  for (const [schema, config] of Object.entries(urlValidationFunctions)) {
+    if (
+      config.validate(url) &&
+      supportedSchemas.includes(schema as ProductSchema)
+    ) {
+      return schema as ProductSchema;
+    }
+  }
+  return null;
+};
+
 // Validation functions for different schemas
 const urlValidationFunctions = {
   [ProductSchema.Doi]: {
@@ -239,6 +253,14 @@ export default function ProductFormFields({
   const handleUrlChange = (value: string) => {
     setUrl(value);
     setTouched((prev) => ({ ...prev, url: true }));
+
+    // Auto-detect and set schema if no schema is currently selected
+    if (!formData.productSchema && value.trim()) {
+      const detectedSchema = detectSchemaFromUrl(value.trim());
+      if (detectedSchema) {
+        setSchema(detectedSchema);
+      }
+    }
   };
 
   const handleSchemaChange = (schema: ProductSchema) => {
