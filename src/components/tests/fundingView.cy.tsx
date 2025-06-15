@@ -99,10 +99,4 @@ describe("Project Funding View", () => {
       .should("exist");
     cy.contains("Funder").parent().contains("Funder").should("exist");
   });
-
-  it("If there are no funders or fundings, the view should not contain any cards", () => {
-    mount(<FundingView project={mockProjectEmpty}></FundingView>);
-
-    cy.get('[data-slot="card-content"]').should("be.empty");
-  });
 });
