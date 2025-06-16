@@ -13,7 +13,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import ProjectDetails from "@/components/projectDetails.tsx";
 import ProjectTimeline from "@/components/projectTimeline.tsx";
 import RAiDInfo from "@/components/raidInfo.tsx";
-import PageLinks from "@/components/ui/pageLinks";
+import PageLinks from "@/components/pageLinks";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { LoadingWrapper } from "@/components/loadingWrapper";
 import {

@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 import { JSX, useState } from "react";
 import { CalendarIcon, UsersIcon, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { getStatus } from "@/utils/projectUtils";
+import { determineProjectStatus } from "@/utils/projectUtils";
 import { useSession } from "@/hooks/SessionContext";
 import { Button } from "@/components/ui/button";
 
@@ -52,7 +52,7 @@ const ProjectCard = ({
     ? new Date(project.end_date).toLocaleDateString()
     : "Ongoing";
 
-  const status = getStatus(project.start_date, project.end_date);
+  const status = determineProjectStatus(project.start_date, project.end_date);
 
   const primaryTitle =
     project.titles?.find(

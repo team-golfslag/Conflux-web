@@ -8,47 +8,41 @@ import { mount } from "cypress/react";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { createApiClientMock, mockContributor } from "./mocks";
 import {
-  Project,
-  Person,
-  Contributor,
   ProjectResponseDTO,
+  ContributorResponseDTO,
+  PersonResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 
 describe("ProjectContributors Component", () => {
-  const mockProject = new Project({
+  // Create a properly typed mock project using ProjectResponseDTO
+  const mockProject = new ProjectResponseDTO({
     id: "123",
     contributors: [
-      new Contributor({
-        person: new Person({
+      new ContributorResponseDTO({
+        person: new PersonResponseDTO({
           id: "1",
-          schema_uri: "",
           name: "John Doe",
           email: "john.doe@example.com",
           orcid_id: "0000-0001-2345-6789",
-          user_id: undefined,
         }),
-        person_id: "1",
+        project_id: "123",
         leader: true,
         contact: true,
         roles: [],
         positions: [],
-        project_id: "123",
       }),
-      new Contributor({
-        person: new Person({
+      new ContributorResponseDTO({
+        person: new PersonResponseDTO({
           id: "2",
-          schema_uri: "",
           name: "Jane Smith",
           email: "jane.smith@example.com",
           orcid_id: "0000-0002-3456-7890",
-          user_id: undefined,
         }),
-        person_id: "2",
+        project_id: "123",
         leader: false,
         contact: false,
         roles: [],
         positions: [],
-        project_id: "123",
       }),
     ],
     titles: [],
@@ -58,11 +52,11 @@ describe("ProjectContributors Component", () => {
     users: [],
     products: [],
     organisations: [],
-    lastest_edit: new Date(),
   });
 
   // Define onProjectUpdate as a function type
   let onProjectUpdate: () => void;
+  // Get the mock API client from the factory function
   const mockApiClient = createApiClientMock();
 
   beforeEach(() => {
@@ -79,7 +73,7 @@ describe("ProjectContributors Component", () => {
     mount(
       <ApiClientContext.Provider value={mockApiClient}>
         <ProjectContributors
-          project={mockProject as unknown as ProjectResponseDTO}
+          project={mockProject}
           onProjectUpdate={onProjectUpdate}
           isAdmin={true}
         />

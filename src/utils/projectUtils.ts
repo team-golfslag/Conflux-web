@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-export const getStatus = (startDate?: Date, endDate?: Date) => {
+export const determineProjectStatus = (startDate?: Date, endDate?: Date) => {
   const now = new Date();
   if (!startDate)
     return { label: "Not Started", color: "bg-gray-200 text-gray-800" };
