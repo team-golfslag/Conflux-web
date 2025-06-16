@@ -16,6 +16,7 @@ import {
   TitleType,
   ProjectResponseDTO,
   ContributorResponseDTO,
+  PersonResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 
 // Helper function to create dates relative to today (at 00:00:00.000)
@@ -25,6 +26,23 @@ const getDateRelativeToToday = (daysOffset: number): Date => {
   const targetDate = new Date(today);
   targetDate.setDate(today.getDate() + daysOffset);
   return targetDate;
+};
+
+// Helper function to create a proper ContributorResponseDTO
+const createMockContributor = (id: string): ContributorResponseDTO => {
+  return new ContributorResponseDTO({
+    person: new PersonResponseDTO({
+      id: id,
+      name: `Test Person ${id}`,
+      email: `person${id}@example.com`,
+      orcid_id: `0000-0000-0000-000${id}`,
+    }),
+    project_id: "test-project",
+    leader: false,
+    contact: false,
+    roles: [],
+    positions: [],
+  });
 };
 
 // --- Test Data ---
@@ -178,10 +196,9 @@ describe("<ProjectCard /> Component Rendering", () => {
     const projectWithContributors = new ProjectResponseDTO({
       ...baseProject,
       contributors: [
-        // Create minimal contributor objects that satisfy the type requirements
-        {} as ContributorResponseDTO,
-        {} as ContributorResponseDTO,
-        {} as ContributorResponseDTO,
+        createMockContributor("1"),
+        createMockContributor("2"),
+        createMockContributor("3"),
       ],
     });
     mountCard(projectWithContributors);
@@ -193,9 +210,7 @@ describe("<ProjectCard /> Component Rendering", () => {
     const baseProject = createBaseProject();
     const projectWithOneContributor = new ProjectResponseDTO({
       ...baseProject,
-      contributors: [
-        {} as ContributorResponseDTO, // Minimal contributor object for count testing
-      ],
+      contributors: [createMockContributor("1")],
     });
     mountCard(projectWithOneContributor);
     cy.contains("1 contributor").should("be.visible");
