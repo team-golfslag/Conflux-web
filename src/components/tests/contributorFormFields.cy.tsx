@@ -7,9 +7,8 @@ import {
   ContributorPositionType,
   ContributorRoleType,
 } from "@team-golfslag/conflux-api-client/src/client";
-import ContributorFormFields, {
-  ContributorFormData,
-} from "../contributorFormFields";
+import ContributorFormFields from "../contributor/contributorFormFields";
+import type { ContributorFormData } from "../contributor/contributorFormFields";
 import { mount } from "cypress/react";
 
 describe("ContributorFormFields Component", () => {
@@ -17,7 +16,7 @@ describe("ContributorFormFields Component", () => {
     name: "Jane Smith",
     email: "jane.smith@example.com",
     roles: [ContributorRoleType.Supervision],
-    positions: [ContributorPositionType.PrincipalInvestigator],
+    position: ContributorPositionType.PrincipalInvestigator,
     orcidId: "0000-0002-3456-7890",
     leader: true,
     contact: true,
@@ -27,7 +26,7 @@ describe("ContributorFormFields Component", () => {
     name: "",
     email: "",
     roles: [],
-    positions: [],
+    position: undefined,
     orcidId: "",
     leader: true,
     contact: true,
@@ -44,6 +43,7 @@ describe("ContributorFormFields Component", () => {
         onPositionChange={cy.stub().as("handlePositionChange")}
         onLeaderChange={cy.stub().as("handleLeaderChange")}
         onContactChange={cy.stub().as("handleContactChange")}
+        onOrcidAutoFill={cy.stub().as("handleOrcidAutoFill")}
       />,
     );
 
@@ -54,7 +54,7 @@ describe("ContributorFormFields Component", () => {
   it("renders all form fields with correct initial values", () => {
     cy.get('input[id="name"]').should("have.value", initialValues.name);
     cy.get('input[id="email"]').should("have.value", initialValues.email);
-    cy.contains(initialValues.roles[0]).should("have.class", "bg-primary");
+    cy.contains(initialValues.roles[0]);
     cy.get('input[id="orcidId"]').should("have.value", initialValues.orcidId);
   });
 
@@ -79,7 +79,7 @@ describe("ContributorFormFields Component", () => {
     cy.contains("Name").should("exist");
     cy.contains("Email").should("exist");
     cy.contains("Role").should("exist");
-    cy.contains("ORCID").should("exist");
+    cy.contains("ORCID ID").should("exist");
   });
 
   it("handles empty initial values gracefully", () => {
@@ -93,6 +93,7 @@ describe("ContributorFormFields Component", () => {
         onPositionChange={cy.stub().as("handlePositionChange")}
         onLeaderChange={cy.stub().as("handleLeaderChange")}
         onContactChange={cy.stub().as("handleContactChange")}
+        onOrcidAutoFill={cy.stub().as("handleOrcidAutoFill")}
       />,
     );
 

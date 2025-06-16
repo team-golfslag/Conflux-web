@@ -6,8 +6,8 @@
 
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  ProjectDTO,
-  ContributorDTO,
+  ProjectResponseDTO,
+  ContributorResponseDTO,
   ApiClient,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Edit, X } from "lucide-react";
@@ -23,13 +23,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import AddContributorModal from "@/components/addContributorModal";
-import EditContributorModal from "@/components/editContributorModal";
-import ContributorCard from "@/components/contributorCard";
+import AddContributorModal from "@/components/contributor/addContributorModal";
+import EditContributorModal from "@/components/contributor/editContributorModal";
+import ContributorCard from "@/components/contributor/contributorCard";
 import { ApiMutation } from "@/components/apiMutation";
 
 type ProjectContributorsProps = {
-  project: ProjectDTO;
+  project: ProjectResponseDTO;
+  isAdmin?: boolean;
   onProjectUpdate: () => void;
 };
 
@@ -40,20 +41,21 @@ type ProjectContributorsProps = {
  */
 export default function ProjectContributors({
   project,
+  isAdmin = false,
   onProjectUpdate,
 }: Readonly<ProjectContributorsProps>) {
   const [editMode, setEditMode] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingContributor, setEditingContributor] =
-    useState<ContributorDTO | null>(null);
+    useState<ContributorResponseDTO | null>(null);
   const [deleteContributor, setDeleteContributor] =
-    useState<ContributorDTO | null>(null);
+    useState<ContributorResponseDTO | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const toggleEditMode = () => setEditMode(!editMode);
 
-  const handleEditContributor = (contributor: ContributorDTO) => {
+  const handleEditContributor = (contributor: ContributorResponseDTO) => {
     setEditingContributor(contributor);
     setIsEditModalOpen(true);
   };
@@ -69,7 +71,7 @@ export default function ProjectContributors({
     setEditingContributor(null);
   };
 
-  const openDeleteDialog = (contributor: ContributorDTO) => {
+  const openDeleteDialog = (contributor: ContributorResponseDTO) => {
     setDeleteContributor(contributor);
     setIsDeleteDialogOpen(true);
   };
@@ -83,30 +85,36 @@ export default function ProjectContributors({
             "absolute right-0 items-center justify-between space-x-4 px-4 group-hover:flex"
           }
         >
-          <Button variant="outline" size="sm" onClick={toggleEditMode}>
-            {editMode ? (
-              <>
-                <X className="mr-2 h-4 w-4" /> Exit Edit Mode
-              </>
-            ) : (
-              <>
-                <Edit className="mr-2 h-4 w-4" /> Edit
-              </>
-            )}
-          </Button>
+          {isAdmin && (
+            <div className="invisible flex items-center gap-2 group-hover/card:visible">
+              <Button variant="outline" size="sm" onClick={toggleEditMode}>
+                {editMode ? (
+                  <>
+                    <X className="mr-2 h-4 w-4" /> Exit Edit Mode
+                  </>
+                ) : (
+                  <>
+                    <Edit className="mr-2 h-4 w-4" /> Edit
+                  </>
+                )}
+              </Button>
 
-          <AddContributorModal
-            isOpen={isAddModalOpen}
-            onOpenChange={setIsAddModalOpen}
-            projectId={project.id}
-            onContributorAdded={handleContributorAdded}
-          />
+              <AddContributorModal
+                isOpen={isAddModalOpen}
+                onOpenChange={setIsAddModalOpen}
+                projectId={project.id}
+                onContributorAdded={handleContributorAdded}
+              />
+            </div>
+          )}
+
+          {/* Only show edit button if there are contributors and user is admin */}
         </div>
       </CardHeader>
 
       <CardContent>
         {editMode && (
-          <div className="bg-destructive/10 text-destructive mb-4 rounded-md p-2 text-center text-sm">
+          <div className="mb-4 rounded-md bg-amber-100 p-2 text-center text-sm text-amber-600">
             Edit mode active. You can edit or delete contributors from the
             project.
           </div>
@@ -120,8 +128,11 @@ export default function ProjectContributors({
                 name={contributor.person.name}
                 email={contributor.person.email}
                 orcidId={contributor.person.orcid_id}
-                roles={contributor.roles}
-                positions={contributor.positions}
+                roles={contributor.roles.map((role) => role.role_type)}
+                position={
+                  contributor.positions.find((p) => !p.end_date)?.position
+                }
+                isConfluxUser={!!contributor.person.user_id}
                 isLeader={contributor.leader}
                 isContact={contributor.contact}
                 editMode={editMode}
@@ -147,8 +158,14 @@ export default function ProjectContributors({
                       Are you absolutely sure?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
+                      <strong>
+                        In most cases you should end the users position to
+                        signify their departure from the project
+                      </strong>
+                      <br />
                       This will remove {contributor.person.name} from this
-                      project. This action cannot be undone.
+                      project and from any future syncs with RAiD. This action
+                      cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -192,6 +209,7 @@ export default function ProjectContributors({
         contributor={editingContributor}
         projectId={project.id}
         onContributorUpdated={handleContributorUpdated}
+        isConfluxUser={!!editingContributor?.person.user_id}
       />
     </>
   );

@@ -7,11 +7,14 @@ import DashboardListView from "../dashboardListView.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { mount } from "cypress/react";
 import {
-  ProjectDTO,
-  ProjectTitleDTO,
-  ProjectDescriptionDTO,
+  Project,
+  ProjectTitle,
+  ProjectDescription,
   TitleType,
   DescriptionType,
+  ProjectResponseDTO,
+  ProjectTitleResponseDTO,
+  ProjectDescriptionResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 
 /// <reference types="cypress" />
@@ -22,42 +25,76 @@ describe("<DashboardListView />", () => {
     { id: "456", title: "Project 2", description: "Description for project 2" },
     { id: "789", title: "Project 3", description: "Description for project 3" },
   ];
-  const mockProjects: ProjectDTO[] = mockInfo.map(
+  const mockProjects: Project[] = mockInfo.map(
     (info) =>
-      new ProjectDTO({
+      new Project({
         id: info.id,
         users: [],
         contributors: [],
         products: [],
         start_date: new Date(),
         organisations: [],
+        lastest_edit: new Date(),
         titles: [
-          new ProjectTitleDTO({
+          new ProjectTitle({
             text: info.title,
             type: TitleType.Primary,
             start_date: new Date(),
+            project_id: info.id,
+            id: `title-${info.id}`,
+            type_schema_uri: "",
+            type_uri: "",
           }),
         ],
         descriptions: [
-          new ProjectDescriptionDTO({
+          new ProjectDescription({
             text: info.description,
             type: DescriptionType.Primary,
+            project_id: info.id,
+            id: `desc-${info.id}`,
+            type_schema_uri: "",
+            type_uri: "",
           }),
         ],
       }),
   );
 
-  const mockData = mockProjects.map((p) => ({
-    project: new ProjectDTO({
-      ...p,
-      start_date: new Date(p.start_date),
-      primary_title: p.titles.find((title) => title.type === TitleType.Primary),
-      primary_description: p.descriptions.find(
-        (desc) => desc.type === DescriptionType.Primary,
+  // Create projects with primary_title and primary_description properties needed by ProjectCard
+  const mockData = mockProjects.map((p) => {
+    const projectResponseDTO = new ProjectResponseDTO({
+      id: p.id,
+      start_date: p.start_date,
+      end_date: p.end_date,
+      titles: p.titles.map(
+        (title) =>
+          new ProjectTitleResponseDTO({
+            text: title.text,
+            type: title.type,
+            start_date: title.start_date,
+            id: title.id,
+            project_id: title.project_id,
+          }),
       ),
-    }),
-    role: "Member",
-  }));
+      descriptions: p.descriptions.map(
+        (desc) =>
+          new ProjectDescriptionResponseDTO({
+            text: desc.text,
+            type: desc.type,
+            id: desc.id,
+            project_id: desc.project_id,
+          }),
+      ),
+      users: [],
+      contributors: [],
+      products: [],
+      organisations: [],
+    });
+
+    return {
+      project: projectResponseDTO,
+      roles: ["Member"],
+    };
+  });
 
   beforeEach(() => {
     // Mount the component within BrowserRouter because ProjectCard uses <Link>
@@ -72,7 +109,7 @@ describe("<DashboardListView />", () => {
     // Using the Card component from the updated ProjectCard
     cy.get(".flex.h-full.flex-col.rounded-xl").should(
       "have.length",
-      mockData.length * 2,
+      mockData.length,
     );
   });
 
@@ -111,7 +148,6 @@ describe("<DashboardListView />", () => {
         <DashboardListView />
       </BrowserRouter>,
     );
-    cy.get("div.grid").should("exist");
-    cy.get(".flex.h-full.flex-col.rounded-xl").should("not.exist"); // No cards should be present
+    cy.contains("h3", "No projects yet").should("be.visible");
   });
 });

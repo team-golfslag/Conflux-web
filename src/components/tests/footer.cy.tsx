@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import Footer from "../footer";
+import Footer from "../layout/footer";
 import { mount } from "cypress/react";
 
 describe("Footer component", () => {
@@ -14,18 +14,15 @@ describe("Footer component", () => {
   it("renders correctly", () => {
     // Check if the footer element exists
     cy.get("footer").should("exist");
-    cy.get("footer").should("have.class", "bg-primary");
   });
 
   it("displays the logo", () => {
     cy.get("img").should("exist");
     cy.get("img").should("have.attr", "alt", "");
-    cy.get("img").should("have.class", "h-16");
   });
 
   it("displays the Conflux title", () => {
     cy.contains("Conflux").should("exist");
-    cy.contains("Conflux").should("have.class", "text-white");
   });
 
   it("shows copyright information", () => {

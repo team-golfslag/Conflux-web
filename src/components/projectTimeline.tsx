@@ -19,10 +19,10 @@ export default function ProjectTimeline({
 
   return (
     <Card>
-      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="">
-        <CardHeader className="relative flex justify-between">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CardHeader className="relative flex items-baseline justify-between">
           <CardTitle>Timeline</CardTitle>
-          <div className="absolute top-2.5 right-0 flex items-center justify-between space-x-4 px-4">
+          <div className="flex items-center justify-between">
             <CollapsibleTrigger asChild>
               <Button
                 variant="ghost"
@@ -39,7 +39,7 @@ export default function ProjectTimeline({
             </CollapsibleTrigger>
           </div>
         </CardHeader>
-        <div className="mt-4 ml-3 space-y-4">
+        <div className="mt-4 ml-3">
           <Timeline items={timelineData} />
         </div>
       </Collapsible>

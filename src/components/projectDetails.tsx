@@ -3,18 +3,21 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
-  ProjectDTO,
+  ProjectResponseDTO,
   ApiClient,
-  ContributorDTO,
-  ProjectPatchDTO,
+  ProjectRequestDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
-import { format } from "date-fns";
-import { Edit, Check, X } from "lucide-react";
-import { ApiMutation } from "./apiMutation";
+import { Edit, Check, X, RefreshCw, CheckCircle, XCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -22,284 +25,352 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { ApiMutation } from "./apiMutation";
 import { Label } from "./ui/label";
-import { DatePicker } from "./ui/datepicker";
+import { ApiClientContext } from "@/lib/ApiClientContext";
+import { determineProjectStatus } from "@/utils/projectUtils";
+import { Badge } from "@/components/ui/badge.tsx";
+import ProjectDates from "@/components/projectDates";
+import { useApiQuery } from "@/hooks/useApiQuery";
 
 type ProjectDetailsProps = {
-  project: ProjectDTO;
+  project: ProjectResponseDTO;
+  isAdmin: boolean;
   onProjectUpdate: () => void;
-};
-
-const determineStatus = (
-  startDate: Date | undefined | null,
-  endDate: Date | undefined | null,
-) => {
-  const now = new Date();
-  if (!startDate || startDate > now) {
-    return "Not started";
-  } else if (endDate && endDate < now) {
-    return "Ended";
-  } else {
-    return "Active";
-  }
 };
 
 export default function ProjectDetails({
   project,
+  isAdmin,
   onProjectUpdate,
 }: Readonly<ProjectDetailsProps>) {
+  const apiClient = useContext(ApiClientContext);
   const [editMode, setEditMode] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState<
-    Date | null | undefined
-  >(project.start_date);
-  const [selectedEndDate, setSelectedEndDate] = useState<
-    Date | null | undefined
-  >(project.end_date);
-  const [selectedLeaderId, setSelectedLeaderId] = useState<string | undefined>(
-    project.contributors.find((c) => c.leader)?.person.id,
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | undefined>(
+    project.start_date,
   );
-  const [selectedOrganizationId, setSelectedOrganizationId] = useState<
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | undefined>(
+    project.end_date,
+  );
+  const [selectedLectorate, setSelectedLectorate] = useState<
     string | undefined
-  >(project.organisations[0]?.id);
+  >(project.lectorate || undefined);
+
+  // Fetch available lectorates
+  const { data: availableLectorates } = useApiQuery(
+    (client) => client.admin_GetLectorates(),
+    [],
+  );
 
   const toggleEditMode = () => {
     if (editMode) {
       // Reset selections to current values if canceling
       setSelectedStartDate(project.start_date);
       setSelectedEndDate(project.end_date);
-      setSelectedLeaderId(
-        project.contributors.find((c) => c.leader)?.person.id,
-      );
-      setSelectedOrganizationId(project.organisations[0]?.id);
+      setSelectedLectorate(project.lectorate || undefined);
     }
     setEditMode(!editMode);
   };
 
-  const updateProject = async (apiClient: ApiClient) => {
-    // Update contributor roles if leader changed
-    if (selectedLeaderId) {
-      // First, unset any existing leader
-      for (const contributor of project.contributors) {
-        if (contributor.leader && contributor.person.id !== selectedLeaderId) {
-          await apiClient.contributors_UpdateContributor(
-            project.id,
-            contributor.person.id,
-            new ContributorDTO({
-              ...contributor,
-              leader: false,
-            }),
-          );
-        }
-      }
+  // States to track sync progress
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
+  const [syncFailed, setSyncFailed] = useState(false);
 
-      // Set the new leader
-      const newLeader = project.contributors.find(
-        (c) => c.person.id === selectedLeaderId,
-      );
-      if (newLeader && !newLeader.leader) {
-        await apiClient.contributors_UpdateContributor(
-          project.id,
-          newLeader.person.id,
-          new ContributorDTO({
-            ...newLeader,
-            leader: true,
-          }),
-        );
-      }
+  // Method to sync project data with SRAM
+  const syncWithSram = async () => {
+    try {
+      setIsSyncing(true);
+      setSyncSuccess(false);
+      setSyncFailed(false);
+      await apiClient.projects_SyncProject(project.id);
+      onProjectUpdate();
+      setSyncSuccess(true);
+      // Reset success state after 2 seconds
+      setTimeout(() => {
+        setSyncSuccess(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error syncing with SRAM:", error);
+      setSyncFailed(true);
+      // Reset failure state after 2 seconds
+      setTimeout(() => {
+        setSyncFailed(false);
+      }, 2000);
+    } finally {
+      setIsSyncing(false);
     }
-    // Update project dates
-    return apiClient.projects_PatchProject(
+  };
+
+  const updateProject = async (apiClient: ApiClient) => {
+    // Update project dates and lectorate
+    return apiClient.projects_PutProject(
       project.id,
-      new ProjectPatchDTO({
-        start_date: selectedStartDate === null ? undefined : selectedStartDate,
+      new ProjectRequestDTO({
+        start_date: selectedStartDate ?? project.start_date ?? new Date(),
         end_date: selectedEndDate === null ? undefined : selectedEndDate,
+        lectorate: selectedLectorate || undefined,
       }),
     );
   };
 
-  const projectLead = project.contributors.find(
-    (contributor) => contributor.leader,
-  );
+  // Helper function to get all project leads
+  const getProjectLeads = (
+    contributors: Array<{ leader: boolean; person: { name: string } }>,
+  ) => {
+    const leads = contributors.filter((contributor) => contributor.leader);
+    return leads.length > 0
+      ? leads.map((lead) => lead.person.name).join(", ")
+      : "N/A";
+  };
+
+  // Helper function to get all project contacts
+  const getProjectContacts = (
+    contributors: Array<{ contact: boolean; person: { name: string } }>,
+  ) => {
+    const contacts = contributors.filter((contributor) => contributor.contact);
+    return contacts.length > 0
+      ? contacts.map((contact) => contact.person.name).join(", ")
+      : "N/A";
+  };
+
+  const getProjectContactsCount = (
+    contributors: Array<{ contact: boolean }>,
+  ) => {
+    return contributors.filter((contributor) => contributor.contact).length;
+  };
+  const getProjectLeadsCount = (contributors: Array<{ leader: boolean }>) => {
+    return contributors.filter((contributor) => contributor.leader).length;
+  };
+
+  const status = determineProjectStatus(project.start_date, project.end_date);
 
   return (
-    <Card className="">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card>
+      <CardHeader className="flex items-center justify-between">
         <CardTitle>Project Details</CardTitle>
-        <Button variant="outline" size="sm" onClick={toggleEditMode}>
-          {editMode ? (
-            <>
-              <X className="mr-2 h-4 w-4" /> Cancel
-            </>
-          ) : (
-            <>
-              <Edit className="mr-2 h-4 w-4" /> Edit
-            </>
+
+        <div className="invisible flex items-center gap-2 group-hover/card:visible">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="relative group-hover:inline-flex"
+                  onClick={syncWithSram}
+                  disabled={isSyncing}
+                >
+                  {syncSuccess ? (
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <>
+                      {syncFailed ? (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      ) : (
+                        <RefreshCw
+                          className={`h-4 w-4 transition-transform duration-300 ${isSyncing ? "animate-spin" : "hover:rotate-90"}`}
+                        />
+                      )}
+                    </>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {isSyncing ? (
+                    "Syncing..."
+                  ) : (
+                    <>
+                      {syncSuccess ? (
+                        "Sync complete!"
+                      ) : (
+                        <>
+                          {syncFailed
+                            ? "Sync failed!"
+                            : "Sync this project with SRAM"}
+                        </>
+                      )}
+                    </>
+                  )}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          {isAdmin && (
+            <Button variant="outline" size="sm" onClick={toggleEditMode}>
+              {editMode ? (
+                <>
+                  <X className="mr-2 h-4 w-4" /> Cancel
+                </>
+              ) : (
+                <>
+                  <Edit className="mr-2 h-4 w-4" /> Edit
+                </>
+              )}
+            </Button>
           )}
-        </Button>
+        </div>
       </CardHeader>
       <CardContent>
-        {editMode ? (
-          <ApiMutation
-            mutationFn={updateProject}
-            data={{}}
-            loadingMessage="Updating project details..."
-            mode="component"
-            onSuccess={() => {
-              setEditMode(false);
-              onProjectUpdate();
-            }}
-          >
-            {({ onSubmit, isLoading: outerLoading }) => (
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="status" className="font-semibold">
-                    Status
-                  </Label>
-                  <p className="text-gray-700">
-                    {determineStatus(project.start_date, project.end_date)}
-                  </p>
-                </div>
+        <div className="flex flex-col gap-4">
+          {editMode ? (
+            <ApiMutation
+              mutationFn={updateProject}
+              data={{}}
+              loadingMessage="Updating project details..."
+              mode="component"
+              onSuccess={() => {
+                setEditMode(false);
+                onProjectUpdate();
+              }}
+            >
+              {({ onSubmit, isLoading: outerLoading }) => (
+                <>
+                  <div>
+                    <Label htmlFor="status" className="font-semibold">
+                      Status
+                    </Label>
+                    <Badge
+                      className={`${status.color} mt-1 font-medium whitespace-nowrap`}
+                    >
+                      {status.label}
+                    </Badge>
+                  </div>
 
-                <div>
-                  <Label htmlFor="project-lead" className="font-semibold">
-                    Project Lead
-                  </Label>
-                  <Select
-                    value={selectedLeaderId}
-                    onValueChange={setSelectedLeaderId}
-                  >
-                    <SelectTrigger className="mt-1 w-full">
-                      <SelectValue
-                        placeholder="Select project lead"
-                        className="text-left whitespace-normal"
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {project.contributors.map((contributor) => (
-                        <SelectItem
-                          key={contributor.person.id}
-                          value={contributor.person.id}
-                          className="text-left whitespace-normal"
+                  <div>
+                    <Label htmlFor="project-lead" className="font-semibold">
+                      Project Lead
+                      {getProjectLeadsCount(project.contributors) > 1
+                        ? "s"
+                        : ""}
+                    </Label>
+                    <p className="text-gray-700">
+                      {getProjectLeads(project.contributors)}
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="project-contacts" className="font-semibold">
+                      Project Contact
+                      {getProjectContactsCount(project.contributors) > 1
+                        ? "s"
+                        : ""}
+                    </Label>
+                    <p className="text-gray-700">
+                      {getProjectContacts(project.contributors)}
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label
+                      htmlFor="project-lectorate"
+                      className="font-semibold"
+                    >
+                      Lectorate
+                    </Label>
+                    <div className="mt-1 flex items-center gap-2">
+                      <Select
+                        value={selectedLectorate || ""}
+                        onValueChange={(value) =>
+                          setSelectedLectorate(value === "" ? undefined : value)
+                        }
+                      >
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Select a lectorate..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableLectorates?.map((lectorate) => (
+                            <SelectItem key={lectorate} value={lectorate}>
+                              {lectorate}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {selectedLectorate && (
+                        <Button
+                          variant="ghost"
+                          className="text-muted-foreground mx-2 cursor-pointer"
+                          size="sm"
+                          onClick={() => setSelectedLectorate(undefined)}
                         >
-                          {contributor.person.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
 
-                <div>
-                  <Label htmlFor="start-date" className="font-semibold">
-                    Start Date
-                  </Label>
-                  <DatePicker
-                    className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1"
-                    buttonClassName="w-full max-w-[calc(100%-44px)]"
-                    initialDate={project.start_date}
-                    onDateChange={setSelectedStartDate}
+                  <ProjectDates
+                    editMode={editMode}
+                    start_date={project.start_date}
+                    end_date={project.end_date}
+                    setSelectedStartDate={setSelectedStartDate}
+                    setSelectedEndDate={setSelectedEndDate}
                   />
-                </div>
 
-                <div>
-                  <Label htmlFor="end-date" className="font-semibold">
-                    End Date
-                  </Label>
-                  <DatePicker
-                    className="mt-1 flex flex-nowrap gap-2 overflow-visible pr-1"
-                    buttonClassName="w-full max-w-[calc(100%-44px)]"
-                    initialDate={project.end_date}
-                    onDateChange={setSelectedEndDate}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="lead-organization" className="font-semibold">
-                    Lead Organisation
-                  </Label>
-                  <Select
-                    value={selectedOrganizationId}
-                    onValueChange={setSelectedOrganizationId}
-                  >
-                    <SelectTrigger className="mt-1 w-full">
-                      <SelectValue placeholder="Select lead organization" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {project.organisations.map((org) => (
-                        <SelectItem key={org.id} value={org.id || ""}>
-                          {org.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button
-                    variant="default"
-                    className="flex items-center gap-1"
-                    onClick={onSubmit}
-                    disabled={outerLoading}
-                  >
-                    <Check size={16} /> Save Changes
-                  </Button>
-                </div>
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button
+                      variant="default"
+                      className="flex items-center gap-1"
+                      onClick={onSubmit}
+                      disabled={outerLoading}
+                    >
+                      <Check size={16} /> Save Changes
+                    </Button>
+                  </div>
+                </>
+              )}
+            </ApiMutation>
+          ) : (
+            <>
+              <div>
+                <Label htmlFor="status" className="font-semibold">
+                  Status
+                </Label>
+                <Badge
+                  className={`${status.color} mt-1 font-medium whitespace-nowrap`}
+                >
+                  {status.label}
+                </Badge>
               </div>
-            )}
-          </ApiMutation>
-        ) : (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="status" className="font-semibold">
-                Status
-              </Label>
-              <p className="text-gray-700">
-                {determineStatus(project.start_date, project.end_date)}
-              </p>
-            </div>
 
-            <div>
-              <Label htmlFor="project-lead" className="font-semibold">
-                Project Lead
-              </Label>
-              <p className="text-gray-700">
-                {projectLead ? projectLead.person.name : "N/A"}
-              </p>
-            </div>
+              <div>
+                <Label htmlFor="project-lead" className="font-semibold">
+                  Project Lead
+                  {getProjectLeadsCount(project.contributors) > 1 ? "s" : ""}
+                </Label>
+                <p className="pt-1 pb-2 text-gray-700">
+                  {getProjectLeads(project.contributors)}
+                </p>
+              </div>
 
-            <div>
-              <Label htmlFor="start-date" className="font-semibold">
-                Start Date
-              </Label>
-              <p className="text-gray-700">
-                {project.start_date
-                  ? format(project.start_date, "d MMMM yyyy")
-                  : "N/A"}
-              </p>
-            </div>
+              <div>
+                <Label htmlFor="project-contacts" className="font-semibold">
+                  Project Contact
+                  {getProjectContactsCount(project.contributors) > 1 ? "s" : ""}
+                </Label>
+                <p className="pt-1 pb-2 text-gray-700">
+                  {getProjectContacts(project.contributors)}
+                </p>
+              </div>
 
-            <div>
-              <Label htmlFor="end-date" className="font-semibold">
-                End Date
-              </Label>
-              <p className="text-gray-700">
-                {project.end_date
-                  ? format(project.end_date, "d MMMM yyyy")
-                  : "N/A"}
-              </p>
-            </div>
+              <div>
+                <Label htmlFor="project-lectorate" className="font-semibold">
+                  Lectorate
+                </Label>
+                <p className="text-gray-700">
+                  {project.lectorate ? project.lectorate : "Not specified"}
+                </p>
+              </div>
 
-            <div>
-              <Label htmlFor="lead-organization" className="font-semibold">
-                Lead Organisation
-              </Label>
-              <p className="text-gray-700">
-                {project.organisations.length > 0
-                  ? project.organisations[0].name
-                  : "N/A"}
-              </p>
-            </div>
-          </div>
-        )}
+              <ProjectDates
+                editMode={editMode}
+                start_date={project.start_date}
+                end_date={project.end_date}
+              />
+            </>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

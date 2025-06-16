@@ -3,47 +3,46 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import ProjectContributors from "@/components/projectContributors.tsx";
+import ProjectContributors from "@/components/contributor/projectContributors";
 import { mount } from "cypress/react";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { createApiClientMock, mockContributor } from "./mocks";
 import {
-  ProjectDTO,
-  Person,
-  ContributorDTO,
+  ProjectResponseDTO,
+  ContributorResponseDTO,
+  PersonResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 
 describe("ProjectContributors Component", () => {
-  const mockProject = new ProjectDTO({
+  // Create a properly typed mock project using ProjectResponseDTO
+  const mockProject = new ProjectResponseDTO({
     id: "123",
     contributors: [
-      new ContributorDTO({
-        person: new Person({
+      new ContributorResponseDTO({
+        person: new PersonResponseDTO({
           id: "1",
-          schema_uri: "",
           name: "John Doe",
           email: "john.doe@example.com",
           orcid_id: "0000-0001-2345-6789",
         }),
+        project_id: "123",
         leader: true,
         contact: true,
         roles: [],
         positions: [],
-        project_id: "123",
       }),
-      new ContributorDTO({
-        person: new Person({
+      new ContributorResponseDTO({
+        person: new PersonResponseDTO({
           id: "2",
-          schema_uri: "",
           name: "Jane Smith",
           email: "jane.smith@example.com",
           orcid_id: "0000-0002-3456-7890",
         }),
+        project_id: "123",
         leader: false,
         contact: false,
         roles: [],
         positions: [],
-        project_id: "123",
       }),
     ],
     titles: [],
@@ -57,6 +56,7 @@ describe("ProjectContributors Component", () => {
 
   // Define onProjectUpdate as a function type
   let onProjectUpdate: () => void;
+  // Get the mock API client from the factory function
   const mockApiClient = createApiClientMock();
 
   beforeEach(() => {
@@ -75,6 +75,7 @@ describe("ProjectContributors Component", () => {
         <ProjectContributors
           project={mockProject}
           onProjectUpdate={onProjectUpdate}
+          isAdmin={true}
         />
       </ApiClientContext.Provider>,
     );

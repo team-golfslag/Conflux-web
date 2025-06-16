@@ -5,7 +5,7 @@
  */
 import { useState, useEffect, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { UserSession } from "@team-golfslag/conflux-api-client/src/client";
+import { UserSessionResponseDTO } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import { useContext } from "react";
 import {
@@ -20,7 +20,7 @@ const SESSION_EXPIRATION_TIME = 30 * 60 * 1000;
 
 // Type for the stored session with timestamp
 interface StoredSession {
-  userData: UserSession;
+  userData: UserSessionResponseDTO;
   timestamp: number;
 }
 
@@ -29,7 +29,7 @@ interface SessionProviderProps {
 }
 
 export function SessionProvider({ children }: SessionProviderProps) {
-  const [session, setSession] = useState<UserSession | null>(null);
+  const [session, setSession] = useState<UserSessionResponseDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const navigate = useNavigate();
@@ -48,15 +48,13 @@ export function SessionProvider({ children }: SessionProviderProps) {
         // Check if session is expired
         const now = new Date().getTime();
         if (now - storedSession.timestamp > SESSION_EXPIRATION_TIME) {
-          console.log("Session expired, removing from storage");
           localStorage.removeItem(SESSION_STORAGE_KEY);
           return null;
         }
 
         // Return valid non-expired session
         return storedSession.userData;
-      } catch (e) {
-        console.error("Failed to parse stored session:", e);
+      } catch {
         localStorage.removeItem(SESSION_STORAGE_KEY);
         return null;
       }
@@ -111,7 +109,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
     fetchSession();
   }, [apiClient, navigate, location.pathname]);
 
-  const saveSession = (userData: UserSession) => {
+  const saveSession = (userData: UserSessionResponseDTO) => {
     const sessionWithTimestamp: StoredSession = {
       userData,
       timestamp: new Date().getTime(),

@@ -18,17 +18,16 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, User, AlertCircle } from "lucide-react";
+import { Plus, Search, User, AlertCircle, Loader2 } from "lucide-react";
 import OrcidIcon from "@/components/icons/orcidIcon";
 import ContributorFormFields from "./contributorFormFields";
 import {
   ContributorRoleType,
   Person,
-  PersonDTO,
-  ContributorDTO,
-  ContributorPositionDTO,
+  PersonRequestDTO,
   ContributorPositionType,
   ApiClient,
+  ContributorRequestDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import {
@@ -43,7 +42,7 @@ interface ContributorFormData {
   email: string;
   orcidId: string;
   roles: ContributorRoleType[];
-  positions: ContributorPositionType[];
+  position?: ContributorPositionType;
   leader: boolean;
   contact: boolean;
 }
@@ -52,7 +51,7 @@ interface AddContributorModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   projectId: string;
-  onContributorAdded: (contributor: ContributorDTO) => void;
+  onContributorAdded: (contributor: ContributorRequestDTO) => void;
 }
 
 export default function AddContributorModal({
@@ -67,7 +66,7 @@ export default function AddContributorModal({
     email: "",
     orcidId: "",
     roles: [],
-    positions: [],
+    position: undefined,
     leader: false,
     contact: false,
   });
@@ -75,6 +74,7 @@ export default function AddContributorModal({
   // Search state
   const [orcidSearchTerm, setOrcidSearchTerm] = useState("");
   const [isLoadingOrcidSearch, setIsLoadingOrcidSearch] = useState(false);
+  const [isLoadingOrcidAutofill, setIsLoadingOrcidAutofill] = useState(false);
   const [orcidSearchResults, setOrcidSearchResults] = useState<Person[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Person[]>([]);
@@ -101,9 +101,7 @@ export default function AddContributorModal({
   const handlePositionChange = (position: ContributorPositionType) => {
     setFormData((prev) => ({
       ...prev,
-      positions: prev.positions.includes(position)
-        ? prev.positions.filter((p) => p !== position)
-        : [...prev.positions, position],
+      position: prev.position === position ? undefined : position,
     }));
     setSelectedPerson(null);
   };
@@ -115,7 +113,7 @@ export default function AddContributorModal({
       email: "",
       orcidId: "",
       roles: [],
-      positions: [],
+      position: undefined,
       leader: false,
       contact: false,
     });
@@ -168,6 +166,7 @@ export default function AddContributorModal({
   const handleOrcidAutoFill = async () => {
     if (!formData.orcidId) return false;
 
+    setIsLoadingOrcidAutofill(true);
     setAutoFillError(null);
 
     try {
@@ -190,7 +189,7 @@ export default function AddContributorModal({
       setAutoFillError("Failed to search ORCID. Please try again.");
       return false;
     } finally {
-      setIsLoadingOrcidSearch(false);
+      setIsLoadingOrcidAutofill(false);
     }
   };
 
@@ -258,69 +257,67 @@ export default function AddContributorModal({
     }));
     setSearchResults([]);
     setSearchTerm("");
+    setOrcidSearchResults([]);
+    setOrcidSearchTerm("");
   };
 
   // Prepare data for API mutation
   const prepareContributorData = async (): Promise<{
-    contributorData: ContributorDTO;
-    newPerson?: PersonDTO;
+    contributorData: ContributorRequestDTO;
+    existingPerson?: Person;
+    newPerson?: PersonRequestDTO;
   }> => {
-    let personToUse: Person;
-    let newPerson: PersonDTO | undefined;
+    const contributorData = new ContributorRequestDTO({
+      roles: formData.roles,
+      position: formData.position,
+      leader: formData.leader,
+      contact: formData.contact,
+    });
 
     if (selectedPerson) {
-      personToUse = selectedPerson;
+      return { contributorData, existingPerson: selectedPerson };
     } else {
       const formattedOrcid = formData.orcidId
         ? formatOrcidAsUrl(formData.orcidId)
         : null;
-      newPerson = new PersonDTO({
+      const newPerson = new PersonRequestDTO({
         name: formData.name,
         email: formData.email,
         or_ci_d: formattedOrcid ?? undefined,
       });
 
-      // We'll use a temporary person object until the actual creation
-      personToUse = new Person({
-        id: "temp-id", // Will be replaced by the actual created person
-        name: formData.name,
-        email: formData.email,
-        orcid_id: formattedOrcid ?? undefined,
-        schema_uri: "",
-      });
+      return { contributorData, newPerson };
     }
-
-    const contributorData = new ContributorDTO({
-      person: personToUse,
-      project_id: projectId,
-      roles: formData.roles,
-      positions: formData.positions.map(
-        (type) => new ContributorPositionDTO({ type, start_date: new Date() }),
-      ),
-      leader: formData.leader,
-      contact: formData.contact,
-    });
-
-    return { contributorData, newPerson };
   };
 
   // Create or get person, then create contributor
   const createContributor = async (apiClient: ApiClient) => {
-    const { contributorData, newPerson } = await prepareContributorData();
+    const { contributorData, newPerson, existingPerson } =
+      await prepareContributorData();
 
-    // If we need to create a new person first
-    if (newPerson) {
+    let personId: string;
+
+    // Use existing person if available
+    if (existingPerson) {
+      personId = existingPerson.id;
+    }
+    // Create new person if needed
+    else if (newPerson) {
       const createdPerson = await apiClient.people_CreatePerson(newPerson);
       if (!createdPerson?.id) {
         throw new Error("Failed to create person");
       }
-
-      // Update the contributor with the created person
-      contributorData.person = createdPerson;
+      personId = createdPerson.id;
+    } else {
+      throw new Error("No person data available");
     }
 
-    // Now create the contributor
-    return apiClient.contributors_CreateContributor(projectId, contributorData);
+    const con = await apiClient.contributors_CreateContributor(
+      projectId,
+      personId,
+      contributorData,
+    );
+    return con;
   };
 
   return (
@@ -331,10 +328,15 @@ export default function AddContributorModal({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Add Contributor</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-h-[90vh] overflow-y-auto border-0 bg-white/95 shadow-2xl backdrop-blur-md sm:max-w-[700px]">
+        <DialogHeader className="space-y-3 border-b border-gray-100 pb-6">
+          <DialogTitle className="flex items-center gap-3 text-2xl">
+            <div className="rounded-lg bg-gray-100 p-2">
+              <User className="h-6 w-6 text-green-600" />
+            </div>
+            Add Contributor
+          </DialogTitle>
+          <DialogDescription className="text-base text-gray-600">
             Add a new contributor to this project. You can search by ORCID or
             enter details manually.
           </DialogDescription>
@@ -346,7 +348,15 @@ export default function AddContributorModal({
           loadingMessage="Adding contributor..."
           mode="component"
           onSuccess={(createdContributor) => {
-            onContributorAdded(createdContributor);
+            onContributorAdded(
+              new ContributorRequestDTO({
+                roles: createdContributor.roles.map((role) => role.role_type),
+                position: createdContributor.positions.find((p) => !p.end_date)!
+                  .position,
+                leader: createdContributor.leader,
+                contact: createdContributor.contact,
+              }),
+            );
             onOpenChange(false);
             resetForm();
           }}
@@ -380,8 +390,19 @@ export default function AddContributorModal({
                       type="button"
                       onClick={searchInOrcid}
                       disabled={isLoadingOrcidSearch}
+                      className="flex items-center gap-2"
                     >
-                      {isLoadingOrcidSearch ? "Searching..." : "Search"}
+                      {isLoadingOrcidSearch ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Searching...
+                        </>
+                      ) : (
+                        <>
+                          <Search className="h-4 w-4" />
+                          Search
+                        </>
+                      )}
                     </Button>
                   </div>
 
@@ -483,6 +504,7 @@ export default function AddContributorModal({
                   onRoleChange={handleRoleChange}
                   onPositionChange={handlePositionChange}
                   orcidError={autoFillError}
+                  isLoadingOrcidAutofill={isLoadingOrcidAutofill}
                   onLeaderChange={(e) => {
                     setFormData((prev) => ({
                       ...prev,
@@ -501,22 +523,23 @@ export default function AddContributorModal({
                 />
               </div>
 
-              <DialogFooter>
-                <Button variant="outline" onClick={() => onOpenChange(false)}>
+              <DialogFooter className="flex gap-3 border-t border-gray-100 pt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  className="transition-all duration-200 hover:scale-105 hover:bg-gray-50"
+                >
                   Cancel
                 </Button>
                 {error && (
-                  <div className="text-destructive text-xs">
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
                     {error.message}
                   </div>
                 )}
                 <Button
                   onClick={onSubmit}
-                  disabled={
-                    isLoading ||
-                    !formData.name ||
-                    formData.positions.length === 0
-                  }
+                  disabled={isLoading || !formData.name || !formData.position}
+                  className="bg-gray-800 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isLoading ? "Adding..." : "Add Contributor"}
                 </Button>

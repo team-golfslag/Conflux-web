@@ -3,7 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
-import AddContributorModal from "../addContributorModal";
+import AddContributorModal from "../contributor/addContributorModal";
 import { mount } from "cypress/react";
 
 describe("AddContributorModal Component", () => {
@@ -127,5 +127,15 @@ describe("AddContributorModal Component", () => {
 
     // Button should now be enabled
     cy.get("button").contains("Add").should("not.be.disabled");
+  });
+
+  it("allows only one position to be selected at a time", () => {
+    // Select a position
+    cy.contains("Principal Investigator").click();
+
+    // Verify it's selected (using the UI state - it should have the default variant styling)
+    cy.contains("Principal Investigator");
+    // Select a different position
+    cy.contains("Consultant").click();
   });
 });

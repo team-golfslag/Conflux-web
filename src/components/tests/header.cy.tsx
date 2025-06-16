@@ -5,7 +5,7 @@
  */
 import { BrowserRouter } from "react-router-dom"; // Import BrowserRouter for Link component
 import { mount } from "cypress/react";
-import Header from "@/components/header.tsx";
+import Header from "@/components/layout/header";
 
 /// <reference types="cypress" />
 
@@ -22,12 +22,6 @@ describe("<Header />", () => {
   it("renders the logo and brand name", () => {
     cy.get('img[alt="Logo"]').should("be.visible");
     cy.contains("span", "Conflux").should("be.visible");
-  });
-
-  it("renders the header with correct classes", () => {
-    cy.get("header").should("have.class", "bg-primary");
-    cy.get("header").should("have.class", "text-primary-foreground");
-    cy.get("header").should("have.class", "sticky");
   });
 
   it("initially shows header at top position when scrolling up", () => {

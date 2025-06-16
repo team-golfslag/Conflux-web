@@ -10,13 +10,13 @@ import { mount } from "cypress/react";
 import { BrowserRouter } from "react-router-dom";
 import ProjectCard from "../projectCard.tsx";
 import {
-  ContributorDTO,
   DescriptionType,
-  Person,
-  ProjectDescriptionDTO,
-  ProjectDTO,
-  ProjectTitleDTO,
+  ProjectDescriptionResponseDTO,
+  ProjectTitleResponseDTO,
   TitleType,
+  ProjectResponseDTO,
+  ContributorResponseDTO,
+  PersonResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 
 // Helper function to create dates relative to today (at 00:00:00.000)
@@ -28,76 +28,97 @@ const getDateRelativeToToday = (daysOffset: number): Date => {
   return targetDate;
 };
 
+// Helper function to create a proper ContributorResponseDTO
+const createMockContributor = (id: string): ContributorResponseDTO => {
+  return new ContributorResponseDTO({
+    person: new PersonResponseDTO({
+      id: id,
+      name: `Test Person ${id}`,
+      email: `person${id}@example.com`,
+      orcid_id: `0000-0000-0000-000${id}`,
+    }),
+    project_id: "test-project",
+    leader: false,
+    contact: false,
+    roles: [],
+    positions: [],
+  });
+};
+
 // --- Test Data ---
-const mockProjectBase: ProjectDTO = new ProjectDTO({
-  id: "proj-123",
-  primary_title: new ProjectTitleDTO({
-    text: "Test Project Alpha",
-    type: TitleType.Primary,
+// Create a base project with properties needed by ProjectResponseDTO
+const createBaseProject = (): ProjectResponseDTO => {
+  const project = new ProjectResponseDTO({
+    id: "proj-123",
+    titles: [
+      new ProjectTitleResponseDTO({
+        text: "Test Project Alpha",
+        type: TitleType.Primary,
+        start_date: new Date("2023-01-01"),
+        id: "title-1",
+        project_id: "proj-123",
+      }),
+    ],
+    descriptions: [
+      new ProjectDescriptionResponseDTO({
+        text: "This is a test project description.",
+        type: DescriptionType.Primary,
+        id: "desc-1",
+        project_id: "proj-123",
+      }),
+    ],
+    users: [],
+    contributors: [],
+    products: [],
     start_date: new Date("2023-01-01"),
-  }),
-  primary_description: new ProjectDescriptionDTO({
-    text: "This is a test project description.",
-    type: DescriptionType.Primary,
-  }),
-  titles: [],
-  descriptions: [],
-  users: [],
-  contributors: [],
-  products: [],
-  start_date: new Date("2023-01-01"),
-  organisations: [],
+    organisations: [],
+  });
+
+  // These properties are not needed, the component looks for titles and descriptions
+  // with TitleType.Primary and DescriptionType.Primary
+
+  return project;
+};
+
+const projectUpcoming = new ProjectResponseDTO({
+  ...createBaseProject(),
+  id: "proj-upcoming",
+  start_date: getDateRelativeToToday(5),
+  end_date: getDateRelativeToToday(10),
 });
 
-const projectUpcoming: ProjectDTO = {
-  ...mockProjectBase,
-  id: "proj-upcoming",
-  start_date: getDateRelativeToToday(5), // Starts in 5 days
-  end_date: getDateRelativeToToday(10),
-  init: mockProjectBase.init,
-  toJSON: mockProjectBase.toJSON,
-};
-
-const projectActive: ProjectDTO = {
-  ...mockProjectBase,
+const projectActive = new ProjectResponseDTO({
+  ...createBaseProject(),
   id: "proj-active",
-  start_date: getDateRelativeToToday(-5), // Started 5 days ago
-  end_date: getDateRelativeToToday(10), // Ends in 10 days
-  init: mockProjectBase.init,
-  toJSON: mockProjectBase.toJSON,
-};
+  start_date: getDateRelativeToToday(-5),
+  end_date: getDateRelativeToToday(10),
+});
 
-const projectInProgress: ProjectDTO = {
-  ...mockProjectBase,
+const projectInProgress = new ProjectResponseDTO({
+  ...createBaseProject(),
   id: "proj-active-no-end",
-  start_date: getDateRelativeToToday(-5), // Started 5 days ago
+  start_date: getDateRelativeToToday(-5),
   end_date: undefined,
-  init: mockProjectBase.init,
-  toJSON: mockProjectBase.toJSON,
-};
+});
 
-const projectCompleted: ProjectDTO = {
-  ...mockProjectBase,
+const projectCompleted = new ProjectResponseDTO({
+  ...createBaseProject(),
   id: "proj-ended",
-  start_date: getDateRelativeToToday(-10), // Started 10 days ago
-  end_date: getDateRelativeToToday(-5), // Ended 5 days ago
-  init: mockProjectBase.init,
-  toJSON: mockProjectBase.toJSON,
-};
+  start_date: getDateRelativeToToday(-10),
+  end_date: getDateRelativeToToday(-5),
+});
 
-const projectNoDates: ProjectDTO = {
-  ...mockProjectBase,
+const projectNoDates = new ProjectResponseDTO({
+  ...createBaseProject(),
   id: "proj-no-dates",
-  start_date: null as unknown as Date, // Handle null as Date for testing
-  end_date: null as unknown as Date, // Handle null as Date for testing
-  init: mockProjectBase.init,
-  toJSON: mockProjectBase.toJSON,
-};
+  start_date: null as unknown as Date, // Force null to trigger "Not Started" status
+  end_date: null as unknown as Date,
+});
 
 // --- Test Suite ---
 describe("<ProjectCard /> Component Rendering", () => {
-  // Accept an optional array of roles
-  const mountCard = (project: ProjectDTO, roles?: string[]) => {
+  // Accept ProjectResponseDTO as project type
+  const mountCard = (project: ProjectResponseDTO, roles?: string[]) => {
     mount(
       <BrowserRouter>
         <ProjectCard project={project} roles={roles} />
@@ -107,22 +128,27 @@ describe("<ProjectCard /> Component Rendering", () => {
 
   it("renders basic project information", () => {
     mountCard(projectActive);
-    cy.contains("h3", projectActive.primary_title!.text).should("be.visible");
-    cy.contains("p", projectActive.primary_description!.text).should(
-      "be.visible",
+    const primaryTitle = projectActive.titles.find(
+      (title) => title.type === TitleType.Primary,
     );
+    const primaryDescription = projectActive.descriptions.find(
+      (desc) => desc.type === DescriptionType.Primary,
+    );
+
+    cy.contains("h3", primaryTitle!.text).should("be.visible");
+    cy.contains("p", primaryDescription!.text).should("be.visible");
     cy.get("a").should("have.attr", "href", `/projects/${projectActive.id}`);
   });
 
   it('renders "Not Started" status when start date is undefined', () => {
     mountCard(projectNoDates);
-    cy.contains("Not Started").should("be.visible");
+    cy.get('[data-cy="project-status"]').should("contain", "Not Started");
     cy.contains("No start date").should("be.visible");
   });
 
   it('renders "Upcoming" status when start date is in the future', () => {
     mountCard(projectUpcoming);
-    cy.contains("Upcoming").should("be.visible");
+    cy.get('[data-cy="project-status"]').should("contain", "Upcoming");
     cy.contains(
       new Date(projectUpcoming.start_date!).toLocaleDateString(),
     ).should("be.visible");
@@ -130,7 +156,7 @@ describe("<ProjectCard /> Component Rendering", () => {
 
   it('renders "Active" status when project is currently active', () => {
     mountCard(projectActive);
-    cy.contains("Active").should("be.visible");
+    cy.get('[data-cy="project-status"]').should("contain", "Active");
     cy.contains(
       new Date(projectActive.start_date!).toLocaleDateString(),
     ).should("be.visible");
@@ -141,7 +167,7 @@ describe("<ProjectCard /> Component Rendering", () => {
 
   it('renders "In Progress" status when project has no end date', () => {
     mountCard(projectInProgress);
-    cy.contains("In Progress").should("be.visible");
+    cy.get('[data-cy="project-status"]').should("contain", "In Progress");
     cy.contains(
       new Date(projectInProgress.start_date!).toLocaleDateString(),
     ).should("be.visible");
@@ -155,7 +181,7 @@ describe("<ProjectCard /> Component Rendering", () => {
 
   it('renders "Completed" status when end date is in the past', () => {
     mountCard(projectCompleted);
-    cy.contains("Completed").should("be.visible");
+    cy.get('[data-cy="project-status"]').should("contain", "Completed");
     cy.contains(
       new Date(projectCompleted.start_date!).toLocaleDateString(),
     ).should("be.visible");
@@ -165,57 +191,27 @@ describe("<ProjectCard /> Component Rendering", () => {
   });
 
   it("shows the correct contributor count", () => {
-    const mockContributors = [
-      { id: "1", name: "Contributor 1" },
-      { id: "2", name: "Contributor 2" },
-      { id: "3", name: "Contributor 3" },
-    ];
-    const projectWithContributors: ProjectDTO = new ProjectDTO({
-      ...mockProjectBase,
-      contributors: mockContributors.map(
-        (c) =>
-          new ContributorDTO({
-            person: new Person({
-              id: c.id,
-              name: c.name,
-              schema_uri: "",
-            }),
-            roles: [],
-            project_id: "",
-            positions: [],
-            leader: false,
-            contact: false,
-          }),
-      ),
+    // Create a project with 3 contributors for testing count display
+    const baseProject = createBaseProject();
+    const projectWithContributors = new ProjectResponseDTO({
+      ...baseProject,
+      contributors: [
+        createMockContributor("1"),
+        createMockContributor("2"),
+        createMockContributor("3"),
+      ],
     });
     mountCard(projectWithContributors);
     cy.contains("3 contributors").should("be.visible");
   });
 
   it("shows singular 'contributor' text when count is 1", () => {
-    const projectWithOneContributor: ProjectDTO = {
-      ...mockProjectBase,
-      contributors: [
-        {
-          person: {
-            id: "1",
-            name: "Single Contributor",
-            init: mockProjectBase.init,
-            toJSON: mockProjectBase.toJSON,
-            schema_uri: "",
-          },
-          roles: [],
-          init: mockProjectBase.init,
-          toJSON: mockProjectBase.toJSON,
-          project_id: "",
-          positions: [],
-          leader: false,
-          contact: false,
-        },
-      ],
-      init: mockProjectBase.init,
-      toJSON: mockProjectBase.toJSON,
-    };
+    // Create project with just one contributor
+    const baseProject = createBaseProject();
+    const projectWithOneContributor = new ProjectResponseDTO({
+      ...baseProject,
+      contributors: [createMockContributor("1")],
+    });
     mountCard(projectWithOneContributor);
     cy.contains("1 contributor").should("be.visible");
   });
