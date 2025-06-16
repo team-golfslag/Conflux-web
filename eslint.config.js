@@ -25,6 +25,14 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
+      "headers/header-format": [
+        "error",
+        {
+          source: "string",
+          content:
+            "This program has been developed by students from the bachelor Computer Science at Utrecht\nUniversity within the Software Project course.\n© Copyright Utrecht University (Department of Information and Computing Sciences)",
+        },
+      ],
     },
   },
 );

@@ -1,19 +1,5 @@
 /**
- * This program has been develofunction DialogOverlay({
-  className,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
-  return (
-    <DialogPrimitive.Overlay
-      data-slot="dialog-overlay"
-      className={cn(
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/60",
-        className,
-      )}
-      {...props}
-    />
-  );
-} from the bachelor Computer Science at Utrecht
+ * This program has been developed by students from the bachelor Computer Science at Utrecht
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */

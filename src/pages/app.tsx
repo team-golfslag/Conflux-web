@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button.tsx";
 import { Card } from "@/components/ui/card.tsx";
 import config from "@/config.ts";
 import Logo from "@/components/icons/logo";
-import { useBackendStatus } from "@/lib/backendStatusContext";
+import { useBackendStatus } from "@/lib/BackendStatusContext";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 
 function App() {

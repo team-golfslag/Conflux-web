@@ -1,3 +1,8 @@
+/**
+ * This program has been developed by students from the bachelor Computer Science at Utrecht
+ * University within the Software Project course.
+ * © Copyright Utrecht University (Department of Information and Computing Sciences)
+ */
 import { useState, useEffect, useRef } from "react";
 import {
   Edit,
@@ -22,7 +27,7 @@ import {
   useTruncatableText,
 } from "@/hooks/useEditableContent";
 import { LanguageInput } from "@/components/ui/languageInput";
-import { useLanguage } from "@/lib/languageContext";
+import { useLanguage } from "@/lib/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {

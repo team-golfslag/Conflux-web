@@ -1,14 +1,5 @@
 /**
- *import {
-  DescriptionType,
-  ProductCategoryType,
-  Product,
-  ProductType,
-  ProjectDescription,
-  Project,
-  ProjectTitle,
-  TitleType,
-} from "@team-golfslag/conflux-api-client/src/client.ts";ram has been developed by students from the bachelor Computer Science at Utrecht
+ * This program has been developed by students from the bachelor Computer Science at Utrecht
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */

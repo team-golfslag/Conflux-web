@@ -6,7 +6,7 @@
 import ProjectOverview from "@/components/overview/projectOverview";
 import { mount } from "cypress/react";
 import { ApiClientContext } from "@/lib/ApiClientContext";
-import { LanguageProvider } from "@/lib/languageContext";
+import { LanguageProvider } from "@/lib/LanguageContext";
 import { createApiClientMock } from "./mocks";
 import {
   ProjectTitleResponseDTO,

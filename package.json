@@ -7,11 +7,11 @@
   "scripts": {
     "reset": "npm i && npm run purge-vite && npm run dev",
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "format": "npx prettier --write .",
+    "format": "eslint . --fix && npx prettier --write .",
     "preview": "vite preview",
-    "build:prod": "NODE_ENV=production vite build",
+    "build:prod": "NODE_ENV=production tsc -b && vite build",
     "purge-vite": "rimraf node_modules/.vite",
     "prepare": "husky"
   },
