@@ -253,9 +253,14 @@ export default function ContributorFormFields({
                 value={formData.orcidId}
                 onChange={handleOrcidIdChange}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault();
-                    if (formData.orcidId && onOrcidAutoFill && !isConfluxUser && !isLoadingOrcidAutofill) {
+                    if (
+                      formData.orcidId &&
+                      onOrcidAutoFill &&
+                      !isConfluxUser &&
+                      !isLoadingOrcidAutofill
+                    ) {
                       onOrcidAutoFill();
                     }
                   }
