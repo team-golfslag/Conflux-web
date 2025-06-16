@@ -37,13 +37,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-function getEnumKeys<
-  T extends string,
-  TEnumValue extends string | number,
->(enumVariable: { [key in T]: TEnumValue }) {
-  return Object.keys(enumVariable) as Array<T>;
-}
-
 type ProjectContributorsProps = {
   project: ProjectResponseDTO;
   isAdmin?: boolean;
@@ -153,7 +146,7 @@ export default function ProjectContributors({
                   <DropdownMenuContent className="group/dropdown w-56">
                     <DropdownMenuLabel>Filter by roles</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {getEnumKeys(ContributorRoleType).map((role) => (
+                    {Object.keys(ContributorRoleType).map((role) => (
                       <DropdownMenuCheckboxItem
                         checked={filteredRoles.includes(role)}
                         onCheckedChange={(b) => handleCheckRole(b, role)}
