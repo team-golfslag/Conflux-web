@@ -11,8 +11,7 @@ import {
   ContributorRoleType,
   ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
-import { Edit, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Edit, X, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import {
@@ -104,7 +103,7 @@ export default function ProjectContributors({
 
   return (
     <>
-      <CardHeader className="relative flex justify-between">
+      <CardHeader className="relative flex">
         <CardTitle className="text-xl font-semibold">Contributors</CardTitle>
         <div
           className={
@@ -131,6 +130,40 @@ export default function ProjectContributors({
                 projectId={project.id}
                 onContributorAdded={handleContributorAdded}
               />
+
+              <div className="visible">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 border-gray-100 bg-white/70 text-sm shadow-sm"
+                    >
+                      <>
+                        <Filter></Filter>
+                        {filteredRoles.length == 1 && (
+                          <p>{filteredRoles.length} role</p>
+                        )}
+                        {filteredRoles.length > 1 && (
+                          <p>{filteredRoles.length} roles</p>
+                        )}
+                      </>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="group/dropdown w-56">
+                    <DropdownMenuLabel>Filter by roles</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {getEnumKeys(ContributorRoleType).map((role) => (
+                      <DropdownMenuCheckboxItem
+                        checked={filteredRoles.includes(role)}
+                        onCheckedChange={(b) => handleCheckRole(b, role)}
+                      >
+                        {role.toString()}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           )}
 
@@ -139,36 +172,6 @@ export default function ProjectContributors({
       </CardHeader>
 
       <CardContent>
-        <div className="flex flex-wrap items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 w-[100px] border-gray-100 bg-white/70 text-sm shadow-sm"
-              >
-                Filter
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="group/dropdown w-56">
-              <DropdownMenuLabel>Filter by roles</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {getEnumKeys(ContributorRoleType).map((role) => (
-                <DropdownMenuCheckboxItem
-                  checked={filteredRoles.includes(role)}
-                  onCheckedChange={(b) => handleCheckRole(b, role)}
-                >
-                  {role.toString()}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          {filteredRoles.map((role) => (
-            <Badge variant="secondary" className="h-5 px-2 py-0 text-xs">
-              {role.toString()}
-            </Badge>
-          ))}
-        </div>
         {editMode && (
           <div className="bg-destructive/10 text-destructive mb-4 rounded-md p-2 text-center text-sm">
             Edit mode active. You can edit or delete contributors from the

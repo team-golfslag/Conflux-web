@@ -199,13 +199,4 @@ describe("ProjectContributors Component", () => {
     cy.contains("Jane Smith").should("not.exist");
     cy.contains("jane.smith@example.com").should("not.exist");
   });
-
-  it("shows badges of the filtered role types", () => {
-    //select the methodology filter
-    cy.get("#radix-«r75»").click();
-    cy.get("#radix-«r76» > :nth-child(8)").click();
-
-    //check if the methodology badge exists
-    cy.contains("Methodology").should("be.visible");
-  });
 });
