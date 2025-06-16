@@ -67,11 +67,6 @@ export default function EditProductModal({
     );
   };
 
-  // Handle URL change
-  const handleUrlChange = (newUrl: string) => {
-    setUrl(newUrl);
-  };
-
   const handleError = (message: string) => {
     alert(`Failed to update product: ${message}`);
   };
@@ -150,7 +145,7 @@ export default function EditProductModal({
         <ProductFormFields
           formData={productData}
           setProductTitle={setProductTitle}
-          setUrl={handleUrlChange}
+          setUrl={setUrl}
           setProductType={setProductType}
           setSchema={setProductSchema}
           onCategoryChange={handleCategoryChange}

@@ -88,11 +88,6 @@ export default function AddProductModal({
     setHasValidationErrors(false);
   };
 
-  // Handle URL change
-  const handleUrlChange = (newUrl: string) => {
-    setUrl(newUrl);
-  };
-
   const handleError = (message: string) => {
     setErrorMessage(message);
     setShowErrorModal(true);
@@ -160,7 +155,7 @@ export default function AddProductModal({
           <ProductFormFields
             formData={productData}
             setProductTitle={setProductTitle}
-            setUrl={handleUrlChange}
+            setUrl={setUrl}
             setProductType={setProductType}
             setSchema={setProductSchema}
             onCategoryChange={handleCategoryChange}
