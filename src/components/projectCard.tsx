@@ -55,10 +55,10 @@ const ProjectCard = ({
   const status = getStatus(project.start_date, project.end_date);
 
   const primaryTitle = project.titles?.find(
-    (title) => title.type === TitleType.Primary,
+    (title) => title.type === TitleType.Primary && title.end_date === null,
   );
   const primaryDescription = project.descriptions?.find(
-    (desc) => desc.type === DescriptionType.Primary,
+    (desc) => desc.type === DescriptionType.Primary
   );
 
   // Count contributors
