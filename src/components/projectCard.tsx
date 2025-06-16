@@ -56,9 +56,11 @@ const ProjectCard = ({
 
   const primaryTitle = project.titles?.find(
     (title) => title.type === TitleType.Primary && title.end_date === null,
-  );
+  ) ?? project.titles?.filter((title) => title.type === TitleType.Primary).sort((a, b) => {
+    return new Date(a.end_date ?? 0).getTime() - new Date(b.end_date ?? 0).getTime();
+  })[0];
   const primaryDescription = project.descriptions?.find(
-    (desc) => desc.type === DescriptionType.Primary
+    (desc) => desc.type === DescriptionType.Primary,
   );
 
   // Count contributors
