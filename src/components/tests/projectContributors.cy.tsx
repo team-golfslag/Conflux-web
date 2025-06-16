@@ -12,7 +12,9 @@ import {
   Person,
   Contributor,
   ProjectResponseDTO,
+  ContributorRoleType,
 } from "@team-golfslag/conflux-api-client/src/client";
+import { ContributorRole } from "@team-golfslag/conflux-api-client/src/client.ts";
 
 describe("ProjectContributors Component", () => {
   const mockProject = new Project({
@@ -30,7 +32,14 @@ describe("ProjectContributors Component", () => {
         person_id: "1",
         leader: true,
         contact: true,
-        roles: [],
+        roles: [
+          new ContributorRole({
+            person_id: "1",
+            project_id: "123",
+            role_type: ContributorRoleType.Conceptualization,
+            schema_uri: "321",
+          }),
+        ],
         positions: [],
         project_id: "123",
       }),
@@ -46,7 +55,14 @@ describe("ProjectContributors Component", () => {
         person_id: "2",
         leader: false,
         contact: false,
-        roles: [],
+        roles: [
+          new ContributorRole({
+            person_id: "1",
+            project_id: "123",
+            role_type: ContributorRoleType.DataCuration,
+            schema_uri: "321",
+          }),
+        ],
         positions: [],
         project_id: "123",
       }),
@@ -170,5 +186,26 @@ describe("ProjectContributors Component", () => {
 
     // Edit mode message should no longer be visible
     cy.contains("Edit mode active").should("not.exist");
+  });
+
+  it("only shows the contributors which satisfy to the filter", () => {
+    //select the conceptualizations filter
+    cy.get("#radix-«r63»").click();
+    cy.get("#radix-«r64» > :nth-child(3)").click();
+
+    //check that only contributors with the conceptualization role are visible
+    cy.contains("John Doe").should("be.visible");
+    cy.contains("john.doe@example.com").should("be.visible");
+    cy.contains("Jane Smith").should("not.exist");
+    cy.contains("jane.smith@example.com").should("not.exist");
+  });
+
+  it("shows badges of the filtered role types", () => {
+    //select the methodology filter
+    cy.get("#radix-«r75»").click();
+    cy.get("#radix-«r76» > :nth-child(8)").click();
+
+    //check if the methodology badge exists
+    cy.contains("Methodology").should("be.visible");
   });
 });

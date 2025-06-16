@@ -6,11 +6,13 @@
 
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  ProjectResponseDTO,
-  ContributorResponseDTO,
   ApiClient,
+  ContributorResponseDTO,
+  ContributorRoleType,
+  ProjectResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Edit, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import {
@@ -27,6 +29,21 @@ import AddContributorModal from "@/components/contributor/addContributorModal";
 import EditContributorModal from "@/components/contributor/editContributorModal";
 import ContributorCard from "@/components/contributor/contributorCard";
 import { ApiMutation } from "@/components/apiMutation";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+function getEnumKeys<
+  T extends string,
+  TEnumValue extends string | number,
+>(enumVariable: { [key in T]: TEnumValue }) {
+  return Object.keys(enumVariable) as Array<T>;
+}
 
 type ProjectContributorsProps = {
   project: ProjectResponseDTO;
@@ -52,6 +69,7 @@ export default function ProjectContributors({
   const [deleteContributor, setDeleteContributor] =
     useState<ContributorResponseDTO | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [filteredRoles, setFilteredRoles] = useState<string[]>([]);
 
   const toggleEditMode = () => setEditMode(!editMode);
 
@@ -74,6 +92,14 @@ export default function ProjectContributors({
   const openDeleteDialog = (contributor: ContributorResponseDTO) => {
     setDeleteContributor(contributor);
     setIsDeleteDialogOpen(true);
+  };
+
+  const handleCheckRole = (b: boolean, role: string) => {
+    if (b) {
+      setFilteredRoles([...filteredRoles, role]);
+    } else {
+      setFilteredRoles(filteredRoles.filter((r) => r !== role));
+    }
   };
 
   return (
@@ -113,6 +139,36 @@ export default function ProjectContributors({
       </CardHeader>
 
       <CardContent>
+        <div className="flex flex-wrap items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-[100px] border-gray-100 bg-white/70 text-sm shadow-sm"
+              >
+                Filter
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="group/dropdown w-56">
+              <DropdownMenuLabel>Filter by roles</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {getEnumKeys(ContributorRoleType).map((role) => (
+                <DropdownMenuCheckboxItem
+                  checked={filteredRoles.includes(role)}
+                  onCheckedChange={(b) => handleCheckRole(b, role)}
+                >
+                  {role.toString()}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {filteredRoles.map((role) => (
+            <Badge variant="secondary" className="h-5 px-2 py-0 text-xs">
+              {role.toString()}
+            </Badge>
+          ))}
+        </div>
         {editMode && (
           <div className="bg-destructive/10 text-destructive mb-4 rounded-md p-2 text-center text-sm">
             Edit mode active. You can edit or delete contributors from the
@@ -121,85 +177,93 @@ export default function ProjectContributors({
         )}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {project.contributors?.map((contributor) => (
-            <div key={contributor.person.id} className="flex h-full flex-col">
-              <ContributorCard
-                id={contributor.person.id}
-                name={contributor.person.name}
-                email={contributor.person.email}
-                orcidId={contributor.person.orcid_id}
-                roles={contributor.roles.map((role) => role.role_type)}
-                position={
-                  contributor.positions.find((p) => !p.end_date)?.position
-                }
-                isConfluxUser={!!contributor.person.user_id}
-                isLeader={contributor.leader}
-                isContact={contributor.contact}
-                editMode={editMode}
-                onEdit={() => handleEditContributor(contributor)}
-                onDelete={() => openDeleteDialog(contributor)}
-                openDeleteDialog={() => openDeleteDialog(contributor)}
-              />
-              <AlertDialog
-                open={
-                  isDeleteDialogOpen &&
-                  deleteContributor?.person.id === contributor.person.id
-                }
-                onOpenChange={(isOpen) => {
-                  if (!isOpen) {
-                    setIsDeleteDialogOpen(false);
-                    setDeleteContributor(null);
+          {project.contributors
+            ?.filter(
+              (c) =>
+                filteredRoles.length === 0 ||
+                filteredRoles.some((item) =>
+                  c.roles.some((r) => r.role_type.toString() === item),
+                ),
+            )
+            .map((contributor) => (
+              <div key={contributor.person.id} className="flex h-full flex-col">
+                <ContributorCard
+                  id={contributor.person.id}
+                  name={contributor.person.name}
+                  email={contributor.person.email}
+                  orcidId={contributor.person.orcid_id}
+                  roles={contributor.roles.map((role) => role.role_type)}
+                  position={
+                    contributor.positions.find((p) => !p.end_date)?.position
                   }
-                }}
-              >
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      <strong>
-                        In most cases you should end the users position to
-                        signify their departure from the project
-                      </strong>
-                      <br />
-                      This will remove {contributor.person.name} from this
-                      project and from any future syncs with RAiD. This action
-                      cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <ApiMutation
-                      mutationFn={(apiClient: ApiClient) =>
-                        apiClient.contributors_DeleteContributor(
-                          project.id,
-                          contributor.person.id,
-                        )
-                      }
-                      data={{}}
-                      loadingMessage="Deleting contributor..."
-                      mode="component"
-                      onSuccess={() => {
-                        onProjectUpdate();
-                        setIsDeleteDialogOpen(false);
-                        setDeleteContributor(null);
-                      }}
-                    >
-                      {({ onSubmit }) => (
-                        <AlertDialogAction
-                          className="border-destructive bg-destructive hover:text-destructive border-1 text-white hover:bg-white/10 hover:font-bold"
-                          onClick={onSubmit}
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      )}
-                    </ApiMutation>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          ))}
+                  isConfluxUser={!!contributor.person.user_id}
+                  isLeader={contributor.leader}
+                  isContact={contributor.contact}
+                  editMode={editMode}
+                  onEdit={() => handleEditContributor(contributor)}
+                  onDelete={() => openDeleteDialog(contributor)}
+                  openDeleteDialog={() => openDeleteDialog(contributor)}
+                />
+                <AlertDialog
+                  open={
+                    isDeleteDialogOpen &&
+                    deleteContributor?.person.id === contributor.person.id
+                  }
+                  onOpenChange={(isOpen) => {
+                    if (!isOpen) {
+                      setIsDeleteDialogOpen(false);
+                      setDeleteContributor(null);
+                    }
+                  }}
+                >
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        <strong>
+                          In most cases you should end the users position to
+                          signify their departure from the project
+                        </strong>
+                        <br />
+                        This will remove {contributor.person.name} from this
+                        project and from any future syncs with RAiD. This action
+                        cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <ApiMutation
+                        mutationFn={(apiClient: ApiClient) =>
+                          apiClient.contributors_DeleteContributor(
+                            project.id,
+                            contributor.person.id,
+                          )
+                        }
+                        data={{}}
+                        loadingMessage="Deleting contributor..."
+                        mode="component"
+                        onSuccess={() => {
+                          onProjectUpdate();
+                          setIsDeleteDialogOpen(false);
+                          setDeleteContributor(null);
+                        }}
+                      >
+                        {({ onSubmit }) => (
+                          <AlertDialogAction
+                            className="border-destructive bg-destructive hover:text-destructive border-1 text-white hover:bg-white/10 hover:font-bold"
+                            onClick={onSubmit}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        )}
+                      </ApiMutation>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            ))}
         </div>
       </CardContent>
 
