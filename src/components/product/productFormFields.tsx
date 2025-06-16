@@ -215,22 +215,24 @@ export default function ProductFormFields({
   onError,
 }: Readonly<ProductFormFieldsProps>) {
   const apiClient = useContext(ApiClientContext);
-  
+
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
     [],
   );
   const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
   const [isCreatingArchive, setIsCreatingArchive] = useState<boolean>(false);
-  const [showArchiveSuggestion, setShowArchiveSuggestion] = useState<boolean>(false);
+  const [showArchiveSuggestion, setShowArchiveSuggestion] =
+    useState<boolean>(false);
   const [showArchiveSuccess, setShowArchiveSuccess] = useState<boolean>(false);
-  
+
   // DOI autofill state
   const [doiError, setDoiError] = useState<string | null>(null);
   const [isLoadingDoi, setIsLoadingDoi] = useState<boolean>(false);
 
   // DOI autofill function
   const handleDoiAutoFill = async (): Promise<boolean> => {
-    if (!formData.url || formData.productSchema !== ProductSchema.Doi) return false;
+    if (!formData.url || formData.productSchema !== ProductSchema.Doi)
+      return false;
 
     setDoiError(null);
     setIsLoadingDoi(true);
@@ -266,14 +268,18 @@ export default function ProductFormFields({
   };
 
   // Archive creation function
-  const handleCreateArchiveInternal = async (url: string): Promise<string | null> => {
+  const handleCreateArchiveInternal = async (
+    url: string,
+  ): Promise<string | null> => {
     try {
       const archiveUrl = await apiClient.productInfo_GetArchiveLinkForUrl(url);
       return archiveUrl;
     } catch (error) {
       console.error("Error creating archive:", error);
       if (onError) {
-        onError(`Failed to create archive: ${error instanceof Error ? error.message : "Unknown error"}`);
+        onError(
+          `Failed to create archive: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
       }
       return null;
     }
@@ -304,7 +310,7 @@ export default function ProductFormFields({
     }
 
     setValidationErrors(errors);
-    
+
     // Notify parent about validation state
     if (onValidationChange) {
       onValidationChange(errors.length > 0);
@@ -328,7 +334,10 @@ export default function ProductFormFields({
       const detectedSchema = detectSchemaFromUrl(value.trim());
       if (detectedSchema) {
         // Only update schema if it's different from current or if no schema is selected
-        if (!formData.productSchema || formData.productSchema !== detectedSchema) {
+        if (
+          !formData.productSchema ||
+          formData.productSchema !== detectedSchema
+        ) {
           setSchema(detectedSchema);
         }
       } else {
@@ -343,7 +352,9 @@ export default function ProductFormFields({
     // Special case: if current schema is Archive but URL is valid HTTP and NOT already an archive URL
     if (formData.productSchema === ProductSchema.Archive && value.trim()) {
       const basicUrlPattern = /^https?:\/\/.+$/;
-      const isAlreadyArchiveUrl = urlValidationFunctions[ProductSchema.Archive].validate(value.trim());
+      const isAlreadyArchiveUrl = urlValidationFunctions[
+        ProductSchema.Archive
+      ].validate(value.trim());
       if (basicUrlPattern.test(value.trim()) && !isAlreadyArchiveUrl) {
         // Check if it matches another schema first
         const detectedSchema = detectSchemaFromUrl(value.trim());
@@ -367,14 +378,14 @@ export default function ProductFormFields({
         setSchema(ProductSchema.Archive);
         setTouched((prev) => ({ ...prev, url: true }));
         setShowArchiveSuccess(true);
-        
+
         // Hide success message after 5 seconds
         setTimeout(() => {
           setShowArchiveSuccess(false);
         }, 5000);
       }
     } catch (error) {
-      console.error('Error creating archive:', error);
+      console.error("Error creating archive:", error);
       // Error is already handled in handleCreateArchiveInternal
     } finally {
       setIsCreatingArchive(false);
@@ -385,16 +396,18 @@ export default function ProductFormFields({
     setSchema(schema);
     setShowArchiveSuggestion(false); // Hide suggestion when user manually selects a schema
     setShowArchiveSuccess(false); // Hide success message when schema changes
-    
+
     // Mark URL as touched to trigger validation when schema changes
     if (formData.url.trim()) {
       setTouched((prev) => ({ ...prev, url: true }));
     }
-    
+
     // Show archive suggestion if Archive schema is selected, URL is valid HTTP, but NOT already an archive URL
     if (schema === ProductSchema.Archive && formData.url.trim()) {
       const basicUrlPattern = /^https?:\/\/.+$/;
-      const isAlreadyArchiveUrl = urlValidationFunctions[ProductSchema.Archive].validate(formData.url.trim());
+      const isAlreadyArchiveUrl = urlValidationFunctions[
+        ProductSchema.Archive
+      ].validate(formData.url.trim());
       if (basicUrlPattern.test(formData.url.trim()) && !isAlreadyArchiveUrl) {
         setShowArchiveSuggestion(true);
       }
@@ -440,7 +453,10 @@ export default function ProductFormFields({
         </div>
       </div>
       <div className="grid grid-cols-4 items-start gap-4">
-        <Label htmlFor="url" className="pt-2 text-right font-semibold text-gray-700">
+        <Label
+          htmlFor="url"
+          className="pt-2 text-right font-semibold text-gray-700"
+        >
           URL
         </Label>
         <div className="col-span-3">
@@ -471,39 +487,44 @@ export default function ProductFormFields({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{isLoadingDoi ? "Loading DOI information..." : "Autofill title and type using DOI"}</p>
+                    <p>
+                      {isLoadingDoi
+                        ? "Loading DOI information..."
+                        : "Autofill title and type using DOI"}
+                    </p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             )}
           </div>
-          {((getFieldError("url") || doiError) && !showArchiveSuggestion && !isCreatingArchive) && (
-            <p className="mt-1 text-sm text-red-500">
-              {doiError || getFieldError("url")?.message}
-            </p>
-          )}
+          {(getFieldError("url") || doiError) &&
+            !showArchiveSuggestion &&
+            !isCreatingArchive && (
+              <p className="mt-1 text-sm text-red-500">
+                {doiError || getFieldError("url")?.message}
+              </p>
+            )}
           {showArchiveSuggestion && !isCreatingArchive && (
-            <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
-              <p className="text-sm text-blue-800 mb-2">
-                {formData.productSchema === ProductSchema.Archive 
+            <div className="mt-2 rounded-md border border-blue-200 bg-blue-50 p-3">
+              <p className="mb-2 text-sm text-blue-800">
+                {formData.productSchema === ProductSchema.Archive
                   ? "This URL is not an archive link yet. Would you like to create an archived version?"
-                  : "No supported schema detected for this URL. Would you like to create an archived version?"
-                }
+                  : "No supported schema detected for this URL. Would you like to create an archived version?"}
               </p>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={handleCreateArchive}
-                className="bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200"
+                className="border-blue-300 bg-blue-100 text-blue-700 hover:bg-blue-200"
               >
-                <Archive className="h-4 w-4 mr-2" />
+                <Archive className="mr-2 h-4 w-4" />
                 Create Archive URL
               </Button>
             </div>
           )}
           {isCreatingArchive && (
-            <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+            <div className="mt-2 rounded-md border border-yellow-200 bg-yellow-50 p-3">
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin text-yellow-600" />
                 <p className="text-sm text-yellow-800">
@@ -513,11 +534,12 @@ export default function ProductFormFields({
             </div>
           )}
           {showArchiveSuccess && (
-            <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
+            <div className="mt-2 rounded-md border border-green-200 bg-green-50 p-3">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <p className="text-sm text-green-800">
-                  Archive URL created successfully! The URL and schema have been updated.
+                  Archive URL created successfully! The URL and schema have been
+                  updated.
                 </p>
               </div>
             </div>

@@ -10,7 +10,7 @@ import {
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import Organization from "@/components/organization/organization";
 import { Label } from "@/components/ui/label.tsx";
-import EditOrganizationModal from "@/components/contributor/editOrganizationModal";
+import EditOrganizationModal from "@/components/organization/editOrganizationModal";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Edit, X, Archive, Building2 } from "lucide-react";
 import { Button } from "../ui/button";

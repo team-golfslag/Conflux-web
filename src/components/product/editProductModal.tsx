@@ -56,7 +56,8 @@ export default function EditProductModal({
   const [categories, setCategories] = React.useState<ProductCategoryType[]>([]);
 
   // Validation state
-  const [hasValidationErrors, setHasValidationErrors] = React.useState<boolean>(false);
+  const [hasValidationErrors, setHasValidationErrors] =
+    React.useState<boolean>(false);
 
   const handleCategoryChange = (category: ProductCategoryType) => {
     setCategories((prev) =>

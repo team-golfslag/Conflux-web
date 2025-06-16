@@ -69,6 +69,7 @@ export default function EditContributorModal({
   });
 
   const [autoFillError, setAutoFillError] = useState<string | null>(null);
+  const [isLoadingOrcidAutofill, setIsLoadingOrcidAutofill] = useState(false);
   const apiClient = useContext(ApiClientContext);
 
   // Update form when contributor changes
@@ -120,6 +121,7 @@ export default function EditContributorModal({
   const handleOrcidAutoFill = async (): Promise<boolean> => {
     if (!formData.orcidId || isConfluxUser) return false;
 
+    setIsLoadingOrcidAutofill(true);
     setAutoFillError(null);
 
     try {
@@ -140,6 +142,8 @@ export default function EditContributorModal({
       console.error("Error searching ORCID:", error);
       setAutoFillError("Failed to search ORCID. Please try again.");
       return false;
+    } finally {
+      setIsLoadingOrcidAutofill(false);
     }
   };
 
@@ -272,6 +276,7 @@ export default function EditContributorModal({
                 }
                 onOrcidAutoFill={handleOrcidAutoFill}
                 orcidError={autoFillError}
+                isLoadingOrcidAutofill={isLoadingOrcidAutofill}
                 isEdit={true}
                 isConfluxUser={isConfluxUser}
               />

@@ -66,7 +66,8 @@ export default function AddProductModal({
   const [errorMessage, setErrorMessage] = React.useState<string>("");
 
   // Validation state
-  const [hasValidationErrors, setHasValidationErrors] = React.useState<boolean>(false);
+  const [hasValidationErrors, setHasValidationErrors] =
+    React.useState<boolean>(false);
 
   const handleCategoryChange = (category: ProductCategoryType) => {
     setCategories((prev) =>
