@@ -18,7 +18,7 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Search, User, AlertCircle } from "lucide-react";
+import { Plus, Search, User, AlertCircle, Loader2 } from "lucide-react";
 import OrcidIcon from "@/components/icons/orcidIcon";
 import ContributorFormFields from "./contributorFormFields";
 import {
@@ -74,6 +74,7 @@ export default function AddContributorModal({
   // Search state
   const [orcidSearchTerm, setOrcidSearchTerm] = useState("");
   const [isLoadingOrcidSearch, setIsLoadingOrcidSearch] = useState(false);
+  const [isLoadingOrcidAutofill, setIsLoadingOrcidAutofill] = useState(false);
   const [orcidSearchResults, setOrcidSearchResults] = useState<Person[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Person[]>([]);
@@ -165,6 +166,7 @@ export default function AddContributorModal({
   const handleOrcidAutoFill = async () => {
     if (!formData.orcidId) return false;
 
+    setIsLoadingOrcidAutofill(true);
     setAutoFillError(null);
 
     try {
@@ -187,7 +189,7 @@ export default function AddContributorModal({
       setAutoFillError("Failed to search ORCID. Please try again.");
       return false;
     } finally {
-      setIsLoadingOrcidSearch(false);
+      setIsLoadingOrcidAutofill(false);
     }
   };
 
@@ -388,8 +390,19 @@ export default function AddContributorModal({
                       type="button"
                       onClick={searchInOrcid}
                       disabled={isLoadingOrcidSearch}
+                      className="flex items-center gap-2"
                     >
-                      {isLoadingOrcidSearch ? "Searching..." : "Search"}
+                      {isLoadingOrcidSearch ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Searching...
+                        </>
+                      ) : (
+                        <>
+                          <Search className="h-4 w-4" />
+                          Search
+                        </>
+                      )}
                     </Button>
                   </div>
 
@@ -491,6 +504,7 @@ export default function AddContributorModal({
                   onRoleChange={handleRoleChange}
                   onPositionChange={handlePositionChange}
                   orcidError={autoFillError}
+                  isLoadingOrcidAutofill={isLoadingOrcidAutofill}
                   onLeaderChange={(e) => {
                     setFormData((prev) => ({
                       ...prev,

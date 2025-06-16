@@ -13,7 +13,7 @@ import {
 } from "@team-golfslag/conflux-api-client/src/client";
 import { useApiMutation } from "@/hooks/useApiMutation";
 import { useEditableText } from "@/hooks/useEditableContent";
-import { LanguageInput } from "@/components/ui/languageInput";
+import { LanguageInput } from "@/components/languageInput";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { CardTitle } from "@/components/ui/card";

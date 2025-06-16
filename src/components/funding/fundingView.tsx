@@ -24,7 +24,16 @@ export default function FundingView({
   );
 
   if (productFunding.length === 0 && organisationFunding.length === 0) {
-    return <></>;
+    return (
+      <Card>
+        <CardHeader className="relative flex justify-between">
+          <CardTitle className="text-xl font-semibold">Funding</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center text-gray-500">
+          No funding information available for this project.
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

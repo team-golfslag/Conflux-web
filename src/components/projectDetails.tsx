@@ -28,9 +28,9 @@ import {
 import { ApiMutation } from "./apiMutation";
 import { Label } from "./ui/label";
 import { ApiClientContext } from "@/lib/ApiClientContext";
-import { getStatus } from "@/utils/projectUtils";
+import { determineProjectStatus } from "@/utils/projectUtils";
 import { Badge } from "@/components/ui/badge.tsx";
-import ProjectDates from "@/components/ui/projectDates";
+import ProjectDates from "@/components/projectDates";
 import { useApiQuery } from "@/hooks/useApiQuery";
 
 type ProjectDetailsProps = {
@@ -143,7 +143,7 @@ export default function ProjectDetails({
     return contributors.filter((contributor) => contributor.leader).length;
   };
 
-  const status = getStatus(project.start_date, project.end_date);
+  const status = determineProjectStatus(project.start_date, project.end_date);
 
   return (
     <Card>
