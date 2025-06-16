@@ -119,7 +119,7 @@ export default function ProjectOrganizations({
 
         <CardContent>
           {editMode && (
-            <div className="bg-destructive/10 text-destructive rounded-md p-2 text-center text-sm">
+            <div className="bg-amber-100 text-amber-600 rounded-md p-2 text-center text-sm">
               Edit mode active. You can edit organizations from the project{" "}
               {showArchived ? "(including archived ones)" : ""}.
             </div>

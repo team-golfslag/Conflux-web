@@ -114,7 +114,7 @@ export default function ProjectContributors({
 
       <CardContent>
         {editMode && (
-          <div className="bg-destructive/10 text-destructive mb-4 rounded-md p-2 text-center text-sm">
+          <div className="bg-amber-100 text-amber-600 mb-4 rounded-md p-2 text-center text-sm">
             Edit mode active. You can edit or delete contributors from the
             project.
           </div>
