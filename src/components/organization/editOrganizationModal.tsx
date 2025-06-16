@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx";
 import { ApiMutation } from "@/components/apiMutation.tsx";
-import { Plus, X, Building, ArrowRight } from "lucide-react";
+import { Plus, X, Building, ArrowRight, Loader2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -120,6 +120,7 @@ export default function EditOrganizationModal({
   );
   const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
   const [autoFillError, setAutoFillError] = useState<string | null>(null);
+  const [isRorLoading, setIsRorLoading] = useState(false);
 
   const apiClient = useContext(ApiClientContext);
 
@@ -150,12 +151,15 @@ export default function EditOrganizationModal({
     setTouched((prev) => ({ ...prev, rorId: true }));
     // Clear error when input changes
     if (autoFillError) setAutoFillError(null);
+    // Clear loading state when input changes
+    if (isRorLoading) setIsRorLoading(false);
   };
 
   const handleRorAutoFill = async (): Promise<boolean> => {
     if (!formData.rorId) return false;
 
     setAutoFillError(null);
+    setIsRorLoading(true);
 
     try {
       const id = formData.rorId.trim().split("/").pop();
@@ -179,6 +183,8 @@ export default function EditOrganizationModal({
       console.error("Error searching ROR:", error);
       setAutoFillError("Failed to search ROR. Please try again.");
       return false;
+    } finally {
+      setIsRorLoading(false);
     }
   };
 
@@ -204,6 +210,7 @@ export default function EditOrganizationModal({
     setValidationErrors([]);
     setTouched({});
     setAutoFillError(null);
+    setIsRorLoading(false);
   }, [organization]);
 
   //update form if organization changes
@@ -420,13 +427,21 @@ export default function EditOrganizationModal({
                               variant="outline"
                               size="sm"
                               onClick={handleRorAutoFill}
-                              disabled={!formData.rorId}
+                              disabled={!formData.rorId || isRorLoading}
                             >
-                              <ArrowRight className="h-4 w-4" />
+                              {isRorLoading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <ArrowRight className="h-4 w-4" />
+                              )}
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Autofill organization name from ROR</p>
+                            <p>
+                              {isRorLoading
+                                ? "Loading organization name..."
+                                : "Autofill organization name from ROR"}
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>

@@ -4,19 +4,19 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 import ContributorCard from "@/components/contributor/contributorCard";
-import { Contributor } from "@team-golfslag/conflux-api-client/src/client";
+import type { ContributorResponseDTO } from "@team-golfslag/conflux-api-client/src/client";
 import { mockContributor } from "./mocks";
 import { mount } from "cypress/react";
 
 describe("ContributorCard Component", () => {
-  const mockCardContributor: Contributor = mockContributor;
+  const mockCardContributor: ContributorResponseDTO = mockContributor;
 
   beforeEach(() => {
     mount(
       <ContributorCard
         onEdit={cy.stub().as("editHandler")}
         onDelete={cy.stub().as("deleteHandler")}
-        name={mockCardContributor.person?.name || ""}
+        name={mockCardContributor.person!.name}
         roles={mockCardContributor.roles.map((r) => r.role_type)}
         orcidId={mockCardContributor.person?.orcid_id}
         isLeader={mockCardContributor.leader}
@@ -24,7 +24,7 @@ describe("ContributorCard Component", () => {
         position={
           mockCardContributor.positions.find((p) => !p.end_date)?.position
         }
-        id={mockCardContributor.person?.id || ""}
+        id={mockCardContributor.person!.id}
         email={mockCardContributor.person?.email}
         editMode={false}
       />,
@@ -32,11 +32,11 @@ describe("ContributorCard Component", () => {
   });
 
   it("renders the contributor information correctly", () => {
-    cy.contains(mockCardContributor.person?.name || "").should("exist");
+    cy.contains(mockCardContributor.person!.name).should("exist");
   });
 
   it("renders the email correctly", () => {
-    cy.contains(mockCardContributor.person?.email || "").should("exist");
+    cy.contains(mockCardContributor.person!.email!).should("exist");
   });
 
   it("renders the roles of the contributor", () => {
@@ -55,7 +55,7 @@ describe("ContributorCard Component", () => {
 });
 
 describe("ContributorCard Component in Edit Mode", () => {
-  const mockCardContributor: Contributor = mockContributor;
+  const mockCardContributor: ContributorResponseDTO = mockContributor;
 
   beforeEach(() => {
     mount(
@@ -63,7 +63,7 @@ describe("ContributorCard Component in Edit Mode", () => {
         onEdit={cy.stub().as("editHandler")}
         onDelete={cy.stub().as("deleteHandler")}
         openDeleteDialog={cy.stub().as("openDeleteDialogHandler")}
-        name={mockCardContributor.person?.name || ""}
+        name={mockCardContributor.person!.name}
         roles={mockCardContributor.roles.map((r) => r.role_type)}
         orcidId={mockCardContributor.person?.orcid_id}
         isLeader={mockCardContributor.leader}
@@ -72,7 +72,7 @@ describe("ContributorCard Component in Edit Mode", () => {
         position={
           mockCardContributor.positions.find((p) => !p.end_date)?.position
         }
-        id={mockCardContributor.person?.id || ""}
+        id={mockCardContributor.person!.id}
         email={mockCardContributor.person?.email}
         editMode={true}
       />,
@@ -100,7 +100,7 @@ describe("ContributorCard Component in Edit Mode", () => {
 });
 
 describe("ContributorCard for Conflux User in Edit Mode", () => {
-  const mockCardContributor: Contributor = mockContributor;
+  const mockCardContributor: ContributorResponseDTO = mockContributor;
 
   beforeEach(() => {
     mount(
@@ -108,7 +108,7 @@ describe("ContributorCard for Conflux User in Edit Mode", () => {
         onEdit={cy.stub().as("editHandler")}
         onDelete={cy.stub().as("deleteHandler")}
         openDeleteDialog={cy.stub().as("openDeleteDialogHandler")}
-        name={mockCardContributor.person?.name || ""}
+        name={mockCardContributor.person!.name}
         roles={mockCardContributor.roles.map((r) => r.role_type)}
         orcidId={mockCardContributor.person?.orcid_id}
         isLeader={mockCardContributor.leader}
@@ -117,7 +117,7 @@ describe("ContributorCard for Conflux User in Edit Mode", () => {
         position={
           mockCardContributor.positions.find((p) => !p.end_date)?.position
         }
-        id={mockCardContributor.person?.id || ""}
+        id={mockCardContributor.person!.id}
         email={mockCardContributor.person?.email}
         editMode={true}
       />,

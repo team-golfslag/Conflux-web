@@ -26,7 +26,7 @@ import {
   useEditableText,
   useTruncatableText,
 } from "@/hooks/useEditableContent";
-import { LanguageInput } from "@/components/ui/languageInput";
+import { LanguageInput } from "@/components/languageInput";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";

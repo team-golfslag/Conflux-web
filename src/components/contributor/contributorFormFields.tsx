@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/tooltip";
 import { getRoleDisplay } from "@/lib/formatters/roleFormatter";
 import { getPositionDisplay } from "@/lib/formatters/positionFormatter";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState, useEffect } from "react";
 
@@ -99,6 +99,7 @@ interface ContributorFormFieldsProps {
   onContactChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onOrcidAutoFill?: () => Promise<boolean>;
   orcidError?: string | null;
+  isLoadingOrcidAutofill?: boolean;
   isEdit?: boolean;
   isConfluxUser?: boolean;
 }
@@ -114,6 +115,7 @@ export default function ContributorFormFields({
   onContactChange,
   onOrcidAutoFill,
   orcidError,
+  isLoadingOrcidAutofill = false,
   isEdit = false,
   isConfluxUser = false,
 }: Readonly<ContributorFormFieldsProps>) {
@@ -250,6 +252,19 @@ export default function ContributorFormFields({
                 className={`flex-1 ${orcidError || getFieldError("orcidId") ? "border-red-500 focus:border-red-500" : ""}`}
                 value={formData.orcidId}
                 onChange={handleOrcidIdChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (
+                      formData.orcidId &&
+                      onOrcidAutoFill &&
+                      !isConfluxUser &&
+                      !isLoadingOrcidAutofill
+                    ) {
+                      onOrcidAutoFill();
+                    }
+                  }
+                }}
                 placeholder="0000-0000-0000-0000"
                 aria-invalid={!!(orcidError || getFieldError("orcidId"))}
                 disabled={isConfluxUser}
@@ -263,10 +278,18 @@ export default function ContributorFormFields({
                       size="sm"
                       onClick={onOrcidAutoFill}
                       disabled={
-                        !formData.orcidId || !onOrcidAutoFill || isConfluxUser
+                        !formData.orcidId ||
+                        !onOrcidAutoFill ||
+                        isConfluxUser ||
+                        isLoadingOrcidAutofill
                       }
+                      className="flex items-center gap-1"
                     >
-                      <ArrowRight className="h-4 w-4" />
+                      {isLoadingOrcidAutofill ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <ArrowRight className="h-4 w-4" />
+                      )}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>

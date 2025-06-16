@@ -10,7 +10,7 @@ import {
 } from "@team-golfslag/conflux-api-client/src/client.ts";
 import Organization from "@/components/organization/organization";
 import { Label } from "@/components/ui/label.tsx";
-import EditOrganizationModal from "@/components/contributor/editOrganizationModal";
+import EditOrganizationModal from "@/components/organization/editOrganizationModal";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Edit, X, Archive, Building2 } from "lucide-react";
 import { Button } from "../ui/button";
@@ -119,7 +119,7 @@ export default function ProjectOrganizations({
 
         <CardContent>
           {editMode && (
-            <div className="bg-destructive/10 text-destructive rounded-md p-2 text-center text-sm">
+            <div className="rounded-md bg-amber-100 p-2 text-center text-sm text-amber-600">
               Edit mode active. You can edit organizations from the project{" "}
               {showArchived ? "(including archived ones)" : ""}.
             </div>

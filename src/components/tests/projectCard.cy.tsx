@@ -10,13 +10,13 @@ import { mount } from "cypress/react";
 import { BrowserRouter } from "react-router-dom";
 import ProjectCard from "../projectCard.tsx";
 import {
-  Contributor,
   DescriptionType,
-  Person,
   ProjectDescriptionResponseDTO,
   ProjectTitleResponseDTO,
   TitleType,
   ProjectResponseDTO,
+  ContributorResponseDTO,
+  PersonResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 
 // Helper function to create dates relative to today (at 00:00:00.000)
@@ -26,6 +26,23 @@ const getDateRelativeToToday = (daysOffset: number): Date => {
   const targetDate = new Date(today);
   targetDate.setDate(today.getDate() + daysOffset);
   return targetDate;
+};
+
+// Helper function to create a proper ContributorResponseDTO
+const createMockContributor = (id: string): ContributorResponseDTO => {
+  return new ContributorResponseDTO({
+    person: new PersonResponseDTO({
+      id: id,
+      name: `Test Person ${id}`,
+      email: `person${id}@example.com`,
+      orcid_id: `0000-0000-0000-000${id}`,
+    }),
+    project_id: "test-project",
+    leader: false,
+    contact: false,
+    roles: [],
+    positions: [],
+  });
 };
 
 // --- Test Data ---
@@ -63,41 +80,40 @@ const createBaseProject = (): ProjectResponseDTO => {
   return project;
 };
 
-// Create separate project objects for each test scenario
-const projectUpcoming = {
+const projectUpcoming = new ProjectResponseDTO({
   ...createBaseProject(),
   id: "proj-upcoming",
   start_date: getDateRelativeToToday(5),
   end_date: getDateRelativeToToday(10),
-} as unknown as ProjectResponseDTO;
+});
 
-const projectActive = {
+const projectActive = new ProjectResponseDTO({
   ...createBaseProject(),
   id: "proj-active",
   start_date: getDateRelativeToToday(-5),
   end_date: getDateRelativeToToday(10),
-} as unknown as ProjectResponseDTO;
+});
 
-const projectInProgress = {
+const projectInProgress = new ProjectResponseDTO({
   ...createBaseProject(),
   id: "proj-active-no-end",
   start_date: getDateRelativeToToday(-5),
   end_date: undefined,
-} as unknown as ProjectResponseDTO;
+});
 
-const projectCompleted = {
+const projectCompleted = new ProjectResponseDTO({
   ...createBaseProject(),
   id: "proj-ended",
   start_date: getDateRelativeToToday(-10),
   end_date: getDateRelativeToToday(-5),
-} as unknown as ProjectResponseDTO;
+});
 
-const projectNoDates = {
+const projectNoDates = new ProjectResponseDTO({
   ...createBaseProject(),
   id: "proj-no-dates",
-  start_date: null as unknown as Date,
+  start_date: null as unknown as Date, // Force null to trigger "Not Started" status
   end_date: null as unknown as Date,
-} as unknown as ProjectResponseDTO;
+});
 
 // --- Test Suite ---
 describe("<ProjectCard /> Component Rendering", () => {
@@ -175,58 +191,28 @@ describe("<ProjectCard /> Component Rendering", () => {
   });
 
   it("shows the correct contributor count", () => {
-    const mockContributors = [
-      { id: "1", name: "Contributor 1" },
-      { id: "2", name: "Contributor 2" },
-      { id: "3", name: "Contributor 3" },
-    ];
-    // Create a new project with required fields
-    const projectWithContributors = {
-      ...createBaseProject(),
-      contributors: mockContributors.map(
-        (c) =>
-          new Contributor({
-            person: new Person({
-              id: c.id,
-              name: c.name,
-              schema_uri: "",
-            }),
-            person_id: c.id,
-            roles: [],
-            project_id: projectActive.id,
-            positions: [],
-            leader: false,
-            contact: false,
-          }),
-      ),
-    };
-    // Type cast to ProjectResponseDTO to match component requirements
-    mountCard(projectWithContributors as unknown as ProjectResponseDTO);
+    // Create a project with 3 contributors for testing count display
+    const baseProject = createBaseProject();
+    const projectWithContributors = new ProjectResponseDTO({
+      ...baseProject,
+      contributors: [
+        createMockContributor("1"),
+        createMockContributor("2"),
+        createMockContributor("3"),
+      ],
+    });
+    mountCard(projectWithContributors);
     cy.contains("3 contributors").should("be.visible");
   });
 
   it("shows singular 'contributor' text when count is 1", () => {
-    // Create project with just one contributor and required fields
-    const projectWithOneContributor = {
-      ...createBaseProject(),
-      contributors: [
-        new Contributor({
-          person: new Person({
-            id: "1",
-            name: "Single Contributor",
-            schema_uri: "",
-          }),
-          person_id: "1",
-          roles: [],
-          project_id: projectActive.id,
-          positions: [],
-          leader: false,
-          contact: false,
-        }),
-      ],
-    };
-    // Type cast to ProjectResponseDTO to match component requirements
-    mountCard(projectWithOneContributor as unknown as ProjectResponseDTO);
+    // Create project with just one contributor
+    const baseProject = createBaseProject();
+    const projectWithOneContributor = new ProjectResponseDTO({
+      ...baseProject,
+      contributors: [createMockContributor("1")],
+    });
+    mountCard(projectWithOneContributor);
     cy.contains("1 contributor").should("be.visible");
   });
 

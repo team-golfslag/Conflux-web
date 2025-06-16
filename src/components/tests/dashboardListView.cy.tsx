@@ -13,6 +13,8 @@ import {
   TitleType,
   DescriptionType,
   ProjectResponseDTO,
+  ProjectTitleResponseDTO,
+  ProjectDescriptionResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 
 /// <reference types="cypress" />
@@ -59,18 +61,38 @@ describe("<DashboardListView />", () => {
 
   // Create projects with primary_title and primary_description properties needed by ProjectCard
   const mockData = mockProjects.map((p) => {
-    // Add the primary_title and primary_description properties expected by ProjectCard
-    const enhancedProject = {
-      ...p,
-      primary_title: p.titles.find((t) => t.type === TitleType.Primary),
-      primary_description: p.descriptions.find(
-        (d) => d.type === DescriptionType.Primary,
+    const projectResponseDTO = new ProjectResponseDTO({
+      id: p.id,
+      start_date: p.start_date,
+      end_date: p.end_date,
+      titles: p.titles.map(
+        (title) =>
+          new ProjectTitleResponseDTO({
+            text: title.text,
+            type: title.type,
+            start_date: title.start_date,
+            id: title.id,
+            project_id: title.project_id,
+          }),
       ),
-    };
+      descriptions: p.descriptions.map(
+        (desc) =>
+          new ProjectDescriptionResponseDTO({
+            text: desc.text,
+            type: desc.type,
+            id: desc.id,
+            project_id: desc.project_id,
+          }),
+      ),
+      users: [],
+      contributors: [],
+      products: [],
+      organisations: [],
+    });
 
     return {
-      project: enhancedProject as unknown as ProjectResponseDTO,
-      role: "Member",
+      project: projectResponseDTO,
+      roles: ["Member"],
     };
   });
 

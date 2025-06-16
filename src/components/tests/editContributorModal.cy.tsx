@@ -6,12 +6,11 @@
 import EditContributorModal from "@/components/contributor/editContributorModal";
 import { mount } from "cypress/react";
 import { mockContributor } from "./mocks";
-import { ContributorResponseDTO } from "@team-golfslag/conflux-api-client/src/client";
+import type { ContributorResponseDTO } from "@team-golfslag/conflux-api-client/src/client";
 
 describe("EditContributorModal Component", () => {
-  // Type cast mockContributor to ContributorResponseDTO
-  const mockEditContributor =
-    mockContributor as unknown as ContributorResponseDTO;
+  // mockContributor is already properly typed as ContributorResponseDTO
+  const mockEditContributor: ContributorResponseDTO = mockContributor;
 
   beforeEach(() => {
     // Mount with explicit stub creation inside the test
@@ -69,5 +68,20 @@ describe("EditContributorModal Component", () => {
     );
 
     cy.get('div[role="dialog"]').should("not.exist");
+  });
+
+  it("Save Changes button state reflects form validity", () => {
+    // Check if button exists and is enabled initially (since form is pre-filled)
+    cy.get("button")
+      .contains("Save Changes")
+      .should("exist")
+      .and("not.be.disabled");
+
+    // Clear the name field using the label as a more reliable selector
+    cy.contains("Name").parent().find("input").clear();
+
+    // Add a name
+    cy.contains("Name").parent().find("input").type("Updated Name");
+    cy.get("button").contains("Save Changes").should("not.be.disabled");
   });
 });
