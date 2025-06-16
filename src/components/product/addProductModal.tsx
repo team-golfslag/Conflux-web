@@ -65,8 +65,8 @@ export default function AddProductModal({
   const [showErrorModal, setShowErrorModal] = React.useState<boolean>(false);
   const [errorMessage, setErrorMessage] = React.useState<string>("");
 
-  // DOI autofill state
-  const [doiError, setDoiError] = React.useState<string | null>(null);
+  // Validation state
+  const [hasValidationErrors, setHasValidationErrors] = React.useState<boolean>(false);
 
   const handleCategoryChange = (category: ProductCategoryType) => {
     setCategories((prev) =>
@@ -84,47 +84,17 @@ export default function AddProductModal({
     setCategories([]);
     setShowErrorModal(false);
     setErrorMessage("");
-    setDoiError(null);
+    setHasValidationErrors(false);
   };
 
-  // Handle URL change to clear DOI error
+  // Handle URL change
   const handleUrlChange = (newUrl: string) => {
     setUrl(newUrl);
-    if (doiError) setDoiError(null);
   };
 
-  // DOI autofill function
-  const handleDoiAutoFill = async (): Promise<boolean> => {
-    if (!url || productSchema !== ProductSchema.Doi) return false;
-
-    setDoiError(null);
-
-    try {
-      // Extract DOI from URL if it's a full DOI URL
-      let doi = url;
-      const doiMatch = url.match(/(?:doi\.org\/|DOI:)?(10\.\d+\/.+)$/);
-      if (doiMatch) {
-        doi = doiMatch[1];
-      }
-
-      const result = await apiClient.products_GetInfoFromDoi(doi);
-      if (result) {
-        if (result.title) {
-          setProductTitle(result.title);
-        }
-        if (result.type) {
-          setProductType(result.type);
-        }
-        return true;
-      } else {
-        setDoiError("No information found for this DOI.");
-        return false;
-      }
-    } catch (error) {
-      console.error("Error fetching DOI info:", error);
-      setDoiError("Failed to fetch DOI information. Please try again.");
-      return false;
-    }
+  const handleError = (message: string) => {
+    setErrorMessage(message);
+    setShowErrorModal(true);
   };
 
   const productData: ProductFormData = {
@@ -193,8 +163,8 @@ export default function AddProductModal({
             setProductType={setProductType}
             setSchema={setProductSchema}
             onCategoryChange={handleCategoryChange}
-            onDoiAutoFill={handleDoiAutoFill}
-            doiError={doiError}
+            onValidationChange={setHasValidationErrors}
+            onError={handleError}
           />
           <DialogFooter className="flex gap-3 border-t border-gray-100 pt-6">
             <Button
@@ -213,7 +183,8 @@ export default function AddProductModal({
                 !productTitle ||
                 !productType ||
                 !productSchema ||
-                categories.length === 0
+                categories.length === 0 ||
+                hasValidationErrors
               }
               className="bg-gray-800 shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-900 disabled:opacity-50"
             >
