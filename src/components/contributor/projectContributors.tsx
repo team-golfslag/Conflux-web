@@ -88,7 +88,9 @@ export default function ProjectContributors({
 
     // Check if user still has contributor role
     const hasContributorRole =
-      attachedUser.roles?.some((role) => role.type === UserRoleType.Contributor) ?? false;
+      attachedUser.roles?.some(
+        (role) => role.type === UserRoleType.Contributor,
+      ) ?? false;
 
     // Can delete if user no longer has contributor role
     return !hasContributorRole;
@@ -239,7 +241,8 @@ export default function ProjectContributors({
                     contributor.positions.find((p) => !p.end_date)?.position
                   }
                   isConfluxUser={!!contributor.person.user_id}
-                  canDelete={canDeleteContributor(contributor)}isLeader={contributor.leader}
+                  canDelete={canDeleteContributor(contributor)}
+                  isLeader={contributor.leader}
                   isContact={contributor.contact}
                   editMode={editMode}
                   onEdit={() => handleEditContributor(contributor)}
@@ -268,13 +271,14 @@ export default function ProjectContributors({
                           In most cases you should end the user's position to
                           signify their departure from the project
                         </strong>
-                        <br />{contributor.person.user_id ? (
-                        <>
-                          This contributor is linked to a user account but no
-                          longer has the contributor role.
-                          <br />
-                        </>
-                      ) : null}
+                        <br />
+                        {contributor.person.user_id ? (
+                          <>
+                            This contributor is linked to a user account but no
+                            longer has the contributor role.
+                            <br />
+                          </>
+                        ) : null}
                         This will remove {contributor.person.name} from this
                         project and from any future syncs with RAiD. This action
                         cannot be undone.
