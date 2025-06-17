@@ -144,8 +144,23 @@ export default function ProjectContributors({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="group/dropdown w-56">
-                    <DropdownMenuLabel>Filter by roles</DropdownMenuLabel>
+                    <DropdownMenuLabel className="flex flex-row items-center justify-between">
+                      <div>Filter by roles </div>
+
+                      {filteredRoles.length > 0 && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setFilteredRoles([]);
+                          }}
+                        >
+                          <X size={4} className="mr-1" />
+                        </Button>
+                      )}
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+
                     {Object.keys(ContributorRoleType).map((role) => (
                       <DropdownMenuCheckboxItem
                         checked={filteredRoles.includes(role)}
