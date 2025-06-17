@@ -39,7 +39,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import CsvExportDialog from "@/components/csvExportDialog";
 import ExportDropdown from "@/components/exportDropdown";
-import { ExportOptions } from "@/components/exportDialog";
+import { CsvExportOptions } from "@/components/csvExportDialog";
 
 /** Project Search Page component <br>
  * Fetches projects from the backend using a debounced search term and selected sort order.
@@ -144,7 +144,7 @@ const ProjectSearchPage = () => {
   // Export functionality
   const [showCsvExportDialog, setShowCsvExportDialog] = useState(false);
   const [triggerDownload, setTriggerDownload] = useState(false);
-  const [exportOptions, setExportOptions] = useState<ExportOptions | null>(
+  const [exportOptions, setExportOptions] = useState<CsvExportOptions | null>(
     null,
   );
 
@@ -214,7 +214,7 @@ const ProjectSearchPage = () => {
     setShowCsvExportDialog(true);
   };
 
-  const handleCsvExport = (options: ExportOptions) => {
+  const handleCsvExport = (options: CsvExportOptions) => {
     setExportOptions(options);
     setTriggerDownload(true);
     setShowCsvExportDialog(false);
