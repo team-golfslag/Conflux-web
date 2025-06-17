@@ -69,6 +69,7 @@ describe("ContributorCard Component in Edit Mode", () => {
         isLeader={mockCardContributor.leader}
         isContact={mockCardContributor.contact}
         isConfluxUser={false}
+        canDelete={true}
         position={
           mockCardContributor.positions.find((p) => !p.end_date)?.position
         }

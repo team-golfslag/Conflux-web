@@ -35,6 +35,7 @@ type ContributorCardProps = {
   isLeader?: boolean;
   isContact?: boolean;
   isConfluxUser?: boolean;
+  canDelete?: boolean;
   editMode: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -50,7 +51,7 @@ export default function ContributorCard({
   position,
   isLeader,
   isContact,
-  isConfluxUser = false,
+  canDelete = false,
   editMode,
   onEdit,
   onDelete,
@@ -143,7 +144,7 @@ export default function ContributorCard({
                   </Tooltip>
                 </TooltipProvider>
 
-                {!isConfluxUser && (
+                {canDelete && (
                   <AlertDialog>
                     <TooltipProvider>
                       <Tooltip>

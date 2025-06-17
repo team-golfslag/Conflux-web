@@ -4,7 +4,7 @@
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import {
   SwaggerException,
@@ -15,6 +15,11 @@ import { useProjectCache } from "@/hooks/useProjectCache";
 export function useDashboardData() {
   const apiClient = useContext(ApiClientContext);
   const projectCache = useProjectCache();
+  const projectCacheRef = useRef(projectCache);
+
+  // Update ref when projectCache changes
+  projectCacheRef.current = projectCache;
+
   const [data, setData] = useState<ProjectResponseDTO[] | undefined>();
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -25,7 +30,7 @@ export function useDashboardData() {
 
     const fetchData = async () => {
       // Check for cached data first
-      const cachedData = projectCache.getCachedDashboardData();
+      const cachedData = projectCacheRef.current.getCachedDashboardData();
       if (cachedData) {
         // Use cached data immediately for instant display
         if (isMounted) {
@@ -41,7 +46,7 @@ export function useDashboardData() {
           if (isMounted) {
             setData(freshData);
             // Update cache with fresh data
-            projectCache.setCachedDashboardData(freshData);
+            projectCacheRef.current.setCachedDashboardData(freshData);
           }
         } catch (err) {
           // If background update fails, just log it - we already have cached data showing
@@ -58,7 +63,7 @@ export function useDashboardData() {
           setData(result);
           setError(null);
           // Cache the fresh data
-          projectCache.setCachedDashboardData(result);
+          projectCacheRef.current.setCachedDashboardData(result);
         }
       } catch (err) {
         if (isMounted) {
@@ -88,7 +93,7 @@ export function useDashboardData() {
     return () => {
       isMounted = false;
     };
-  }, [apiClient, projectCache]);
+  }, [apiClient]);
 
   return { data, isLoading, isInitialLoad, error };
 }
