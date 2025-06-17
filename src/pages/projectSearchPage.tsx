@@ -5,7 +5,13 @@
  */
 import ProjectCard from "@/components/projectCard";
 import { Input } from "@/components/ui/input.tsx";
-import React, { useState, useContext, useCallback } from "react";
+import React, {
+  useState,
+  useContext,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
 import {
   OrderByType,
   ApiClient,
@@ -14,7 +20,7 @@ import {
   UserResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Separator } from "@/components/ui/separator.tsx";
-import { Search, Download } from "lucide-react";
+import { Search } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -28,11 +34,12 @@ import { DatePicker } from "@/components/ui/datepicker.tsx";
 import { useDebounce } from "@/hooks/useDebounce"; // Assuming you have or create this hook
 import { useSession } from "@/hooks/SessionContext";
 import { ApiWrapper } from "@/components/apiWrapper";
-import { Button } from "@/components/ui/button";
 import { useApiQuery } from "@/hooks/useApiQuery";
 import { Pagination } from "@/components/ui/pagination";
 import { ApiClientContext } from "@/lib/ApiClientContext";
 import CsvExportDialog from "@/components/csvExportDialog";
+import ExportDropdown from "@/components/exportDropdown";
+import { ExportOptions } from "@/components/exportDialog";
 
 /** Project Search Page component <br>
  * Fetches projects from the backend using a debounced search term and selected sort order.
@@ -47,6 +54,7 @@ const ProjectSearchPage = () => {
   const [lectorate, setLectorate] = useState<string | undefined>(undefined);
   const [sort, setSort] = useState(""); // Default to relevance
   const [refreshKey, setRefreshKey] = useState(0); // Used to force refresh the query
+  const currentProjectsRef = useRef<ProjectResponseDTO[]>([]);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -133,21 +141,12 @@ const ProjectSearchPage = () => {
     setCurrentPage(1); // Reset to first page when page size changes
   };
 
-  // CSV download functionality
-  const [showExportDialog, setShowExportDialog] = useState(false);
+  // Export functionality
+  const [showCsvExportDialog, setShowCsvExportDialog] = useState(false);
   const [triggerDownload, setTriggerDownload] = useState(false);
-  const [exportOptions, setExportOptions] = useState<{
-    include_start_date?: boolean;
-    include_end_date?: boolean;
-    include_users?: boolean;
-    include_contributors?: boolean;
-    include_products?: boolean;
-    include_organisations?: boolean;
-    include_title?: boolean;
-    include_description?: boolean;
-    include_lectorate?: boolean;
-    include_owner_organisation?: boolean;
-  } | null>(null);
+  const [exportOptions, setExportOptions] = useState<ExportOptions | null>(
+    null,
+  );
 
   const { data: csvData, isLoading: isDownloading } = useApiQuery(
     (apiClient: ApiClient) => {
@@ -184,7 +183,7 @@ const ProjectSearchPage = () => {
   );
 
   // Effect to handle the actual download when data is received
-  React.useEffect(() => {
+  useEffect(() => {
     if (csvData && triggerDownload && csvData !== null) {
       try {
         // csvData is a FileResponse object with a data property containing the Blob
@@ -212,13 +211,37 @@ const ProjectSearchPage = () => {
   }, [csvData, triggerDownload]);
 
   const handleDownloadCSV = () => {
-    setShowExportDialog(true);
+    setShowCsvExportDialog(true);
   };
 
-  const handleExport = (options: typeof exportOptions) => {
+  const handleCsvExport = (options: ExportOptions) => {
     setExportOptions(options);
     setTriggerDownload(true);
-    setShowExportDialog(false);
+    setShowCsvExportDialog(false);
+  };
+
+  const handleJsonExport = () => {
+    // Export all current search results as JSON
+    const projects = currentProjectsRef.current;
+    if (projects.length > 0) {
+      downloadJsonFile(projects);
+    }
+  };
+
+  const downloadJsonFile = (data: ProjectResponseDTO[]) => {
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const fileName = `projects_export_${new Date().toISOString().split("T")[0]}.json`;
+
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", fileName);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -306,16 +329,11 @@ const ProjectSearchPage = () => {
               </SelectContent>
             </Select>
           </div>
-          <Button
-            onClick={handleDownloadCSV}
-            disabled={isDownloading}
-            variant="outline"
-            size="default"
-            className="flex items-center gap-2"
-          >
-            <Download className="h-4 w-4" />
-            {isDownloading ? "Downloading..." : "Download CSV"}
-          </Button>
+          <ExportDropdown
+            onCsvExport={handleDownloadCSV}
+            onJsonExport={handleJsonExport}
+            isDownloading={isDownloading}
+          />
         </div>
       </div>
       <Separator className="col-span-full my-4" />
@@ -341,6 +359,9 @@ const ProjectSearchPage = () => {
         mode="page"
       >
         {(projects) => {
+          // Store current projects in ref for JSON export
+          currentProjectsRef.current = projects;
+
           // Calculate pagination
           const totalItems = projects.length;
           const startIndex = (currentPage - 1) * itemsPerPage;
@@ -406,9 +427,9 @@ const ProjectSearchPage = () => {
 
       {/* CSV Export Dialog */}
       <CsvExportDialog
-        isOpen={showExportDialog}
-        onOpenChange={setShowExportDialog}
-        onExport={handleExport}
+        isOpen={showCsvExportDialog}
+        onOpenChange={setShowCsvExportDialog}
+        onExport={handleCsvExport}
         isDownloading={isDownloading}
       />
     </search>
