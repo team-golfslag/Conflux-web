@@ -16,6 +16,7 @@ import { SessionProvider } from "@/lib/SessionContext";
 import { LanguageProvider } from "@/lib/LanguageContext";
 import { BackendStatusProvider } from "@/lib/BackendStatusContext";
 import { BackendStatusWrapper } from "@/components/BackendStatusWrapper";
+import { ProjectCacheProvider } from "@/lib/ProjectCacheContext";
 
 /*
 This is the main entry point into the program
@@ -36,7 +37,9 @@ createRoot(root!).render(
         <BackendStatusProvider>
           <SessionProvider>
             <LanguageProvider>
-              <BackendStatusWrapper>{allRoutes}</BackendStatusWrapper>
+              <ProjectCacheProvider>
+                <BackendStatusWrapper>{allRoutes}</BackendStatusWrapper>
+              </ProjectCacheProvider>
             </LanguageProvider>
           </SessionProvider>
         </BackendStatusProvider>
