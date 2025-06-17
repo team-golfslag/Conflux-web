@@ -17,7 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Download } from "lucide-react";
 
-interface CsvExportOptions {
+export interface CsvExportOptions {
   include_title?: boolean;
   include_description?: boolean;
   include_start_date?: boolean;
