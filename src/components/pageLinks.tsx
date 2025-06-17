@@ -5,11 +5,13 @@
  */
 
 import { RefObject } from "react";
+import { Link } from "react-router";
 
 // Define the type for each link item
 export type PageLink = {
   label: string;
-  ref: RefObject<HTMLElement | null>;
+  ref?: RefObject<HTMLElement | null>;
+  to?: string;
 };
 
 // Define the props interface for the PageLinks component
@@ -49,20 +51,31 @@ export default function PageLinks({
       className={`flex w-auto items-baseline gap-3 divide-x divide-gray-400 px-4 py-2 ${className}`}
     >
       {links.map((link, index) => {
-        const scrollHandler = createScrollHandler(link.ref);
-
         return (
           <li
             key={link.label}
             className={index < links.length - 1 ? "pr-3" : ""}
           >
-            <button
-              onClick={scrollHandler}
-              onKeyDown={scrollHandler}
-              className="block w-full cursor-pointer font-semibold text-gray-500 decoration-gray-500 hover:underline"
-            >
-              {link.label}
-            </button>
+            {link.to ? (
+              <Link
+                to={link.to}
+                className="block w-full cursor-pointer font-semibold text-gray-500 decoration-gray-500 hover:underline"
+              >
+                {link.label}
+              </Link>
+            ) : link.ref ? (
+              <button
+                onClick={createScrollHandler(link.ref)}
+                onKeyDown={createScrollHandler(link.ref)}
+                className="block w-full cursor-pointer font-semibold text-gray-500 decoration-gray-500 hover:underline"
+              >
+                {link.label}
+              </button>
+            ) : (
+              <span className="block w-full font-semibold text-gray-500">
+                {link.label}
+              </span>
+            )}
           </li>
         );
       })}

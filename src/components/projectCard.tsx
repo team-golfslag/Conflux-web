@@ -11,12 +11,13 @@ import {
   UserRoleType,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Link } from "react-router-dom";
-import { JSX, useState } from "react";
+import { JSX, useState, useCallback } from "react";
 import { CalendarIcon, UsersIcon, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { determineProjectStatus } from "@/utils/projectUtils";
 import { useSession } from "@/hooks/SessionContext";
 import { Button } from "@/components/ui/button";
+import { useProjectCache } from "@/hooks/useProjectCache";
 
 export interface ProjectCardProps {
   project: ProjectResponseDTO;
@@ -42,6 +43,7 @@ const ProjectCard = ({
   onFavoriteToggle,
 }: ProjectCardProps): JSX.Element => {
   const { session } = useSession();
+  const projectCache = useProjectCache();
   const [isToggling, setIsToggling] = useState(false);
 
   // Format dates for display
@@ -73,6 +75,17 @@ const ProjectCard = ({
   // Count contributors
   const contributorCount = project.contributors?.length ?? 0;
 
+  // Preload project data on hover
+  const handleMouseEnter = useCallback(() => {
+    // Only preload if we don't already have cached data
+    if (
+      !projectCache.getCachedProject(project.id) &&
+      !projectCache.isPreloading(project.id)
+    ) {
+      projectCache.preloadProject(project.id);
+    }
+  }, [project.id, projectCache]);
+
   // Handle favorite toggle
   const handleFavoriteToggle = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation to project page
@@ -95,6 +108,7 @@ const ProjectCard = ({
     <Link
       to={`/projects/${project.id}`}
       className="group flex h-full flex-col rounded-2xl transition-all duration-300 hover:translate-y-[-4px] hover:scale-[1.02]"
+      onMouseEnter={handleMouseEnter}
     >
       <Card className="border-border/60 flex h-full flex-col overflow-hidden rounded-xl border shadow-[0_2px_10px_rgba(0,0,0,0.04)] hover:border-blue-700 hover:shadow-[0_4px_18px_rgba(0,0,0,0.08)] [&>*]:rounded-xl">
         <CardHeader className="relative bg-white px-4 pt-4 pb-2">
