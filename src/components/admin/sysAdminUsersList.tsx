@@ -275,7 +275,7 @@ export default function SysAdminUsersList({
                   <AlertDialogTitle>Remove Administrator Role</AlertDialogTitle>
                   <AlertDialogDescription>
                     Are you sure you want to remove the administrator role from{" "}
-                    <strong>{deleteUser!.person!.name}</strong>? This will
+                    <strong>{deleteUser?.person!.name}</strong>? This will
                     downgrade their account to a regular user and remove all
                     administrative privileges. This action cannot be undone.
                   </AlertDialogDescription>
