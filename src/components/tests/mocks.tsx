@@ -106,6 +106,18 @@ export function createApiClientMock(): ApiClient {
         deu: "German",
         fra: "French",
       }),
+    projects_GetProjectById: (id: string) =>
+      Promise.resolve({
+        id,
+        titles: [],
+        descriptions: [],
+        start_date: new Date(),
+        end_date: undefined,
+        users: [],
+        products: [],
+        organisations: [],
+      }),
+    projects_GetProjectTimeline: () => Promise.resolve([]),
   });
 
   return mockClient;

@@ -18,6 +18,9 @@ import {
   ContributorResponseDTO,
   PersonResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
+import { ApiClientContext } from "@/lib/ApiClientContext";
+import { ProjectCacheProvider } from "@/lib/ProjectCacheContext";
+import { createApiClientMock } from "./mocks";
 
 // Helper function to create dates relative to today (at 00:00:00.000)
 const getDateRelativeToToday = (daysOffset: number): Date => {
@@ -119,9 +122,19 @@ const projectNoDates = new ProjectResponseDTO({
 describe("<ProjectCard /> Component Rendering", () => {
   // Accept ProjectResponseDTO as project type
   const mountCard = (project: ProjectResponseDTO, roles?: string[]) => {
+    const mockApiClient = createApiClientMock();
+
+    // Add required mock methods for the project cache (inside the function to avoid cy.stub() outside test)
+    mockApiClient.projects_GetProjectById = cy.stub().resolves({});
+    mockApiClient.projects_GetProjectTimeline = cy.stub().resolves([]);
+
     mount(
       <BrowserRouter>
-        <ProjectCard project={project} roles={roles} />
+        <ApiClientContext.Provider value={mockApiClient}>
+          <ProjectCacheProvider>
+            <ProjectCard project={project} roles={roles} />
+          </ProjectCacheProvider>
+        </ApiClientContext.Provider>
       </BrowserRouter>,
     );
   };

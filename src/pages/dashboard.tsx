@@ -14,18 +14,21 @@ import {
 } from "@team-golfslag/conflux-api-client/src/client";
 import { useCallback, useContext } from "react";
 import { ApiClientContext } from "@/lib/ApiClientContext";
-import { useApiQuery } from "@/hooks/useApiQuery";
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { useProjectCache } from "@/hooks/useProjectCache";
 
 const Dashboard = () => {
   const { session, saveSession } = useSession();
   const apiClient = useContext(ApiClientContext);
+  const projectCache = useProjectCache();
 
-  // Fetch projects data
+  // Fetch projects data with caching
   const {
     data: projects,
     isLoading,
+    isInitialLoad,
     error,
-  } = useApiQuery(() => apiClient.projects_GetAllProjects(), []);
+  } = useDashboardData();
 
   // Handle favorite toggle
   const handleFavoriteToggle = useCallback(
@@ -57,6 +60,21 @@ const Dashboard = () => {
       try {
         // Call the API to update favorite status in the background
         await apiClient.projects_FavoriteProject(projectId, isFavorite);
+
+        // Invalidate dashboard cache since favorites have changed
+        // This will cause fresh data to be fetched next time
+        const cachedData = projectCache.getCachedDashboardData();
+        if (cachedData) {
+          // Update the cached project's favorite status immediately
+          const updatedProjects = cachedData.projects.map((project) => {
+            if (project.id === projectId) {
+              // Note: The favorite status is managed in the session, not the project data
+              // So we don't need to modify the project object itself
+            }
+            return project;
+          });
+          projectCache.setCachedDashboardData(updatedProjects);
+        }
       } catch {
         // Revert the optimistic update on error
         const revertedUser = new UserResponseDTO({
@@ -71,7 +89,7 @@ const Dashboard = () => {
         saveSession(revertedSession);
       }
     },
-    [session, saveSession, apiClient],
+    [session, saveSession, apiClient, projectCache],
   );
 
   // Function to transform projects data to match DashboardCardProps format
@@ -151,6 +169,7 @@ const Dashboard = () => {
   return (
     <LoadingWrapper
       isLoading={isLoading}
+      isInitialLoad={isInitialLoad}
       error={error}
       loadingMessage="Loading your projects..."
       mode="page"

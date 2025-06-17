@@ -26,6 +26,7 @@ import {
 import { useSession } from "@/hooks/SessionContext";
 import ProjectOrganizations from "@/components/organization/projectOrganizations";
 import FundingView from "@/components/funding/fundingView";
+import { useProjectCache } from "@/hooks/useProjectCache";
 
 // Initially empty, will be populated from API
 
@@ -36,6 +37,7 @@ export default function ProjectPage() {
   const { id } = useParams();
   const session = useSession();
   const apiClient = useContext(ApiClientContext);
+  const projectCache = useProjectCache();
   const [project, setProject] = useState<ProjectResponseDTO | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -52,6 +54,67 @@ export default function ProjectPage() {
   // Function to fetch the project data
   const fetchProject = async () => {
     if (!id) return;
+
+    // Check if we have cached data first
+    const cachedProject = projectCache.consumeCachedProject(id);
+    if (cachedProject && !cachedProject.isLoading) {
+      // Use cached data immediately
+      setProject(cachedProject.data);
+      if (cachedProject.timeline) {
+        setTimelineData(cachedProject.timeline);
+      }
+
+      // Set admin status based on cached data
+      const admin = cachedProject.data.users
+        .find((user) => user.scim_id === session?.session?.user?.scim_id)
+        ?.roles.map((role) => role.type)
+        .includes(UserRoleType.Admin);
+      setIsAdmin(admin || false);
+
+      if (
+        session?.session?.user?.permission_level === PermissionLevel.SuperAdmin
+      ) {
+        setIsAdmin(true);
+      }
+
+      if (
+        session?.session?.user?.permission_level === PermissionLevel.SystemAdmin
+      ) {
+        const userOrganizations =
+          session.session.user.assigned_organisations || [];
+        if (
+          cachedProject.data.owner_organisation &&
+          userOrganizations.includes(cachedProject.data.owner_organisation)
+        ) {
+          setIsAdmin(true);
+        }
+
+        const userLectorates = session.session.user.assigned_lectorates || [];
+        if (
+          cachedProject.data.lectorate &&
+          userLectorates.includes(cachedProject.data.lectorate)
+        ) {
+          setIsAdmin(true);
+        }
+      }
+
+      // Don't show loading since we have cached data
+      setIsLoading(false);
+      setIsInitialLoad(false);
+      setError(null);
+
+      // If we don't have timeline data, fetch it in the background
+      if (!cachedProject.timeline) {
+        try {
+          const timeline = await apiClient.projects_GetProjectTimeline(id);
+          setTimelineData(timeline);
+        } catch (err) {
+          console.error("Error fetching timeline:", err);
+        }
+      }
+
+      return; // Exit early since we used cached data
+    }
 
     setIsLoading(true);
     try {
@@ -116,6 +179,14 @@ export default function ProjectPage() {
 
   // Function to update specific project fields without a full reload
   const handleProjectUpdate = () => {
+    // Clear cache since we're updating the project
+    if (id) {
+      projectCache.removeFromCache(id);
+    }
+
+    // Invalidate dashboard data since project data changed
+    projectCache.invalidateDashboardData();
+
     // Only update the project data without showing loading indicators
     const fetchWithoutIndicators = async () => {
       if (!id) return;
@@ -175,6 +246,11 @@ export default function ProjectPage() {
             setIsAdmin(true);
           }
         }
+
+        // Refresh dashboard data in the background
+        projectCache.refreshDashboardData().catch((err) => {
+          console.error("Error refreshing dashboard data:", err);
+        });
       } catch (err) {
         // Log error but don't update error state to avoid UI disruption
         console.error("Error updating project:", err);
@@ -206,6 +282,7 @@ export default function ProjectPage() {
           <PageLinks
             className="mt-6 mr-auto"
             links={[
+              { label: "← Back to Dashboard", to: "/dashboard" },
               { label: "Overview", ref: overviewRef },
               { label: "Contributors", ref: contributorsRef },
               { label: "Products", ref: productsRef },
