@@ -282,6 +282,7 @@ export default function ProjectPage() {
           <PageLinks
             className="mt-6 mr-auto"
             links={[
+              { label: "← Back to Dashboard", to: "/dashboard" },
               { label: "Overview", ref: overviewRef },
               { label: "Contributors", ref: contributorsRef },
               { label: "Products", ref: productsRef },
