@@ -3,6 +3,7 @@
  * University within the Software Project course.
  * © Copyright Utrecht University (Department of Information and Computing Sciences)
  */
+import React from "react";
 import DashboardListView from "../dashboardListView.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { mount } from "cypress/react";
@@ -16,10 +17,26 @@ import {
   ProjectTitleResponseDTO,
   ProjectDescriptionResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
+import { ApiClientContext } from "@/lib/ApiClientContext";
+import { ProjectCacheProvider } from "@/lib/ProjectCacheContext";
+import { createApiClientMock } from "./mocks";
+import type { ApiClient } from "@team-golfslag/conflux-api-client/src/client";
 
 /// <reference types="cypress" />
 
 describe("<DashboardListView />", () => {
+  let mockApiClient: ApiClient;
+
+  const mountWithProviders = (component: React.ReactElement) => {
+    return mount(
+      <BrowserRouter>
+        <ApiClientContext.Provider value={mockApiClient}>
+          <ProjectCacheProvider>{component}</ProjectCacheProvider>
+        </ApiClientContext.Provider>
+      </BrowserRouter>,
+    );
+  };
+
   const mockInfo = [
     { id: "123", title: "Project 1", description: "Description for project 1" },
     { id: "456", title: "Project 2", description: "Description for project 2" },
@@ -97,12 +114,14 @@ describe("<DashboardListView />", () => {
   });
 
   beforeEach(() => {
+    // Create a fresh mock API client for each test
+    mockApiClient = createApiClientMock();
+    // Add required mock methods for the project cache (must be inside beforeEach)
+    mockApiClient.projects_GetProjectById = cy.stub().resolves({});
+    mockApiClient.projects_GetProjectTimeline = cy.stub().resolves([]);
+
     // Mount the component within BrowserRouter because ProjectCard uses <Link>
-    mount(
-      <BrowserRouter>
-        <DashboardListView data={mockData} />
-      </BrowserRouter>,
-    );
+    mountWithProviders(<DashboardListView data={mockData} />);
   });
 
   it("renders the correct number of ProjectCards", () => {
@@ -143,11 +162,7 @@ describe("<DashboardListView />", () => {
   });
 
   it("renders empty grid when no data is provided", () => {
-    mount(
-      <BrowserRouter>
-        <DashboardListView />
-      </BrowserRouter>,
-    );
+    mountWithProviders(<DashboardListView />);
     cy.contains("h3", "No projects yet").should("be.visible");
   });
 });
