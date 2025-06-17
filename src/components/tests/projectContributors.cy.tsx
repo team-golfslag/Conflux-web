@@ -9,9 +9,11 @@ import { ApiClientContext } from "@/lib/ApiClientContext";
 import { createApiClientMock, mockContributor } from "./mocks";
 import {
   ProjectResponseDTO,
+  ContributorRoleType,
   ContributorResponseDTO,
   PersonResponseDTO,
 } from "@team-golfslag/conflux-api-client/src/client";
+import { ContributorRole } from "@team-golfslag/conflux-api-client/src/client.ts";
 
 describe("ProjectContributors Component", () => {
   // Create a properly typed mock project using ProjectResponseDTO
@@ -28,7 +30,14 @@ describe("ProjectContributors Component", () => {
         project_id: "123",
         leader: true,
         contact: true,
-        roles: [],
+        roles: [
+          new ContributorRole({
+            person_id: "1",
+            project_id: "123",
+            role_type: ContributorRoleType.Conceptualization,
+            schema_uri: "321",
+          }),
+        ],
         positions: [],
       }),
       new ContributorResponseDTO({
@@ -41,7 +50,14 @@ describe("ProjectContributors Component", () => {
         project_id: "123",
         leader: false,
         contact: false,
-        roles: [],
+        roles: [
+          new ContributorRole({
+            person_id: "1",
+            project_id: "123",
+            role_type: ContributorRoleType.DataCuration,
+            schema_uri: "321",
+          }),
+        ],
         positions: [],
       }),
     ],
@@ -164,5 +180,17 @@ describe("ProjectContributors Component", () => {
 
     // Edit mode message should no longer be visible
     cy.contains("Edit mode active").should("not.exist");
+  });
+
+  it("only shows the contributors which satisfy to the filter", () => {
+    //select the conceptualizations filter
+    cy.get("#radix-«r63»").click();
+    cy.get("#radix-«r64» > :nth-child(3)").click();
+
+    //check that only contributors with the conceptualization role are visible
+    cy.contains("John Doe").should("be.visible");
+    cy.contains("john.doe@example.com").should("be.visible");
+    cy.contains("Jane Smith").should("not.exist");
+    cy.contains("jane.smith@example.com").should("not.exist");
   });
 });
