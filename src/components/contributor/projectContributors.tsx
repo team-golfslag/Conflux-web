@@ -9,6 +9,7 @@ import {
   ProjectResponseDTO,
   ContributorResponseDTO,
   ApiClient,
+  UserRoleType,
 } from "@team-golfslag/conflux-api-client/src/client";
 import { Edit, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -77,7 +78,7 @@ export default function ProjectContributors({
 
     // Check if user still has contributor role
     const hasContributorRole =
-      attachedUser.roles?.some((role) => role.type === "Contributor") ?? false;
+      attachedUser.roles?.some((role) => role.type === UserRoleType.Contributor) ?? false;
 
     // Can delete if user no longer has contributor role
     return !hasContributorRole;
