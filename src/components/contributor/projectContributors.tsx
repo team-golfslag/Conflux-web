@@ -53,6 +53,36 @@ export default function ProjectContributors({
     useState<ContributorResponseDTO | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  // Check if a contributor can be deleted
+  // Can delete if:
+  // 1. No user is attached to the contributor, OR
+  // 2. User is attached but no longer has the contributor role
+  const canDeleteContributor = (
+    contributor: ContributorResponseDTO,
+  ): boolean => {
+    // Can always delete if no user is attached
+    if (!contributor.person.user_id) {
+      return true;
+    }
+
+    // Find the user in the project's users list
+    const attachedUser = project.users?.find(
+      (user) => user.id === contributor.person.user_id,
+    );
+
+    // If user not found in project, allow deletion (shouldn't happen but safe fallback)
+    if (!attachedUser) {
+      return true;
+    }
+
+    // Check if user still has contributor role
+    const hasContributorRole =
+      attachedUser.roles?.some((role) => role.type === "Contributor") ?? false;
+
+    // Can delete if user no longer has contributor role
+    return !hasContributorRole;
+  };
+
   const toggleEditMode = () => setEditMode(!editMode);
 
   const handleEditContributor = (contributor: ContributorResponseDTO) => {
@@ -133,6 +163,7 @@ export default function ProjectContributors({
                   contributor.positions.find((p) => !p.end_date)?.position
                 }
                 isConfluxUser={!!contributor.person.user_id}
+                canDelete={canDeleteContributor(contributor)}
                 isLeader={contributor.leader}
                 isContact={contributor.contact}
                 editMode={editMode}
@@ -159,10 +190,17 @@ export default function ProjectContributors({
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       <strong>
-                        In most cases you should end the users position to
+                        In most cases you should end the user's position to
                         signify their departure from the project
                       </strong>
                       <br />
+                      {contributor.person.user_id ? (
+                        <>
+                          This contributor is linked to a user account but no
+                          longer has the contributor role.
+                          <br />
+                        </>
+                      ) : null}
                       This will remove {contributor.person.name} from this
                       project and from any future syncs with RAiD. This action
                       cannot be undone.
