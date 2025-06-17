@@ -46,6 +46,8 @@ interface ProjectCacheContextType {
   // Dashboard data caching
   getCachedDashboardData: () => CachedDashboardData | null;
   setCachedDashboardData: (projects: ProjectResponseDTO[]) => void;
+  invalidateDashboardData: () => void;
+  refreshDashboardData: () => Promise<void>;
 
   // Clear cache (useful for memory management)
   clearCache: () => void;
@@ -253,6 +255,22 @@ export function ProjectCacheProvider({ children }: ProjectCacheProviderProps) {
     [],
   );
 
+  // Invalidate dashboard data (clear cache)
+  const invalidateDashboardData = useCallback(() => {
+    setDashboardCache(null);
+  }, []);
+
+  // Refresh dashboard data (fetch fresh data and update cache)
+  const refreshDashboardData = useCallback(async (): Promise<void> => {
+    try {
+      const freshData = await apiClient.projects_GetAllProjects();
+      setCachedDashboardData(freshData);
+    } catch (error) {
+      console.error("Error refreshing dashboard data:", error);
+      throw error;
+    }
+  }, [apiClient, setCachedDashboardData]);
+
   const contextValue = useMemo(
     (): ProjectCacheContextType => ({
       getCachedProject,
@@ -261,6 +279,8 @@ export function ProjectCacheProvider({ children }: ProjectCacheProviderProps) {
       isPreloading,
       getCachedDashboardData,
       setCachedDashboardData,
+      invalidateDashboardData,
+      refreshDashboardData,
       clearCache,
       removeFromCache,
       updateCache,
@@ -272,6 +292,8 @@ export function ProjectCacheProvider({ children }: ProjectCacheProviderProps) {
       isPreloading,
       getCachedDashboardData,
       setCachedDashboardData,
+      invalidateDashboardData,
+      refreshDashboardData,
       clearCache,
       removeFromCache,
       updateCache,

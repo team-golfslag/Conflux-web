@@ -184,6 +184,9 @@ export default function ProjectPage() {
       projectCache.removeFromCache(id);
     }
 
+    // Invalidate dashboard data since project data changed
+    projectCache.invalidateDashboardData();
+
     // Only update the project data without showing loading indicators
     const fetchWithoutIndicators = async () => {
       if (!id) return;
@@ -243,6 +246,11 @@ export default function ProjectPage() {
             setIsAdmin(true);
           }
         }
+
+        // Refresh dashboard data in the background
+        projectCache.refreshDashboardData().catch((err) => {
+          console.error("Error refreshing dashboard data:", err);
+        });
       } catch (err) {
         // Log error but don't update error state to avoid UI disruption
         console.error("Error updating project:", err);
