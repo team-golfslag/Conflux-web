@@ -631,8 +631,12 @@ export default function RAiDInfo({
                   <Hash className="h-4 w-4 text-gray-600" />
                   <Label className="font-semibold text-gray-700">RAiD ID</Label>
                 </div>
+                {/* TEMP: Replace local URL with public URL for display */}
                 <a
-                  href={raidInfo.r_ai_d_id}
+                  href={raidInfo.r_ai_d_id.replace(
+                    "http://raid.local",
+                    "https://raid.surf.nl/raids",
+                  )}
                   target="_blank"
                   className="text-blue-600 hover:text-blue-800"
                   rel="noopener noreferrer"
@@ -641,7 +645,11 @@ export default function RAiDInfo({
                 </a>
               </div>
               <p className="overflow-wrap-anywhere mt-1 rounded bg-gray-100 px-2 py-1 font-mono text-sm break-words break-all text-gray-700">
-                {raidInfo.r_ai_d_id}
+                {/* TEMP: Replace local URL with public URL for display */}
+                {raidInfo.r_ai_d_id.replace(
+                  "http://raid.local",
+                  "https://raid.surf.nl/raids",
+                )}
               </p>
             </div>
 
