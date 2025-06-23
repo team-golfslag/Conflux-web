@@ -9,9 +9,12 @@ import config from "@/config.ts";
 import Logo from "@/components/icons/logo";
 import { useBackendStatus } from "@/lib/BackendStatusContext";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import { useState } from "react";
+import CreditsDialog from "@/components/creditsDialog.tsx";
 
 function App() {
   const { isBackendDown, isChecking, retryConnection } = useBackendStatus();
+  const [creditsDialogOpen, setCreditsDialogOpen] = useState(false);
 
   // Show backend down message if backend is down
   if (isBackendDown) {
@@ -190,9 +193,21 @@ function App() {
             <p className="text-sm leading-relaxed text-gray-500">
               Built by Utrecht University students for the Software Project
               course
+              <br />
+              <a
+                className="underline"
+                href="#"
+                onClick={() => setCreditsDialogOpen(true)}
+              >
+                See Credits
+              </a>
             </p>
           </div>
         </Card>
+        <CreditsDialog
+          isOpen={creditsDialogOpen}
+          onOpenChange={(open: boolean) => setCreditsDialogOpen(open)}
+        />
       </div>
     </div>
   );

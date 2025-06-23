@@ -86,9 +86,9 @@ export function SessionProvider({ children }: SessionProviderProps) {
         setError(null);
 
         // If we're at the root and have a session, redirect to dashboard
-        if (location.pathname === "/") {
-          navigate("/dashboard");
-        }
+        // if (location.pathname === "/") {
+        //   navigate("/dashboard");
+        // }
       } catch (err) {
         console.error("Failed to fetch session:", err);
         setError(err instanceof Error ? err : new Error(String(err)));
