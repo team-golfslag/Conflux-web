@@ -153,8 +153,9 @@ function App() {
 
             <div className="space-y-4">
               <p className="mx-auto max-w-2xl text-base leading-relaxed text-gray-700 md:text-lg">
-                Developed for SURF, Conflux helps manage projects and integrates
-                with modern services like RAiD, ORCiD, ROR and more.
+                Conflux is a prototype to explore a minimal research project
+                administration system based upon existing persistent identifier
+                information
               </p>
 
               <p className="text-base text-gray-600 md:text-lg">
